@@ -1,0 +1,274 @@
+.gig{
+    width: 100%;
+    
+    .breadcrump {
+        width: 100%;
+        
+        // background-color: lightgreen;
+        .breadcrump-container {
+            width: 100%;
+            max-width: 1300px;
+            margin: 0 auto;
+            background-color: lightcoral;
+            padding: 10px 0px;
+            
+            a{
+                text-decoration: none;
+                color: black;
+            }
+        }
+    }
+
+    .gig-container{
+        width: 100%;
+        max-width: 1300px;
+        margin: 0 auto;
+        margin-top: 40px;
+        background-color: rgb(255, 255, 255);
+        display: flex;
+        align-items: flex-start;
+        gap: 5%;
+
+        .title{
+            font-size: 25px;
+            font-weight: 600;
+            padding: 10px 0px;
+        }
+
+        .gig-left{
+            width: 55%;
+            // background-color: lightgreen;
+
+            .gig-title{
+                margin: 20px 0px;
+            }
+
+            .seller-details{
+                display: flex;
+                flex-direction: row;
+
+                .seller-profile-pic{
+                    font-size: 50px;
+                    padding-right: 15px;
+                }
+                .seller-info{
+                    display: flex;
+                    flex-direction: column;
+                    // align-items: center;
+                    justify-content: center;
+
+                    .seller-name{
+                        color: rgb(70, 69, 69);
+                        font-size: 20px;
+                        font-weight: 600;
+                    }
+                }
+            }
+
+            .gig-pic{
+                width: 100%;
+                height: 300px;
+                margin-top: 50px;
+                margin-bottom: 30px;
+                display: flex;
+                justify-content: center;
+                img{
+                    width: 80%;
+                    height: 300px;
+                }
+            }
+
+            .about-gig{
+                width: 100%;
+                
+                .tech-stack{
+                    display: flex;
+                    flex-direction: column;
+                    margin-top: 20px;
+                    width: 50%;
+
+                    .lang{
+                        width: 100%;
+                        display: flex;
+                        flex-direction: row;
+
+                        .attr{
+                            width: 50%;
+                        }
+                        .content{
+                            width: 50%;
+                        }
+                    }
+                }
+                
+            }
+
+            .reviews{
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+
+                .r{
+                    width: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    border: 1px solid gray;
+                    border-radius: 15px;
+                    padding: 10px;
+                    margin-bottom: 50px;
+
+                    hr{
+                        border: 1px solid gray;
+                    }
+
+                    .header{
+                        width: 100%;
+                        display: flex;
+                        flex-direction: row;
+                        margin-bottom: 5px;
+                        
+                        .profile{
+                            font-size: 40px;
+                            padding-right: 10px;
+                        }
+                        
+                        .customer-info{
+                            width: 100%;
+                            display: flex;
+                            flex-direction: row;
+                            align-items: center;
+                            justify-content: space-between;
+                            padding-right: 20px;
+                        }
+                    }
+
+                    .customer-review{
+                        margin-top: 10px;
+                    }
+
+                    .other-details{
+                        width: 100%;
+                        display: flex;
+                        flex-direction: row;
+
+                        .gd1{
+                            width: 50%;
+                            text-align: center;
+                            padding-top: 10px;
+
+                            .d1{
+                                font-size: 20px;
+                                font-weight: 600;
+                                
+                            }
+                            .d2{
+                                color: gray;
+                            }
+                        }
+                        // .gd1::after{
+                        //     content: "";
+                        //     position: absolute;
+                        //     right: 0;
+                        //     top: 25%;
+                        //     height: 50%;
+                        //     width: 1px;
+                        //     background: gray;
+                        // }
+
+                        .gd2{
+                            width: 50%;
+                            text-align: center;
+                            padding-top: 10px;
+
+                            .d1{
+                                font-size: 20px;
+                                font-weight: 600;
+                                
+                            }
+                            .d2{
+                                color: gray;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        .gig-right{
+            width: 40%;
+            // background-color: lightsalmon;
+            display: flex;
+            justify-content: center;
+            flex: 1;
+            position: sticky;
+            top: 1.688rem;
+
+            hr{
+                border: 1px solid rgb(189, 188, 188);
+            }
+
+            .gig-info{
+                width: 80%;
+                padding: 15px;
+                border: 2px solid gray;
+                border-radius: 15px;
+                
+                .gig-price{
+                    width: 100%;
+                    font-size: 30px;
+                    font-weight: 600;
+                    padding: 5px 0px;
+                }
+
+                .gig-desc{
+                    width: 100%;
+                    padding: 5px 0px;
+                }
+
+                .main-attr{
+                    width: 100%;
+                    font-size: 20px;
+                    font-weight: 500;
+                    padding: 5px 0px;
+                }
+
+                .gig-features{
+                    width: 100%;
+                    padding: 10px 0px;
+
+                    .heading{
+                        font-size: 20px;
+                        font-weight: 500;
+                        padding: 5px 0px;
+                    }
+
+                    .features{
+                        padding-left: 20px;
+                        font-style: italic;
+                        padding-top: 10px;
+                        font-size: 17px;
+                    }
+                }
+
+                .contact-seller-btn-container{
+                    width: 100%;
+                    display: flex;
+                    justify-content: center;
+                    padding: 10px 0px;
+                    .contact-seller-btn{
+                        width: 90%;
+                        min-width: 300px;
+                        padding: 10px 0px;
+                        background-color: black;
+                        color: white;
+                        cursor: pointer;
+                    }
+                    .contact-seller-btn:hover{
+                        background-color: rgb(36, 36, 36);
+                    }
+                }
+
+            }
+        }
+    }
+}

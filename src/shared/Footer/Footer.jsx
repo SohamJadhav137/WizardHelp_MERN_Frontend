@@ -1,0 +1,55 @@
+import React from 'react'
+import './footer.scss'
+
+export default function Footer() {
+  return (
+    <div className='footer-container'>
+      <div className="top-container">
+        <div className="top">
+          <div className="c1">
+            <h3>Categories</h3>
+            <span>Web design</span>
+            <span>Graphics Design</span>
+            <span>3D Modeling</span>
+            <span>Android</span>
+          </div>
+          <div className="c1">
+            <h3>For Buyers</h3>
+            <span>How fiverr works</span>
+            <span>Guides</span>
+            <span>Answers</span>
+          </div>
+          <div className="c1">
+            <h3>For Freelancers</h3>
+            <span>Join Us</span>
+            <span>Forum</span>
+            <span>Events</span>
+            <span>Community</span>
+          </div>
+          <div className="c1">
+            <h3>Company</h3>
+            <span>Our Vision</span>
+            <span>About Us</span>
+            <span>Privacy Policy</span>
+            <span>Partnership</span>
+          </div>
+        </div>
+      </div>
+      <div className="bottom-container">
+        <div className="bottom">
+          <div className="left">
+            <span>Website</span>
+            <span className='text'>© 2025 website, Inc.</span>
+          </div>
+          <div className="right">
+            <span>Connect With Us:</span>
+            <span><i class="fa-brands fa-instagram"></i></span>
+            <span><i class="fa-brands fa-facebook"></i></span>
+            <span><i class="fa-brands fa-x-twitter"></i></span>
+            <span><i class="fa-brands fa-linkedin"></i></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

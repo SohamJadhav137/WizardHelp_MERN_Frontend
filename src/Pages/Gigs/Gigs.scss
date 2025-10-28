@@ -1,0 +1,86 @@
+.gigs-main {
+    width: 100%;
+    // background-color: yellow;
+
+    .breadcrump {
+        width: 100%;
+
+        // background-color: lightgreen;
+        .breadcrump-container {
+            width: 100%;
+            max-width: 1300px;
+            margin: 0 auto;
+            background-color: lightcoral;
+            padding: 10px 0px;
+
+            a{
+                text-decoration: none;
+                color: black;
+            }
+        }
+    }
+
+    .category-heading {
+        width: 100%;
+
+        // background-color: lightgreen;
+        .category-heading-container {
+            // width: 100%;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 10px 0px;
+            // background-color: lightcoral;
+        }
+    }
+
+    .sort-options{
+        width: 100%;
+
+        .sort-options-container{
+            width: 100%;
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            padding: 5px 0px;
+            gap: 10px;
+            align-items: center;
+    
+            button{
+                padding: 10px 20px;
+                // border: 1px solid gray;
+                border: none;
+                border-radius: 15px;
+                background-color: lightblue;
+                transition-duration: 0.4s;
+                cursor: pointer;
+            }
+            
+            button.active{
+                background-color: rgb(214, 235, 241);
+            }
+
+            button:hover{
+                background-color: rgb(214, 235, 241);
+            }
+            
+        }
+    }
+
+    .gigs {
+        width: 100%;
+
+        .gigs-container {
+            width: 100%;
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.563rem;
+            padding: 1.25rem 0rem;
+
+            // display: grid;
+            // grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            // gap: 16px; // fixed spacing
+        }
+    }
+}

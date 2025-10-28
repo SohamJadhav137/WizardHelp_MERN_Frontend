@@ -1,0 +1,114 @@
+.header{
+    width: 100%;
+
+    .header-container{
+        width: 100%;
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 30px 0px;
+        
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        
+        .my-gigs-title{
+            font-size: 40px;
+        }
+        
+        .add-gig-button{
+            background-color: lime;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .add-gig-button:hover{
+            background-color: rgb(131, 247, 131);
+        }
+    }
+
+}
+
+.gigs-table{
+    width: 100%;
+
+    .gigs-table-container{
+        width: 100%;
+        max-width: 1300px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        padding: 20px 0px;
+        padding-bottom: 100px;
+
+        table{
+            width: 83%;
+            text-align: center;
+            border-collapse: collapse;
+
+            th,td{
+                border: 1px solid;
+                // padding: 10px 0px;
+                text-align: center;
+                padding-left: 15px;
+                border: none;
+                border-bottom: 1px solid lightgray;
+
+            }
+
+            th{
+                padding: 10px 0px;
+                color: gray;
+            }
+
+            th:nth-child(1){
+                width: 45%;
+            }
+
+            td{
+                padding: 20px 0px;
+            }
+
+            td:nth-child(1){
+                text-align: start;
+            }
+            
+            td:nth-child(4){
+                .p{
+                    color: green;
+                }
+                .np{
+                    color: red;
+                }
+            }
+
+            td:nth-child(5){
+                display: flex;
+                justify-content: center;
+                gap: 15px;
+                button{
+                    padding: 10px 15px;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                }
+                .revoke-button{
+                    background-color: gray;
+                    color: white;
+                }
+                .revoke-button:hover{
+                    background-color: rgb(163, 163, 163);
+                }
+                .delete-button{
+                    background-color: red;
+                    color: white;
+                }
+                .delete-button:hover{
+                    background-color: rgb(250, 102, 102);
+                }
+            }
+        }
+    }
+}

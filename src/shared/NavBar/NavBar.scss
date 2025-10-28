@@ -1,0 +1,84 @@
+.navbar{
+    display: flex;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: rgb(167, 167, 167);
+    .container{
+        width: 100%;
+        max-width: 1300px;
+        padding: 13px 0px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .website-name{
+            display: flex;
+            justify-content: center;
+            .text{
+                font-weight: 600;
+                font-size: 1.875rem;
+            }
+        }
+        .titles{
+            display: flex;
+            gap: 3.75rem;
+            font-size: 20px;
+        }
+        .auth{
+            display: flex;
+            gap: 0.625rem;
+            .a{
+                border: 1px solid gray;
+                padding: 5px 10px;
+            }
+            .auth-after{
+            color: crimson;
+            position: relative;
+            display: flex;
+            gap: 8px;
+                .dropdown-menu{
+                    position: absolute;
+                    top: 28px;
+                    right: 0;
+                    display: flex;
+                    color: black;
+                    justify-content: center;
+                    flex-direction: column;
+                    border: 1px solid gray;
+                    width: 150px;
+                    border-radius: 10px;
+                    background-color: rgb(233, 231, 231);
+                    .dropdown-item{
+                        padding: 5px 10px;
+                    }
+                }
+            }
+        }
+
+        
+    }
+}
+
+.navbar-title{
+    display: flex;
+    justify-content: center;
+    z-index: 1000;
+    position: sticky;
+    top: 0;
+    .container{
+        width: 1300px;
+        background-color: aqua;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        .website-name{
+            display: flex;
+            justify-content: center;
+            .text{
+                font-style: bold;
+                font-size: 30px;
+            }
+        }
+    }
+}

@@ -1,0 +1,84 @@
+.footer-container {
+    width: 100%;
+    max-width: 1300px;
+    height: 54.41vh;
+    margin: 0 auto;
+    background-color: lightcyan;
+
+
+    .top-container {
+        height: 80%;
+        width: 100%;
+        // background-color: red;
+        border-top: 2px solid gray;
+
+        .top{
+            height: 100%;
+            width: 100%;
+            max-width: 1300px;
+            margin: 0 auto;
+            // background-color: yellow;
+            display: flex;
+            flex-direction: row;
+            gap: 3.75rem;
+
+            .c1{
+                height: 100%;
+                width: 250px;
+                display: flex;
+                flex-direction: column;
+                // background-color: pink;
+                // text-align: center;
+                padding-top: 2.5rem;
+
+                span{
+                    margin-top: 0.625rem;
+                }
+            }
+        }
+
+    }
+    .bottom-container {
+        height: 20%;
+        width: 100%;
+        border-top: 2px solid gray;
+        // background-color: blue;
+
+        .bottom{
+            height: 100%;
+            width: 100%;
+            max-width: 1300px;
+            margin: 0 auto;
+            // background-color: purple;
+            display: flex;
+            flex-direction: row;
+            
+            .left{
+                height: 100%;
+                width: 50%;
+                // background-color: orange;
+                display: flex;
+                align-items: center;
+
+                span{
+                    font-size: 2.313rem;
+                }
+                .text{
+                    font-size: medium;
+                    font-weight: 500;
+                    margin-left: 0.625rem;
+                }
+            }
+            .right{
+                height: 100%;
+                width: 50%;
+                // background-color: green;
+                display: flex;
+                align-items: center;
+                justify-content: end;
+                gap: 0.625rem;
+                font-size: 1.25rem;
+            }
+        }
+    }
+}

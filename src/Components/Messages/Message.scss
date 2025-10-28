@@ -1,0 +1,15 @@
+.message-box{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+
+    .message-profile-image-container{
+        flex: 1;
+        background-color: rgb(177, 127, 127);
+    }
+    .message{
+        flex: 9;
+        background-color: rgb(154, 154, 177);
+        padding: 20px;
+    }
+}
