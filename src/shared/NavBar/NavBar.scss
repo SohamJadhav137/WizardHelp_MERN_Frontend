@@ -1,8 +1,6 @@
 .navbar{
     display: flex;
     justify-content: center;
-    position: sticky;
-    top: 0;
     z-index: 1000;
     background-color: rgb(167, 167, 167);
     .container{
@@ -55,30 +53,14 @@
                 }
             }
         }
-
-        
     }
 }
 
-.navbar-title{
-    display: flex;
-    justify-content: center;
-    z-index: 1000;
+.navbar-sticky{
     position: sticky;
     top: 0;
-    .container{
-        width: 1300px;
-        background-color: aqua;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        .website-name{
-            display: flex;
-            justify-content: center;
-            .text{
-                font-style: bold;
-                font-size: 30px;
-            }
-        }
-    }
+}
+
+.navbar-default{
+    position: static;
 }

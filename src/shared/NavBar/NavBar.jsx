@@ -2,12 +2,17 @@ import React, { useEffect, useState } from 'react'
 
 import './NavBar.scss'
 import { Link, useLocation } from 'react-router-dom'
+
 export default function NavBar() {
+
   // const [active, setActive] = useState(true)
-  const [isLogin, setLogin] = useState(true)
+  const [isLogin, setLogin] = useState(false)
   const [showMenu, setShowMenu] = useState(false)
 
-  const { pathName } = useLocation()
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+
+  const navBarForms = `navbar ${isHomePage ? 'navbar-sticky' : 'navbar-default'}`;
 
   const toggleMenu = () => {
     setShowMenu(prev => !prev)
@@ -33,7 +38,7 @@ export default function NavBar() {
   return (
     <>
       {/* <div className={active || pathName!=='/' ? "navbar" : 'navbar-title'}> */}
-      <div className="navbar">
+      <div className={navBarForms}>
         <div className="container">
           <div className="website-name">
             <Link to='/' className='link'>
@@ -75,8 +80,12 @@ export default function NavBar() {
                 :
                 <>
                   <button className='a'> Become Seller</button>
-                  <button className='a'>Login</button>
-                  <button className='a'>Signup</button>
+                  <button className='a'>
+                    <Link to="/login" className='link'>Login</Link>
+                  </button>
+                  <button className='a'>
+                    <Link to="/signup" className='link'>Signup</Link>
+                  </button>
                 </>
             }
           </div>

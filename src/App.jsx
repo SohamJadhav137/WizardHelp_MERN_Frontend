@@ -7,25 +7,17 @@ import MyGig from "./Pages/MyGig/MyGig"
 import Orders from "./Pages/Orders/Orders"
 import Footer from "./shared/Footer/footer"
 import NavBar from "./shared/NavBar/NavBar"
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import Login from "./Pages/Auth/Login/Login"
+import Signup from "./Pages/Auth/Signup/Signup"
+import AppLayout from "./AppLayout"
 
 function App() {
 
   return (
     <>
       <BrowserRouter>
-        <NavBar />
-        <div className="main-content">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/gigs" element={<Gigs />} />
-            <Route path="/orders" element={<Orders />} />
-            <Route path="/gig/:id" element={<Gig/>} />
-            <Route path="/my-gigs" element={<MyGig/>} />
-            <Route path="/messages" element={<MainContainer/>} />
-          </Routes>
-        </div>
-        <Footer />
+        <AppLayout/>
       </BrowserRouter>
     </>
   )

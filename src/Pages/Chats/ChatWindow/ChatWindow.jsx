@@ -3,10 +3,19 @@ import React, { useEffect, useState } from 'react'
 import './ChatWindow.scss'
 import Message from '../../../Components/Messages/Message'
 import socket from '../../../socket';
+import { useParams } from 'react-router-dom';
 
 export default function ChatWindow() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+  const { conversationId } = useParams();
+
+  useEffect(() => {
+    if(conversationId){
+      socket.emit("join_conversation", conversationId);
+      console.log("Frontend joined conversation at ID:",conversationId);
+    }
+  }, [conversationId]);
 
   useEffect(() => {
     const receiveMessageHandler = (data) => {
@@ -14,10 +23,10 @@ export default function ChatWindow() {
       setMessages((prev) => [...prev, data]);
     }
 
-    socket.on("receiveMessage", receiveMessageHandler);
+    socket.on("receive_message", receiveMessageHandler);
 
     return () => {
-      socket.off("receiveMessage", receiveMessageHandler);
+      socket.off("receive_message", receiveMessageHandler);
     };
   }, []);
 
@@ -31,7 +40,7 @@ export default function ChatWindow() {
       text: message
     };
 
-    socket.emit("sendMessage", data);
+    socket.emit("send_message", data);
     // setMessages((prev) => [...prev, data]);
     setMessage("");
   };

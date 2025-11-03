@@ -1,9 +1,14 @@
 import React from 'react'
 import './footer.scss'
+import { useLocation } from 'react-router-dom'
 
 export default function Footer() {
+  
+  const location = useLocation();
+  const isAuth = location.pathname === '/login' || location.pathname === '/signup';
+  const footerForms = `footer-container ${isAuth && 'footer-container-none'}`
   return (
-    <div className='footer-container'>
+    <div className={footerForms}>
       <div className="top-container">
         <div className="top">
           <div className="c1">

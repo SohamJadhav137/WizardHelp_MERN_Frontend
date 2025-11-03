@@ -1,0 +1,64 @@
+.signup {
+    width: 60%;
+    max-width: 350px;
+    margin: 0 auto;
+    background-color: rgb(0, 153, 153);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 20px;
+
+    h3 {
+        text-align: center;
+        font-size: 25px;
+    }
+
+    input{
+        padding: 7px;
+        border: none;
+        margin-bottom: 5px;
+        font-size: 15px;
+    }
+    input:focus{
+        outline: none;
+    }
+
+    label{
+        font-size: 18px;
+        margin-bottom: 5px;
+    }
+
+    .desc{
+        text-align: center;
+        margin-top: 20px;
+
+        span{
+            color: lightcyan;
+        }
+    }
+
+    .auth-button{
+        margin: 0px 90px;
+        margin-top: 10px;
+        padding: 10px 20px;
+        background-color: white;
+        border: white;
+        color: rgb(0, 153, 153);
+        cursor: pointer;
+    }
+
+    .loading-state{
+        background-color: rgba(255, 255, 255, 0.719);
+        cursor: not-allowed;
+    }
+
+    .error{
+        color: red;
+    }
+
+    .radio-buttons{
+        margin: 10px 0px;
+        label{
+            margin-right: 20px;
+        }
+    }
+}
