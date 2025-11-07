@@ -88,7 +88,7 @@ export default function CreateGig() {
         if (!deliveryDays || isNaN(deliveryDays) || deliveryDays < 0) errors.push("Enter valid number for days!");
         if (!revisions || isNaN(revisions) || revisions < 0) errors.push("Enter valid number for revisions!");
 
-        console.log(errors)
+        console.log("Form errors:",errors)
 
         if (errors.length > 0)
             return false;
@@ -107,6 +107,8 @@ export default function CreateGig() {
         for (const img of formData.imageURLs) {
             const url = await uploadToS3(img, token);
             uploadImageUrls.push(url);
+            console.log("New image URL:",uploadImageUrls)
+            console.log("Image URL length:",uploadImageUrls.length)
         }
 
         let uploadVideoUrl = null
@@ -119,14 +121,14 @@ export default function CreateGig() {
             uploadDocUrls.push(url);
         }
 
-        console.log(uploadImageUrls)
-
         const finalFormData = {
             ...formData,
             imageURLs: uploadImageUrls,
             videoURL: uploadVideoUrl,
             docURLs: uploadDocUrls
         }
+
+        console.log("FINAL FORM DATA before sending:\n",finalFormData);
 
         const response = await fetch('http://localhost:5000/api/gigs', {
             method: "POST",
@@ -141,6 +143,8 @@ export default function CreateGig() {
             console.error("Failed to parse JSON response:",e);
             return { message: "An unknown error occured (received non-JSON response)" };
         })
+
+        console.log("RESPONSE DATA:\n",responseData);
 
         if (response.ok) {
             // const newGig = await response.json();
@@ -187,7 +191,7 @@ export default function CreateGig() {
                                     <label htmlFor="gig-desc" className='label-item'>Description</label>
                                 </td>
                                 <td>
-                                    <textarea name="description" id="gig-desc" className='desc' onChange={changeHandler} value={formData.desc} placeholder='Upto 1,200 characters'></textarea>
+                                    <textarea name="description" id="gig-desc" className='desc' onChange={changeHandler} value={formData.description} placeholder='Upto 1,200 characters'></textarea>
                                 </td>
                             </tr>
                             <tr>
