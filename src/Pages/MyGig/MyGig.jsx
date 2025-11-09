@@ -58,7 +58,7 @@ export default function MyGig() {
                         </thead>
                         <tbody>
                             {userGigs.map((gig) => (
-                                <tr key={gig.id}>
+                                <tr key={gig._id}>
                                     <td>{gig.title}</td>
                                     <td>{gig.price}</td>
                                     <td>{gig.orders}</td>

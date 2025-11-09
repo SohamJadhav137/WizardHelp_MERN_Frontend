@@ -85,22 +85,24 @@
             }
 
             td:nth-child(5){
-                display: flex;
-                justify-content: center;
-                gap: 15px;
+                vertical-align: middle;
+
                 button{
                     padding: 10px 15px;
                     border: none;
                     border-radius: 8px;
                     cursor: pointer;
                 }
+
                 .revoke-button{
                     background-color: gray;
                     color: white;
+                    margin-right: 15px;
                 }
                 .revoke-button:hover{
                     background-color: rgb(163, 163, 163);
                 }
+
                 .delete-button{
                     background-color: red;
                     color: white;
