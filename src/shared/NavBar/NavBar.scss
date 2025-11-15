@@ -2,6 +2,8 @@
     display: flex;
     justify-content: center;
     z-index: 1000;
+    flex-shrink: 0;
+    height: 70px;
     background-color: rgb(167, 167, 167);
     .container{
         width: 100%;

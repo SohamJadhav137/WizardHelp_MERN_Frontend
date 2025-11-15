@@ -22,12 +22,6 @@ export default function NavBar() {
     setShowMenu(prev => !prev)
   }
 
-  const currectUser = {
-    id: 1,
-    name: 'Alex',
-    isSeller: true
-  }
-
   // const isScroll = () => {
   //   window.scrollY > 0 ? setActive(true) : setActive(false)
   // }

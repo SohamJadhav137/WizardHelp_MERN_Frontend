@@ -55,7 +55,7 @@ export default function Login() {
       }
 
       localStorage.setItem("token", data.token);
-      const user = { email: data.email, name: data.name, role: data.role }
+      const user = { email: data.email, name: data.username, role: data.role }
       localStorage.setItem("user", JSON.stringify(user));
       console.log(data);
       console.log(user);

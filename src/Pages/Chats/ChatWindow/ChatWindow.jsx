@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import './ChatWindow.scss'
 import Message from '../../../Components/Messages/Message'
@@ -10,14 +10,7 @@ import { getCurrentUser } from '../../../utils/getCurrentUser';
 export default function ChatWindow({ conversationId }) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-
-  // const userString = localStorage.getItem("user");
-  // const userObject = userString ? JSON.parse(userString) : {}
-  // const currentUser = {
-  //   userId: userObject.email,
-  //   name: userObject.name,
-  //   role: userObject.role
-  // };
+  const bottomRef = useRef();
 
   const sender = getCurrentUser();
   const senderId = sender?.id;
@@ -26,6 +19,10 @@ export default function ChatWindow({ conversationId }) {
   const user = localStorage.getItem("user");
   const parsedUserData = JSON.parse(user);
   const currentUser = parsedUserData?.name;
+
+  useEffect(()=> {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages]);
 
   useEffect(() => {
     if(!conversationId) return;
@@ -56,14 +53,22 @@ export default function ChatWindow({ conversationId }) {
   useEffect(() => {
     if(conversationId){
       socket.emit("join_conversation", conversationId);
-      console.log("Frontend joined conversation at ID:",conversationId);
+      console.log(`${currentUser} joined conversation room ID:`,conversationId);
     }
+
+    return () => {
+      if(conversationId){
+        socket.emit("leave_conversation", conversationId);
+        console.log(`${currentUser} left conversation room ID:`,conversationId);
+      }
+    }
+
   }, [conversationId]);
 
   useEffect(() => {
     const receiveMessageHandler = (data) => {
       console.log("Received Message:\n", data);
-      console.log(`From: ${data.username}\nMessage: ${data.text}`);
+      console.log(`From: ${data.senderId.username}\nMessage: ${data.text}`);
       setMessages((prev) => [...prev, data]);
     }
 
@@ -102,9 +107,11 @@ export default function ChatWindow({ conversationId }) {
       <div className='messages-list'>
         {
           messages.map((m, i) => (
-            <Message key={i} msg={m.text} info={ m.senderId === senderId ? "You" : m.username }/>
+            <Message key={i} msg={m.text} info={ m.senderId._id === senderId ? "You" : m.senderId.username }/>
           ))
         }
+
+        <div ref={bottomRef} />
       </div>
       <div className="input-box">
         <input type="text" value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={submitKeyHandler} placeholder='Type a message...'/>

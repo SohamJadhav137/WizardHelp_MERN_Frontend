@@ -1,6 +1,7 @@
 .chat-app{
     width: 100%;
-    height: 95.5vh;
+    height: calc(100vh - 70px);
+    // flex: 1;
 
     .messages-website-title{
         width: 100%;
@@ -28,6 +29,7 @@
             flex: 2.5;
             width: 100%;
             height: 100%;
+            overflow: hidden;
             background-color: rgb(73, 73, 73);
             display: flex;
             flex-direction: column;
@@ -101,6 +103,7 @@
             .messages-list{
                 flex: 1;
                 background-color: rgb(180, 180, 180);
+                overflow-y: auto;
             }
 
             .input-box{

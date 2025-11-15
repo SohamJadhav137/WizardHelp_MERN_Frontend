@@ -13,7 +13,7 @@ export default function GigCard({gig}) {
         </Link>
         <div className="details">
             <div className="seller-name">
-                <span><i class="fa-solid fa-circle-user"></i> {gig.username}</span>
+                <span><i class="fa-solid fa-circle-user"></i> {gig.sellerName}</span>
             </div>
             <Link to={`/gig/${gig._id}`}>
             <div className="gig-desc">

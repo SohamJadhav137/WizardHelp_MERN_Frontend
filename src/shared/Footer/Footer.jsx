@@ -5,8 +5,8 @@ import { useLocation } from 'react-router-dom'
 export default function Footer() {
   
   const location = useLocation();
-  const isAuth = location.pathname === '/login' || location.pathname === '/signup';
-  const footerForms = `footer-container ${isAuth && 'footer-container-none'}`
+  const noFooter = location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/messages' || location.pathname === '/my-gigs' || location.pathname === '/create-gig';
+  const footerForms = `footer-container ${noFooter && 'footer-container-none'}`
   return (
     <div className={footerForms}>
       <div className="top-container">

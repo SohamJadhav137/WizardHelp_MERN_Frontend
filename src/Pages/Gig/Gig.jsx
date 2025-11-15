@@ -85,8 +85,7 @@ export default function Gig() {
             
             if(response.ok){
                 const data = await response.json();
-                console.log(data._id);
-                navigate(`/messages/${data._id}`);
+                navigate(`/messages`);
             }
             else{
                 console.error("BACKEND RESPONSE ERROR:", response.statusText)
