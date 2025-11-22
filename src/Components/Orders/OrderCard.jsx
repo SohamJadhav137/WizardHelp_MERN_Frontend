@@ -25,7 +25,24 @@ export default function OrderCard(prop) {
         day: "numeric",
         timeZone: "UTC"
     };
-    const date = dateObject.toLocaleDateString('en-US', options);
+    const orderCreationDate = dateObject.toLocaleDateString('en-US', options);
+
+    const initialDays = () => {
+        const now = new Date();
+        const deadline = new Date(prop.order.dueDate);
+        return Math.ceil((deadline - now) / (24 * 60 * 60 * 1000));
+    };
+
+    const [remainingDays, setRemainingDays] = useState(initialDays);
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const currentDate = new Date();
+            const remainingDaysInMs = new Date(prop.order.dueDate) - currentDate;
+            setRemainingDays(Math.ceil(remainingDaysInMs / (24 * 60 * 60 * 1000)));
+        }, 1000 * 60);
+
+        return () => clearInterval(interval);
+    }, [prop.order.dueDate]);
 
     const token = localStorage.getItem("token");
 
@@ -104,13 +121,26 @@ export default function OrderCard(prop) {
             <hr />
             <div className="order-card-info">
                 <div>
-                <span>Order ID: {prop.order._id}</span>
-                <br />
-                <span>Ordered On: {date}</span>
-                <br />
-                <span>Price: ₹{prop.order.price}</span>
-                <br />
-                <span>Status: {prop.order.status}</span>
+                    <span>Order ID: {prop.order._id}</span>
+                    <br />
+                    <span>Ordered On: {orderCreationDate}</span>
+                    <br />
+                    <span>Price: ₹{prop.order.price}</span>
+                    <br />
+                    <span>Status: {prop.order.status}</span>
+                    <br />
+                    {
+                        (prop.order.status !== 'completed' && prop.order.status !== 'cancelled') &&
+                        (
+                            remainingDays > 1 ?
+                                <span>Due: {remainingDays} Days left</span>
+                                :
+                                remainingDays === 0 ?
+                                    <span>Due Today</span>
+                                    :
+                                    <span>Due: {Math.abs(remainingDays)} Days late</span>
+                        )
+                    }
                 </div>
             </div>
             <div className="action-bar">

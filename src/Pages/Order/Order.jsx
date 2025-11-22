@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -32,19 +32,6 @@ export default function Order() {
 
     const navigate = useNavigate();
     const token = localStorage.getItem("token");
-
-    const options = {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        timeZone: "UTC"
-    };
-    const finalCreatedDate = order ? new Date(order.createdAt).toLocaleDateString('en-us', options) : '';
-    const finalUpdatedDate = order ? new Date(order.updatedAt).toLocaleDateString('en-us', options) : '';
-
-    let deliveredDate = order?.status === 'delivered' ? finalUpdatedDate : '';
-    let completedDate = order?.status === 'completed' ? finalUpdatedDate : '';
-
 
     // set userId based on role
     useEffect(() => {
@@ -106,7 +93,7 @@ export default function Order() {
     //     }
     // }, [id, setOrder]);
 
-
+    // Handler socket events
     useEffect(() => {
         const handlerOrderEvent = (payload) => {
             if (payload.updatedOrder._id === id) {
@@ -117,7 +104,7 @@ export default function Order() {
         const events = [
             "orderDelivered",
             "orderCompleted",
-            "orderRevised",
+            "orderRevision",
             "orderCancelled"
         ];
 
@@ -438,6 +425,82 @@ export default function Order() {
         }
     };
 
+    const [remainingDays, setRemainingDays] = useState(null);
+
+    useEffect(() => {
+        if (!order) return;
+
+        const currentDate = new Date();
+        const remainingDaysInMs = new Date(order?.dueDate) - currentDate;
+        setRemainingDays(Math.ceil(remainingDaysInMs / (24 * 60 * 60 * 1000)));
+    }, [order]);
+
+    // Display remaining days
+    useEffect(() => {
+        if (!order) return;
+
+        const interval = setInterval(() => {
+            const currentDate = new Date();
+            const remainingDaysInMs = new Date(order?.dueDate) - currentDate;
+            setRemainingDays(Math.ceil(remainingDaysInMs / (24 * 60 * 60 * 1000)));
+        }, 1000 * 60);
+
+        return () => clearInterval(interval);
+    }, [order]);
+
+    const options = {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+    }
+
+    const deleteFromS3 = useCallback(async (url, token) => {
+        try {
+            const response = await fetch("http://localhost:5000/api/s3/delete-file", {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ fileUrl: url })
+            })
+
+            if (!response.ok) {
+                console.error("Failed to delete file from s3:\n", response.status);
+            }
+        } catch (error) {
+            console.error("Some error during file deletion from s3:\n", error);
+        }
+    }, []);
+
+    const requestRevisionHandler = async () => {
+        try{
+            await Promise.all(orderFiles.map(file => deleteFromS3(file.url, token)));
+        } catch(error){
+            console.error("Error occured while deleting files before REVISION: ", error);
+        }
+
+        try {
+            const res = await fetch(`http://localhost:5000/api/orders/${id}/revision`, {
+                method: 'PATCH',
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ buyerNote: textareaNote })
+            })
+
+            if (res.ok) {
+                console.log("Revision success!!!");
+            }
+            else {
+                console.error("Failed to send revision request:", res.status);
+            }
+        } catch (error) {
+            console.error("Some error occured while sending revision request:", error);
+        }
+    }
+
     return (
         <div className='order-container'>
             <div className="order">
@@ -481,11 +544,34 @@ export default function Order() {
                                 </tr>
                                 <tr>
                                     <td><span className='order-attr'>Ordered On:</span></td>
-                                    <td><span>{finalCreatedDate}</span></td>
+                                    <td><span>{new Date(order?.createdAt).toLocaleDateString("en-US", options)}</span></td>
                                 </tr>
                                 <tr>
                                     <td><span className='order-attr'>Price:</span></td>
                                     <td><span>₹{order?.price}</span></td>
+                                </tr>
+                                <tr>
+                                    {
+                                        (order?.status !== 'completed' && order?.status !== 'cancelled') &&
+                                        (
+                                            remainingDays > 1 ?
+                                                <>
+                                                    <td><span className='order-attr'>Due:</span></td>
+                                                    <td><span>{remainingDays} Days left</span></td>
+                                                </>
+                                                :
+                                                remainingDays === 0 ?
+                                                    <>
+                                                        <td><span className='order-attr'>Due:</span></td>
+                                                        <td><span>Due Today</span></td>
+                                                    </>
+                                                    :
+                                                    <>
+                                                        <td><span className='order-attr'>Due:</span></td>
+                                                        <td><span>{Math.abs(remainingDays)} Days late</span></td>
+                                                    </>
+                                        )
+                                    }
                                 </tr>
                             </tbody>
                         </table>
@@ -566,7 +652,7 @@ export default function Order() {
                                             <tbody>
                                                 <tr>
                                                     <td><span>Delivered On: </span></td>
-                                                    <td><span>{deliveredDate}</span></td>
+                                                    <td><span>{new Date(order?.deliveredAt).toLocaleDateString("en-US", options)}</span></td>
                                                 </tr>
 
                                                 <tr>
@@ -614,7 +700,7 @@ export default function Order() {
                                                     <td>
                                                         <div className="order-action-buttons">
                                                             <button className='order-accept-button' onClick={acceptOrderHandler}>Accept Order</button>
-                                                            <button className={`order-revise-button ${order?.revisions === 0 && 'order-revise-button-disable'}`}>Revise Order</button>
+                                                            <button className={`order-revise-button ${order?.revisionCount === 0 && 'order-revise-button-disable'}`} onClick={requestRevisionHandler}>Revise Order</button>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -630,7 +716,7 @@ export default function Order() {
                                             <tbody>
                                                 <tr>
                                                     <td><span>Delivered On: </span></td>
-                                                    <td><span>{deliveredDate}</span></td>
+                                                    <td><span>{new Date(order?.deliveredAt).toLocaleDateString("en-US", options)}</span></td>
                                                 </tr>
                                                 <tr>
                                                     <td>
@@ -649,11 +735,11 @@ export default function Order() {
                                             <tbody>
                                                 <tr>
                                                     <td><span>Delivered On: </span></td>
-                                                    <td><span>{deliveredDate}</span></td>
+                                                    <td><span>{new Date(order?.deliveredAt).toLocaleDateString("en-US", options)}</span></td>
                                                 </tr>
                                                 <tr>
                                                     <td><span>Completed On:</span></td>
-                                                    <td><span>{completedDate}</span></td>
+                                                    <td><span>{new Date(order?.completedAt).toLocaleDateString("en-US", options)}</span></td>
                                                 </tr>
 
                                                 <tr>
@@ -694,11 +780,11 @@ export default function Order() {
                                         <tbody>
                                             <tr>
                                                 <td><span>Delivered On: </span></td>
-                                                <td><span>{deliveredDate}</span></td>
+                                                <td><span>{new Date(order?.deliveredAt).toLocaleDateString("en-US", options)}</span></td>
                                             </tr>
                                             <tr>
                                                 <td><span>Completed On: </span></td>
-                                                <td><span>{completedDate}</span></td>
+                                                <td><span>{new Date(order?.completedAt).toLocaleDateString("en-US", options)}</span></td>
                                             </tr>
                                             <tr>
                                                 <td><span>Buyer Note:</span></td>
@@ -706,6 +792,122 @@ export default function Order() {
                                             </tr>
                                         </tbody>
                                     </table>
+                                }
+
+                                {
+                                    order?.status === 'revision' && user.role === 'buyer' &&
+                                    <div className="order-complete">
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <span>Files: </span>
+                                                    </td>
+                                                    <td>
+                                                        <div className="delivered-files">
+                                                            {
+                                                                order?.deliveryFiles.map((file, index) => (
+                                                                    <div key={index} className='delivered-file'>
+                                                                        <FilePreview2 file={file} />
+                                                                        <div className='delivered-file-info'>
+                                                                            <div className='delivered-file-name'>
+                                                                                <span>{file.fileName}</span>
+                                                                            </div>
+                                                                            <div className='delivered-file-size'>
+                                                                                <span>{formatBytesToSize(file.fileSize)}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        <button onClick={() => downloadFile(file)} className='deliver-file-button'>
+                                                                            <FontAwesomeIcon icon="fa-regular fa-circle-down" />
+                                                                        </button>
+                                                                    </div>
+                                                                ))
+                                                            }
+                                                        </div>
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>
+                                                        <span>Waiting for seller's next delivery...</span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+
+                                {
+                                    order?.status === 'revision' && user.role === 'seller' &&
+                                    (
+                                        <>
+                                            <table>
+                                                <tbody>
+                                                    <tr>
+                                                        <td><span>Buyer Note:</span></td>
+                                                        <td><span>{order?.buyerNote}</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <input type="file" id='order-upload-file' onChange={uploadFilesHandler} className='order-upload-file-input' multiple accept='image/*, video/*, audio/*, .pdf, .doc, .docx, .zip' disabled={isUploading} />
+                                                            <label htmlFor='order-upload-file' className='order-upload-file-button'>
+                                                                Upload Files
+                                                            </label>
+                                                        </td>
+                                                        <td>
+                                                            <div className='order-file-preview-container'>
+                                                                {
+                                                                    isUploading && (
+                                                                        <span>Loading File Preview</span>
+                                                                    )
+                                                                }
+
+                                                                <div className={`order-file-preview ${orderFiles.length > 0 && 'contains'}`}>
+                                                                    {
+                                                                        orderFiles.length === 0 ?
+                                                                            (
+                                                                                <span>No files uploaded yet</span>
+                                                                            )
+                                                                            :
+                                                                            (
+                                                                                orderFiles.map(file => (
+                                                                                    <div key={file.id} className='order-file'>
+                                                                                        <FilePreview file={file} />
+                                                                                        <div>
+                                                                                            <span title={file.name}>{file.name}</span>
+                                                                                            <br />
+                                                                                            <span>{formatBytesToSize(file.size)}</span>
+                                                                                        </div>
+
+                                                                                        <button onClick={() => deleteFileHandler(file.id)} className='delete-img-button'>
+                                                                                            <FontAwesomeIcon icon="fa-solid fa-trash" />
+                                                                                        </button>
+                                                                                    </div>
+                                                                                ))
+                                                                            )
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <label htmlFor="seller-delivery-msg-box">Delivery note:</label>
+                                                        </td>
+                                                        <td>
+                                                            <textarea name="delivery-msg" id="seller-delivery-msg-box" value={textareaNote} onChange={handleChange} ></textarea>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td></td>
+                                                        <td>
+                                                            <button onClick={deliverOrder}>Deliver Work</button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </>
+                                    )
                                 }
 
                                 {/* Seller && status = active */}

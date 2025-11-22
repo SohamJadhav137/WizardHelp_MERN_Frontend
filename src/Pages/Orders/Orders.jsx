@@ -7,6 +7,7 @@ export default function Orders() {
 
   const [orders, setOrders] = useState([]);
 
+  // Fetching orders
   useEffect(() => {
     const fetchOrders = async () => {
       const token = localStorage.getItem("token");
