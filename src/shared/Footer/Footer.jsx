@@ -13,7 +13,7 @@ export default function Footer() {
   location.pathname === '/orders' ||
   location.pathname.startsWith('/messages/');
   
-  const footerForms = `footer-container ${noFooter && 'footer-container-none'}`
+  const footerForms = `footer-container ${noFooter ? 'footer-container-none' : ''}`
   return (
     <div className={footerForms}>
       <div className="top-container">

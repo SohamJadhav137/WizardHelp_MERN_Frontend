@@ -2,10 +2,12 @@ import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import socket from '../../socket';
-import { getCurrentUser } from '../../utils/getCurrentUser';
+import { getSocket } from '../../socket';
+import { Rating } from '@mui/material'
 
 import './Order.scss';
+
+const socket = getSocket();
 
 const formatBytesToSize = (bytes) => {
     var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
@@ -23,7 +25,8 @@ export default function Order() {
     const [order, setOrder] = useState(null);
     let gigId = order?.gigId,
         sellerId = order?.sellerId,
-        buyerId = order?.buyerId;
+        buyerId = order?.buyerId,
+        price = order?.price;
 
     const [gigTitle, setGigTitle] = useState(null);
     const [coverImage, setCoverImage] = useState(null);
@@ -68,20 +71,6 @@ export default function Order() {
         fetchOrderDetails();
     }, [id]);
 
-    // Update order details at buyer side once the order is delivered by seller
-    // useEffect(() => {
-    //     socket.on("orderDelivered", (payload) => {
-    //         console.log("Order payload:", payload.updatedOrder);
-    //         if (payload.updatedOrder._id === id) {
-    //             setOrder(payload.updatedOrder);
-    //         }
-    //     })
-
-    //     return () => {
-    //         socket.off("orderDelivered");
-    //     }
-    // }, [id, setOrder]);
-
     // Handler socket events
     useEffect(() => {
         const handlerOrderEvent = (payload) => {
@@ -113,10 +102,10 @@ export default function Order() {
             if (user.role === 'buyer' && payload.updatedOrder.cancellationRequestedBy === 'buyer') {
                 alert("Seller has rejected order cancellation request. Order is rollbacked to previous state.");
             }
-            else if (user.role === 'seller' && payload.updatedOrder.cancellationRequestedBy === 'seller'){
+            else if (user.role === 'seller' && payload.updatedOrder.cancellationRequestedBy === 'seller') {
                 alert("Buyer has rejected order cancellation request. Order is restored back to previous state");
             }
-            else{
+            else {
                 alert("You rejected order cancellation request. Order is rollbackend to previous state.");
             }
         };
@@ -624,6 +613,78 @@ export default function Order() {
         }
     }
 
+    const [rating, setRating] = useState(0);
+    const [comment, setComment] = useState("");
+
+    const submitReviewHandler = async () => {
+        if (!rating) {
+            alert("Please give rating before submitting the review!");
+            return;
+        }
+        if (!comment) {
+            alert("Please write comment before submitting the review!");
+            return;
+        }
+
+        setIsReviewed(true);
+
+        const rawDuration = new Date(order?.completedAt) - new Date(order?.createdAt);
+        const duration = Math.floor(new Date(rawDuration) / (24 * 60 * 60 * 1000));
+
+        try {
+            const res = await fetch("http://localhost:5000/api/review/submit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ rating, comment, gigId, buyerId, id, price, duration })
+            });
+
+            if (res.ok) {
+                alert("Review was submitted successfully");
+            }
+            else {
+                console.error("Failed to submit review: ", res.status);
+            }
+        } catch (error) {
+            console.error("Some error occured while submitting review:", error);
+        }
+    }
+
+    const [isReviewed, setIsReviewed] = useState(true);
+    const [reviewDate, setReviewDate] = useState(null);
+
+    // Fetch buyer review
+    useEffect(() => {
+        const fetchBuyerReview = async () => {
+            if(user.role === 'seller'){
+                return;
+            }
+            
+            try {
+                const res = await fetch(`http://localhost:5000/api/review/by-order/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    setRating(data.rating);
+                    setComment(data.comment);
+                    setReviewDate(new Date(data.reviewDate).toLocaleDateString('en-us', options));
+                }
+                else {
+                    console.error("Failed to fetch buyer review:", res.status);
+                }
+            } catch (error) {
+                console.error("Some error occured while fetching buyer review:", error);
+            }
+        }
+
+        fetchBuyerReview();
+    }, [id]);
 
     return (
         <div className='order-container'>
@@ -672,7 +733,7 @@ export default function Order() {
                                 </tr>
                                 <tr>
                                     <td><span className='order-attr'>Price:</span></td>
-                                    <td><span>₹{order?.price}</span></td>
+                                    <td><span>₹{price}</span></td>
                                 </tr>
                                 <tr>
                                     {
@@ -1128,11 +1189,6 @@ export default function Order() {
                                     <p>You have accepted the order cancellation request. Order was cancelled successfully.</p>
                                 }
 
-
-
-
-
-
                                 {/* Seller && status = active */}
 
                                 {/* Buyer && status = active */}
@@ -1143,6 +1199,7 @@ export default function Order() {
                                     <button className='order-open-chat-button' onClick={redirectToChat}>Open Chat <FontAwesomeIcon icon="fa-solid fa-comment" /></button>
                                 </div>
 
+                                {/* CANCEL BUTTON */}
                                 <div>
                                     {
                                         order?.status !== 'cancelled' && order?.status !== 'completed' &&
@@ -1161,6 +1218,63 @@ export default function Order() {
                                     }
 
                                 </div>
+
+                                {/* Review Space */}
+                                {
+                                    user.role === 'buyer' &&
+                                    <>
+                                        {
+                                            !isReviewed && order?.status === 'completed' && user.role === 'buyer' ?
+
+                                                <div className="buyer-review-container">
+                                                    <div className="review-title">
+                                                        Leave seller a review...
+                                                    </div>
+                                                    <div className='review-rating'>
+                                                        Rating:
+                                                        <Rating
+                                                            name="simple-controlled"
+                                                            value={rating}
+                                                            onChange={(event, newValue) => {
+                                                                setRating(newValue)
+                                                                console.log(newValue);
+                                                            }}
+                                                            defaultValue={0}
+                                                            precision={0.5}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <textarea name="" id="" placeholder='Share your experience...' value={comment} onChange={(e) => setComment(e.target.value)}>
+                                                        </textarea>
+                                                        <button onClick={submitReviewHandler}>Submit</button>
+                                                    </div>
+                                                </div>
+                                                :
+
+                                                <div className="buyer-review-container">
+                                                    <div className="thanks-msg">
+                                                        Thank you for reviewing this gig! Your feedback helps the seller serve better.
+                                                    </div>
+                                                    <div className="review-subtitle">
+                                                        Your review:
+                                                    </div>
+                                                    <div className='review-rating-and-timestamp'>
+                                                        <div className="review-rating">
+                                                            Rating:
+                                                            <Rating name="read-only" value={rating} readOnly />
+                                                        </div>
+                                                        <div className="review-submittedAt">
+                                                            Reviewed At: {reviewDate}
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <textarea name="" id="" disabled placeholder='Share your experience...' value={comment} onChange={(e) => setComment(e.target.value)}>
+                                                        </textarea>
+                                                    </div>
+                                                </div>
+                                        }
+                                    </>
+                                }
                             </div>
                         </div>
                     </div>

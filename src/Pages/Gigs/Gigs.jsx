@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from 'react'
 
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 
 import './Gigs.scss';
 import GigCard from '../../Components/Gigs/GigCard';
 import {gigs} from '../../Data/GigsData';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 
 export default function Gigs() {
 
   const [gigs, setGigs] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { search } = useLocation();
-  const category = decodeURIComponent(new URLSearchParams(search).get("category"));
+  const { categoryName } = useParams();
+  const category = categoryName;
   const [activeButton, setActiveButton] = useState("best-selling");
 
-  console.log("Received gigs:", gigs);
-  
+  // Filter gigs
   const sortAscend = () => {
     const copyArray = [...gigs]
 
@@ -35,7 +36,7 @@ export default function Gigs() {
   const orderBestSelling = () => {
     const copyArray = [...gigs]
 
-    copyArray.sort((a, b) => b.reviews - a.reviews)
+    copyArray.sort((a, b) => b.orders - a.orders)
     setGigs(copyArray)
     setActiveButton("best-selling")
   }
@@ -43,18 +44,19 @@ export default function Gigs() {
   const orderRating = () => {
     const copyArray = [...gigs]
 
-    copyArray.sort((a, b) => b.rating - a.rating)
+    copyArray.sort((a, b) => b.starRating - a.starRating)
     setGigs(copyArray)
     setActiveButton("rating")
   }
 
+  // Fetch category wise gigs
   useEffect(() => {
     const fetchCatGigs = async (category) => {
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:5000/api/category/${encodeURIComponent(category)}`);
+        const response = await fetch(`http://localhost:5000/api/category/${category}`);
         const data = await response.json();
-        setGigs(data);
+        setGigs([...data].sort((a, b) => b.orders - a.orders));
       } catch (error) {
         console.error("Some error occured while fetching gigs category wise:", error);
       }
@@ -69,7 +71,7 @@ export default function Gigs() {
 
       <div className="breadcrump">
         <div className="breadcrump-container">
-          <span> <Link to='/'>Home</Link> &gt; <Link to={`/category?category=${category}`}>{category}</Link></span>
+          <span> <Link to='/'>Home</Link><FontAwesomeIcon icon="fa-solid fa-angle-left" /><Link to={`/category/${category}`}>{category}</Link></span>
         </div>
       </div>
 

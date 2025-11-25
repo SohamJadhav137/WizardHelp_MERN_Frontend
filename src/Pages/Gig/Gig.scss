@@ -9,8 +9,8 @@
             width: 100%;
             max-width: 1300px;
             margin: 0 auto;
-            background-color: lightcoral;
-            padding: 10px 0px;
+            font-size: 30px;
+            padding: 20px 0px;
             
             a{
                 text-decoration: none;
@@ -23,7 +23,7 @@
         width: 100%;
         max-width: 1300px;
         margin: 0 auto;
-        margin-top: 40px;
+        margin-top: 10px;
         background-color: rgb(255, 255, 255);
         display: flex;
         align-items: flex-start;
@@ -133,34 +133,26 @@
             }
 
             .about-gig{
-                width: 100%;
-                
-                .tech-stack{
-                    display: flex;
-                    flex-direction: column;
-                    margin-top: 20px;
-                    width: 50%;
+                width: 100%;                
+            }
 
-                    .lang{
-                        width: 100%;
-                        display: flex;
-                        flex-direction: row;
-
-                        .attr{
-                            width: 50%;
-                        }
-                        .content{
-                            width: 50%;
-                        }
-                    }
-                }
-                
+            .title{
+                padding: 25px 0px;
             }
 
             .reviews{
                 width: 100%;
                 display: flex;
                 flex-direction: column;
+
+                .reviews-empty-div{
+                    width: 100%;
+                    height: 250px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    font-size: 25px;
+                }
 
                 .r{
                     width: 100%;
@@ -250,7 +242,6 @@
 
         .gig-right{
             width: 40%;
-            // background-color: lightsalmon;
             display: flex;
             justify-content: center;
             flex: 1;

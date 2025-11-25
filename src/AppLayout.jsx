@@ -34,13 +34,13 @@ export default function AppLayout() {
                         <Route path="/login" element={!user ? <Login /> : <Home/>} />
                         <Route path="/signup" element={<Signup />} />
                         <Route path="/" element={<Home />} />
-                        <Route path="/category" element={<Gigs />} />
+                        <Route path="/category/:categoryName" element={<Gigs />} />
                         <Route path="/orders" element={<PrivateRoute><Orders /></PrivateRoute>} />
                         <Route path="/orders/:id" element={<PrivateRoute><Order /></PrivateRoute>} />
                         <Route path="/gig/:gigId" element={<Gig />} />
                         <Route path="/my-gigs" element={<PrivateRoute allowedRoles={"seller"}><MyGig /></PrivateRoute>} />
-                        <Route path="/messages" element={<MainContainer />} />
-                        <Route path="/messages/:conversationId" element={<MainContainer />} />
+                        <Route path="/messages" element={<PrivateRoute><MainContainer /></PrivateRoute>} />
+                        <Route path="/messages/:conversationId" element={<PrivateRoute><MainContainer /></PrivateRoute>} />
                         <Route path="/unauthorized" element={<UnAuthorizedPage/>} />
                         <Route path="/create-gig" element={<PrivateRoute allowedRoles={"seller"}><CreateGig/></PrivateRoute>} />
                         <Route path="/create-gig/:gigId" element={<PrivateRoute allowedRoles={"seller"}><CreateGig/></PrivateRoute>} />

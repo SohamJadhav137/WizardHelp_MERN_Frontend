@@ -13,6 +13,7 @@ import { fas } from '@fortawesome/free-solid-svg-icons'
 import { far } from '@fortawesome/free-regular-svg-icons'
 import { fab } from '@fortawesome/free-brands-svg-icons'
 import { getCurrentUser } from '../../utils/getCurrentUser'
+import ReviewBox from '../../Components/Gig/ReviewBox'
 
 library.add(fas, far, fab)
 
@@ -23,7 +24,7 @@ export default function Gig() {
     const [mediaFiles, setMediaFiles] = useState([]);
     const [selectedItem, setSelectedItem] = useState(mediaFiles[0]);
     const isVideo = (url) => {
-        if(!url) return false;
+        if (!url) return false;
         const videoExtensions = ['.mp4', '.mov', '.avi', '.webm'];
         return videoExtensions.some((ext) => url.toLowerCase().endsWith(ext));
     };
@@ -54,40 +55,41 @@ export default function Gig() {
     // const gig = gigs.find((gig) => gig._id === parseInt(gigId))
 
     useEffect(() => {
-        if(mediaFiles.length > 0 && !selectedItem){
+        if (mediaFiles.length > 0 && !selectedItem) {
             setSelectedItem(mediaFiles[0]);
         }
     }, [mediaFiles]);
 
     const token = localStorage.getItem("token");
 
-    if (!gig)
-        return <h2>Gig not found</h2>
-
     const currentUser = getCurrentUser();
     const userId = currentUser?.id;
     const user = localStorage.getItem("user");
     const parsedUserData = JSON.parse(user);
-    const userName = parsedUserData.name;
+    const userName = parsedUserData?.name;
 
     // console.log(`Buyer Id: ${userId}\nBuyer Name: ${userName}\nSeller Id: ${gig.userId}\nSeller Name:${gig.sellerName}`)
 
     const contactSellerHandler = async (token) => {
+        if(!token){
+            alert("You are not logged in!");
+            return navigate('/login');
+        }
+
         try {
             const response = await fetch("http://localhost:5000/api/conversations", {
                 method: 'POST',
                 headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`
-                        },
-                body: JSON.stringify({ buyerId: userId, buyerName: userName, sellerId: gig.userId, sellerName: gig.sellerName })
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ buyerId: userId, buyerName: userName, sellerId: gig?.userId, sellerName: gig?.sellerName })
             });
-            
-            if(response.ok){
-                const data = await response.json();
+
+            if (response.ok) {
                 navigate(`/messages`);
             }
-            else{
+            else {
                 console.error("BACKEND RESPONSE ERROR:", response.statusText)
             }
         } catch (error) {
@@ -97,13 +99,18 @@ export default function Gig() {
 
     const initiateGigOrder = async (gigId) => {
 
+        if(!token){
+            alert("You are not logged in!");
+            return navigate('/login');
+        }
+
         const isConfirmed = window.confirm("Do you want to place this gig order ?");
 
-        if(!isConfirmed) return;
+        if (!isConfirmed) return;
 
-        if(!gigId) return ;
+        if (!gigId) return;
 
-        try{
+        try {
             const response = await fetch(`http://localhost:5000/api/orders/${gigId}`, {
                 method: 'POST',
                 headers: {
@@ -112,24 +119,54 @@ export default function Gig() {
                 }
             });
 
-            if(response.ok){
+            if (response.ok) {
                 const data = await response.json();
                 alert(data.message);
                 navigate('/orders');
             }
-            else{
+            else {
                 alert(response.message);
                 console.error("Failed to create order!", response.status);
             }
-        } catch(error) {
+        } catch (error) {
             console.error("Some error occured while creating order\n", error);
         }
     }
+
+    const [reviews, setReviews] = useState([]);
+
+    // Fetch gig reviews
+    useEffect(() => {
+        const fetchGigReviews = async () => {
+            try {
+                const res = await fetch(`http://localhost:5000/api/review/gig-reviews/${gigId}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    setReviews(data);
+                }
+                else {
+                    console.error("Failed to fetch gig reviews:", res.status);
+                }
+            } catch (error) {
+                console.error("Some error occured:", error);
+            }
+        }
+
+        fetchGigReviews();
+    }, [gigId]);
+
+    const category = gig?.category;
+
     return (
         <div className='gig'>
             <div className="breadcrump">
                 <div className="breadcrump-container">
-                    <span> <Link to='/'>Home</Link> &gt; <Link to='/gigs'>Programming</Link></span>
+                    <span> <Link to='/'>Home</Link><FontAwesomeIcon icon="fa-solid fa-angle-left" /><Link to={`/category/${category}`}>{category}</Link><FontAwesomeIcon icon="fa-solid fa-angle-left" />Gig</span>
                 </div>
             </div>
 
@@ -137,36 +174,29 @@ export default function Gig() {
 
                 <div className="gig-left">
                     <div className="gig-title">
-                        <h2>{gig.title}</h2>
+                        <h2>{gig?.title}</h2>
                     </div>
                     <div className="seller-details">
                         <div className="seller-profile-pic">
                             <i class="fa-solid fa-circle-user"></i>
                         </div>
                         <div className="seller-info">
-                            <span className='seller-name'>{gig.sellerName}</span>
-                            <span>{gig.starRating} <i class="fa-solid fa-star"></i> ({gig.totalReviews})</span>
+                            <span className='seller-name'>{gig?.sellerName}</span>
+                            <span>{gig?.starRating} <i class="fa-solid fa-star"></i> ({gig?.totalReviews})</span>
                         </div>
                     </div>
-                    {/* <Slider slidesToShow={1} arrowsScroll={1} className="gig-pic">
-                        <img src="https://saigontechnology.com/wp-content/uploads/how-to-estimate-a-web-application-development-project.png" alt="" />
-                        <img src="https://www.umwmedia.com/cdn/shop/articles/Web-Development-Services.jpg?v=1723009547" alt="" />
-                        </Slider> */}
-                    {/* <div className="gig-pic">
-                        <img src="https://tagdiv.com/wp-content/uploads/2020/09/Website-business-design.jpg" alt="" />
-                    </div> */}
 
                     <div className="gig-media">
                         <div className="gig-display">
                             {
                                 isVideo(selectedItem) ?
-                                (
-                                    <video src={`${selectedItem}?t=${Date.now()}`} controls/>
-                                )
-                                :
-                                (
-                                    <img src={selectedItem} alt="gig-img" />
-                                )
+                                    (
+                                        <video src={`${selectedItem}?t=${Date.now()}`} controls />
+                                    )
+                                    :
+                                    (
+                                        <img src={selectedItem} alt="gig-img" />
+                                    )
                             }
                         </div>
                         <div className="gig-thumbnails-container">
@@ -175,12 +205,12 @@ export default function Gig() {
                                     <div key={index} className='gig-thumbnail' onClick={() => setSelectedItem(media)}>
                                         {
                                             isVideo(media) ?
-                                            <>
-                                            <video src={media} muted />
-                                            <span><FontAwesomeIcon icon="fa-solid fa-play" /></span>
-                                            </>
-                                            :
-                                            <img src={media} alt='thumbnail'/>
+                                                <>
+                                                    <video src={media} muted />
+                                                    <span><FontAwesomeIcon icon="fa-solid fa-play" /></span>
+                                                </>
+                                                :
+                                                <img src={media} alt='thumbnail' />
                                         }
                                     </div>
                                 ))
@@ -188,134 +218,35 @@ export default function Gig() {
                         </div>
                     </div>
 
-                    {/* <ImageSlider imageURLs={gig.imageURLs} /> */}
                     <div className="about-gig">
 
                         <span className='title'>About Gig:</span>
 
                         <div className="about-gig-para">
-                            <p>{gig.description}</p>
+                            <p>{gig?.description}</p>
                         </div>
-
-                        {/* <div className="tech-stack">
-                            <span className='title'>Technologies:</span>
-                            <br />
-                            <div className="lang">
-                                <div className="attr">
-                                    <h3>Frontend:</h3>
-                                </div>
-                                <div className="content">
-                                    <ul>
-                                        <li>HTML</li>
-                                        <li>CSS</li>
-                                        <li>JS</li>
-                                        <li>React</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <br />
-                            <div className="lang">
-                                <div className="attr">
-                                    <h3>Backend:</h3>
-                                </div>
-                                <div className="content">
-                                    <ul>
-                                        <li>NodeJS</li>
-                                        <li>ExpressJS</li>
-                                        <li>MongoDB</li>
-                                        <li>Python</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <br />
-                            <div className="lang">
-                                <div className="attr">
-                                    <h3>Services:</h3>
-                                </div>
-                                <div className="content">
-                                    <ul>
-                                        <li>Software development</li>
-                                        <li>Web application development </li>
-                                        <li>Mobile application development</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div> */}
                     </div>
 
-                    {/* DUMMY REVIEWS */}
-
+                    <div className='title'>Reviews ({gig?.totalReviews}):</div>
                     <div className="reviews">
-                        <span className='title'>Reviews ({gig.totalReviews})</span>
-                        <div className="r">
-                            <div className="header">
-                                <div className="profile">
-                                    <i class="fa-solid fa-circle-user"></i>
-                                </div>
-                                <div className="customer-info">
-                                    <div className="customer-name">
-                                        <span>Steven | From: Canada</span>
-                                    </div>
-                                    <div className="customer-rating">
-                                        <span>5 <i class="fa-solid fa-star"></i></span>
-                                    </div>
-                                </div>
+                        {
+                            reviews.length === 0 &&
+                            <div className="reviews-empty-div">
+                                No reviews posted yet...
                             </div>
-                            <hr />
-                            <div className="customer-review">
-                                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi accusamus id cum accusantium? Neque deserunt nisi cumque aliquam enim quos.</p>
-                            </div>
-                            <div className="other-details">
-                                <div className="gd1">
-                                    <span className='d1'>Rs 2000</span>
-                                    <br />
-                                    <span className='d2'>Price</span>
-                                </div>
-                                <div className="gd2">
-                                    <span className='d1'>5 days</span>
-                                    <br />
-                                    <span className='d2'>Duration</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="r">
-                            <div className="header">
-                                <div className="profile">
-                                    <i class="fa-solid fa-circle-user"></i>
-                                </div>
-                                <div className="customer-info">
-                                    <div className="customer-name">
-                                        <span>Steven | From: Canada</span>
-                                    </div>
-                                    <div className="customer-rating">
-                                        <span>5 <i class="fa-solid fa-star"></i></span>
-                                    </div>
-                                </div>
-                            </div>
-                            <hr />
-                            <div className="customer-review">
-                                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi accusamus id cum accusantium? Neque deserunt nisi cumque aliquam enim quos.</p>
-                            </div>
-                            <div className="other-details">
-                                <div className="gd1">
-                                    <span className='d1'>Rs 2000</span>
-                                    <br />
-                                    <span className='d2'>Price</span>
-                                </div>
-                                <div className="gd2">
-                                    <span className='d1'>5 days</span>
-                                    <br />
-                                    <span className='d2'>Duration</span>
-                                </div>
-                            </div>
-                        </div>
+                        }
+                        {
+                            reviews.map(r => (
+                                <ReviewBox key={r._id} review={r} />
+                            ))
+                        }
                     </div>
                 </div>
 
                 <div className="gig-right">
                     <div className="gig-info">
                         <div className="gig-price">
-                            <span>Price: Rs {gig.price}</span>
+                            <span>Price: Rs {gig?.price}</span>
                         </div>
                         <hr />
                         {/* <div className="gig-desc">
@@ -324,10 +255,10 @@ export default function Gig() {
                         {/* <hr /> */}
                         <div className="main-attr">
                             <div className="d">
-                                <span>Time: {gig.deliveryDays} Days</span>
+                                <span>Time: {gig?.deliveryDays} Days</span>
                             </div>
                             <div className="d">
-                                <span>Revisions: {gig.revisions}</span>
+                                <span>Revisions: {gig?.revisions}</span>
                             </div>
                         </div>
                         {/* <hr /> */}
@@ -342,7 +273,7 @@ export default function Gig() {
                             </div>
                         </div> */}
                         <div className="buy-gig-btn-container">
-                            <button className='buy-gig-btn' onClick={() => initiateGigOrder(gig._id)}>Continue</button>
+                            <button className='buy-gig-btn' onClick={() => initiateGigOrder(gig?._id)}>Continue</button>
                         </div>
                         <div className="contact-seller-container">
                             <span>Want to discuss or negotiate about this gig ? <span className='contact-seller-text' onClick={() => contactSellerHandler(token)}>Contact seller</span></span>

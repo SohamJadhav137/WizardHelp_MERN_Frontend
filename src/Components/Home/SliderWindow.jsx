@@ -23,11 +23,11 @@ export default function SliderWindow() {
             <div className="slider">
                 <Slider {...settings}>
                     {
-                        gigCat.map(gig => (
-                            <div key={gig.name} className="slider-gig-card" onClick={() => navigate(`/category?category=${encodeURIComponent(gig.name)}`)}>
+                        gigCat.map((cat, index) => (
+                            <div key={index} className="slider-gig-card" onClick={() => navigate(`/category/${(cat.name)}`)}>
                                 <div className="gig-card-img">
-                                    <img src={gig.image} alt="Gig" />
-                                    <div className="gig-card-title">{gig.name}</div>
+                                    <img src={cat.image} alt="Gig" />
+                                    <div className="gig-card-title">{cat.name}</div>
                                 </div>
                             </div>
                         ))

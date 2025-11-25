@@ -2,14 +2,15 @@ import React, { useContext, useEffect, useState } from 'react'
 
 import './Orders.scss';
 import OrderCard from '../../Components/Orders/OrderCard';
-import socket from '../../socket';
+import { getSocket } from '../../socket';
 import { getCurrentUser } from '../../utils/getCurrentUser';
 import { AuthContext } from '../../context/AuthContext';
 
-export default function Orders() {
 
+export default function Orders() {
+  
+  const socket = getSocket();
   const [orders, setOrders] = useState([]);
-  const { user } = useContext(AuthContext);
 
   // Fetching orders
   useEffect(() => {
@@ -40,6 +41,8 @@ export default function Orders() {
   }, []);
 
   useEffect(() => {
+    if(!socket) return;
+
     const handleSocketEvents = (payload) => {
       const updatedOrder = payload.updatedOrder;
 
@@ -61,7 +64,7 @@ export default function Orders() {
     return () => {
       events.forEach(event => socket.off(event, handleSocketEvents));
     }
-  })
+  }, [socket]);
 
   // Receive new order socket event
   useEffect(() => {

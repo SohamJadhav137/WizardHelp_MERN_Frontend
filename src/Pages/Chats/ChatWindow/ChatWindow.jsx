@@ -2,10 +2,11 @@ import React, { useEffect, useRef, useState } from 'react'
 
 import './ChatWindow.scss'
 import Message from '../../../Components/Messages/Message'
-import socket from '../../../socket';
+import { getSocket } from '../../../socket';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
 import { getCurrentUser } from '../../../utils/getCurrentUser';
+
+const socket = getSocket();
 
 export default function ChatWindow() {
   const { conversationId } = useParams();
@@ -60,13 +61,13 @@ export default function ChatWindow() {
   useEffect(() => {
     if(conversationId){
       socket.emit("join_conversation", conversationId);
-      console.log(`${currentUser} joined conversation room ID:`,conversationId);
+      console.log(`💬 ${currentUser} joined conversation room ID:`,conversationId);
     }
 
     return () => {
       if(conversationId){
         socket.emit("leave_conversation", conversationId);
-        console.log(`${currentUser} left conversation room ID:`,conversationId);
+        console.log(`💬 ❌ ${currentUser} left conversation room ID:`,conversationId);
       }
     }
 
