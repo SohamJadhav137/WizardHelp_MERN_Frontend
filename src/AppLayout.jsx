@@ -16,6 +16,7 @@ import { PrivateRoute } from './ProtectEndpoint/PrivateRoute';
 import UnAuthorizedPage from './Pages/UnAuth/UnAuthorizedPage';
 import CreateGig from './Pages/CreateGig/CreateGig';
 import Order from './Pages/Order/Order';
+import Profile from './Pages/Profile/Profile';
 
 export default function AppLayout() {
 
@@ -44,6 +45,7 @@ export default function AppLayout() {
                         <Route path="/unauthorized" element={<UnAuthorizedPage/>} />
                         <Route path="/create-gig" element={<PrivateRoute allowedRoles={"seller"}><CreateGig/></PrivateRoute>} />
                         <Route path="/create-gig/:gigId" element={<PrivateRoute allowedRoles={"seller"}><CreateGig/></PrivateRoute>} />
+                        <Route path="/my-profile" element={<Profile/>} />
                     </Routes>
                 </div>
                 <Footer />

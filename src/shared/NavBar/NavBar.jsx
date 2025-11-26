@@ -71,7 +71,9 @@ export default function NavBar() {
                     {
                       showMenu && (
                         <div className="dropdown-menu">
-                          <span className='dropdown-item-button link'>My profile</span>
+                          <span className='dropdown-item-button link'>
+                            <Link to='/my-profile' className='link'>My profile</Link>
+                          </span>
                           <span className='dropdown-item-button link' onClick={logout} style={{ cursor: 'pointer' }}>Logout</span>
                         </div>
                       )
