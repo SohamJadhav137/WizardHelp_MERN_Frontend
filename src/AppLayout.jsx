@@ -22,7 +22,7 @@ export default function AppLayout() {
 
     const location = useLocation();
     const isAuth = location.pathname === '/login' || location.pathname === '/signup';
-    const mainContentForms = `main-content ${isAuth && 'main-content-align'}`
+    const mainContentForms = `main-content ${isAuth ? 'main-content-align' : ''}`
 
     const { user } = useContext(AuthContext);
 

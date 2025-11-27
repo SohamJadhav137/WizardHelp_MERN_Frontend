@@ -16,14 +16,14 @@ import { AuthProvider } from "./context/AuthContext"
 function App() {
 
   return (
-    <>
-      <BrowserRouter>
-        <AuthProvider>
-          <AppLayout />
-        </AuthProvider>
-      </BrowserRouter>
-    </>
+    <div className="app-wrapper">
+    <BrowserRouter>
+      <AuthProvider>
+        <AppLayout />
+      </AuthProvider>
+    </BrowserRouter>
+    </div>
   )
 }
 
-export default App
+export default App;
