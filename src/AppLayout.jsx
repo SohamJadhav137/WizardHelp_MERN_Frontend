@@ -17,6 +17,7 @@ import UnAuthorizedPage from './Pages/UnAuth/UnAuthorizedPage';
 import CreateGig from './Pages/CreateGig/CreateGig';
 import Order from './Pages/Order/Order';
 import Profile from './Pages/Profile/Profile';
+import EditProfile from './Pages/EditProfile/EditProfile';
 
 export default function AppLayout() {
 
@@ -46,6 +47,7 @@ export default function AppLayout() {
                         <Route path="/create-gig" element={<PrivateRoute allowedRoles={"seller"}><CreateGig/></PrivateRoute>} />
                         <Route path="/create-gig/:gigId" element={<PrivateRoute allowedRoles={"seller"}><CreateGig/></PrivateRoute>} />
                         <Route path="/my-profile" element={<Profile/>} />
+                        <Route path="/my-profile/edit" element={<EditProfile/>} />
                     </Routes>
                 </div>
                 <Footer />

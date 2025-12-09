@@ -11,7 +11,8 @@ export default function Footer() {
   location.pathname === '/my-gigs' ||
   location.pathname === '/create-gig' ||
   location.pathname === '/orders' ||
-  location.pathname.startsWith('/messages/');
+  location.pathname.startsWith('/messages/') ||
+  location.pathname === '/my-profile/edit' ;
   
   const footerForms = `footer-container ${noFooter ? 'footer-container-none' : ''}`
   return (

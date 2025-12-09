@@ -1,0 +1,90 @@
+.edit-profile-container {
+    width: 100%;
+
+    .edit-profile {
+        width: 1300px;
+        margin: 0 auto;
+
+        .edit-profile-title {
+            padding: 20px 0px;
+            font-size: 40px;
+        }
+
+        .label-item {
+            font-size: 20px;
+            margin-right: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            font-size: 15px;
+        }
+
+        input:focus {
+            outline: none;
+        }
+
+        select {
+            padding: 8px;
+            font-size: 15px;
+            width: 50%;
+        }
+
+        select:focus {
+            outline: none;
+        }
+
+        table {
+            width: 60%;
+            margin: auto;
+        }
+
+        table td {
+            width: 50%;
+            padding: 10px 0px;
+        }
+
+        table tr td:first-child {
+            padding-left: 150px;
+        }
+
+        .chip {
+            background-color: rgb(186, 186, 248);
+            margin-right: 10px;
+            margin-bottom: 5px;
+            padding: 5px 10px;
+            display: inline-block;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .shift-right{
+            margin-left: 10px;
+        }
+
+        .profile-action-buttons{
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            
+            button{
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+            }
+
+            .profile-save-btn{
+                background-color: blue;
+            }
+
+            .profile-cancel-btn{
+                background-color: red;
+            }
+        }
+    }
+}

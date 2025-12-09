@@ -234,14 +234,6 @@ export default function CreateGig() {
         event.target.value = null;
     }
 
-    const deleteImage = (id) => {
-        setSelectedImage(selectedImage.filter(file => file.id !== id));
-    };
-
-    const deleteVideo = (id) => {
-        setSelectedVideo(null);
-    };
-
     const FilePreview = ({ file }) => {
         const isImage = file.type.startsWith('image/');
         const isVideo = file.type.startsWith('video/');
@@ -259,20 +251,6 @@ export default function CreateGig() {
             )
         }
     }
-
-    // const fileUploadHandler = (e) => {
-    //     const { id, files } = e.target;
-
-    //     if (id === 'gig-images') {
-    //         setFormData({ ...formData, imageURLs: Array.from(files) });
-    //     }
-    //     else if (id === 'gig-video') {
-    //         setFormData({ ...formData, videoURL: files[0] });
-    //     }
-    //     // else if (id === 'gig-docs') {
-    //     //     setFormData({ ...formData, docURLs: Array.from(files) });
-    //     // }
-    // };
 
     const uploadToS3 = async (file, token) => {
         const response = await fetch(`http://localhost:5000/api/upload/presign?fileName=${file.name}&fileType=${file.type}`, {
@@ -380,10 +358,7 @@ export default function CreateGig() {
             return { message: "An unknown error occured (received non-JSON response)" };
         })
 
-        // console.log("RESPONSE DATA:\n",responseData);
-
         if (response.ok) {
-            // const newGig = await response.json();
             alert("Gig created successfully");
             console.log("Created gigd:", responseData);
         }

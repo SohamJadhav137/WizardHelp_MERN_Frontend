@@ -5,6 +5,7 @@ import { Rating } from '@mui/material';
 import { getCurrentUser } from '../../utils/getCurrentUser';
 import GigCard from '../../Components/Gigs/GigCard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useNavigate } from 'react-router-dom';
 
 export default function Profile() {
     const { user } = useContext(AuthContext);
@@ -13,12 +14,14 @@ export default function Profile() {
     const [activeGigs, setActiveGigs] = useState([]);
     const [loading, setLoading] = useState(false);
     const [favGigs, setFavGigs] = useState([]);
+    const [isPicMenuOpen, setIsPicMenuOpen] = useState(false);
 
-    // const username = userInfo?.username;
-    const country = userInfo?.country;
-    let rating = userInfo?.rating;
-    // let language = [...userInfo?.language];
-    // let skills = [...userInfo?.skills];
+    const togglePicMenu = () => {
+        console.log("Clicked")
+        setIsPicMenuOpen(!isPicMenuOpen)
+    }
+
+    const navigate = useNavigate();
 
     const userDetails = getCurrentUser();
     const userId = userDetails.id;
@@ -76,12 +79,40 @@ export default function Profile() {
         fetchActiveGigs();
     }, [userId]);
 
+    const uploadToS3 = async (file, token) => {
+        const response = await fetch(`http://localhost:5000/api/upload/presign?fileName=${file.name}&fileType=${file.type}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: "Presigne URL request failed!" }))
+            console.error("Presign URL fetch error:", errorData.message);
+            throw new Error("Failed to get S3 upload link!");
+        }
+
+        const { uploadURL, fileURL } = await response.json();
+
+        await fetch(uploadURL, {
+            method: 'PUT',
+            headers: { "Content-Type": file.type },
+            body: file
+        });
+
+        return fileURL;
+    }
+
+
     return (
         <div className='profile-container'>
-            
+
             <div className="profile-title-container">
                 <div className="profile-title">
-                    {userId ===  userInfo?._id ? 'My' : user.name } Profile
+                    <div>
+                        {userId === userInfo?._id ? 'My' : user.name} Profile
+                    </div>
+                    <div className='profile-title-edit-button'>
+                        <button onClick={() => navigate('/my-profile/edit')}>Edit <FontAwesomeIcon icon="fa-solid fa-pen" /></button>
+                    </div>
                 </div>
             </div>
 
@@ -92,46 +123,39 @@ export default function Profile() {
                         <table>
                             <tbody>
                                 <tr>
-                                    <td><span className='profile-attr'><FontAwesomeIcon icon="fa-solid fa-user" style={{color: "#ffffff",}} /> Name:</span></td>
+                                    <td><span className='profile-attr'><FontAwesomeIcon icon="fa-solid fa-user" style={{ color: "#ffffff", }} /> Name:</span></td>
                                     <td>{userInfo?.username}</td>
                                 </tr>
                                 <tr>
                                     <td><span className='profile-attr'><FontAwesomeIcon icon="fa-solid fa-globe" /> Country:</span></td>
                                     <td>{userInfo?.country}</td>
-                                    <td>
-                                        <button><FontAwesomeIcon icon="fa-solid fa-pen" /></button>
-                                    </td>
                                 </tr>
                                 <tr>
                                     <td><span className='profile-attr'><FontAwesomeIcon icon="fa-solid fa-language" /> Languages:</span></td>
                                     <td>
                                         <div className="languages">
-                                        {userInfo?.languages.map((l, index) => (
-                                            
-                                            <div className="lang" key={index}>
-                                                {l}{index !== userInfo?.languages.length-1 && '/'}
-                                            </div>
-                                        ))}
+                                            {userInfo?.languages.map((l, index) => (
+
+                                                <div className="lang" key={index}>
+                                                    {l}{index !== userInfo?.languages.length - 1 && '/'}
+                                                </div>
+                                            ))}
                                         </div>
                                     </td>
-                                    <td>
-                                        <button><FontAwesomeIcon icon="fa-solid fa-pen" /></button>
-                                    </td>
+
                                 </tr>
                                 <tr>
                                     <td><span className='profile-attr'><FontAwesomeIcon icon="fa-solid fa-briefcase" /> Expertise:</span></td>
                                     <td>
                                         <div className="skills">
-                                        {userInfo?.skills.map((l, index) => (                                            
-                                            <div key={index}>
-                                                {l}{index !== userInfo?.skills.length-1 && ','}
-                                            </div>
-                                        ))}
+                                            {userInfo?.skills.map((l, index) => (
+                                                <div key={index}>
+                                                    {l}{index !== userInfo?.skills.length - 1 && ','}
+                                                </div>
+                                            ))}
                                         </div>
                                     </td>
-                                    <td>
-                                        <button><FontAwesomeIcon icon="fa-solid fa-pen" /></button>
-                                    </td>
+
                                 </tr>
                             </tbody>
                         </table>
@@ -146,6 +170,19 @@ export default function Profile() {
                         <div className="joined-from">
                             Member Since, {new Date(userInfo?.createdAt).toLocaleDateString('en-us', { month: 'short', year: 'numeric' })}
                         </div>
+                        <div className="profile-photo-edit">
+                            {/* <FontAwesomeIcon icon="fa-solid fa-camera" /> */}
+                            <button onClick={togglePicMenu}>
+                                <FontAwesomeIcon icon="fa-solid fa-ellipsis-vertical" />
+                            </button>
+                        </div>
+                        {
+                            isPicMenuOpen &&
+                            <div className="pic-menu">
+                                <div className="pic-menu-item">Upload Image</div>
+                                <div className="pic-menu-item">Remove Image</div>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
@@ -156,7 +193,7 @@ export default function Profile() {
                 <div className="active-gigs-container">
                     <div className="active-gigs">
                         <div className="active-gigs-title">
-                            {userId ===  userInfo?._id ? 'My' : user.name } Active Gigs:
+                            {userId === userInfo?._id ? 'My' : user.name} Active Gigs:
                         </div>
 
                         <div className="active-gigs-display">
@@ -167,14 +204,14 @@ export default function Profile() {
                                     )
                                     :
                                     activeGigs.length === 0 ?
-                                    
-                                    <div className='empty-active-gigs'>
-                                        No active gigs at the moment...
-                                    </div>
-                                    :
-                                    activeGigs?.map((gig) => (
-                                        <GigCard key={gig._id} gig={gig} />
-                                    ))
+
+                                        <div className='empty-active-gigs'>
+                                            No active gigs at the moment...
+                                        </div>
+                                        :
+                                        activeGigs?.map((gig) => (
+                                            <GigCard key={gig._id} gig={gig} />
+                                        ))
                             }
                         </div>
                     </div>
