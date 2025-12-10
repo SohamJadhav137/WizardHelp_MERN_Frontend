@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
 import './Gig.scss'
 import { gigs } from '../../Data/GigsData'
@@ -14,6 +14,7 @@ import { far } from '@fortawesome/free-regular-svg-icons'
 import { fab } from '@fortawesome/free-brands-svg-icons'
 import { getCurrentUser } from '../../utils/getCurrentUser'
 import ReviewBox from '../../Components/Gig/ReviewBox'
+import { AuthContext } from '../../context/AuthContext'
 
 library.add(fas, far, fab)
 
@@ -23,13 +24,22 @@ export default function Gig() {
     const [gig, setGig] = useState(null);
     const [mediaFiles, setMediaFiles] = useState([]);
     const [selectedItem, setSelectedItem] = useState(mediaFiles[0]);
+    const [reviews, setReviews] = useState([]);
+    const [sellerInfo, setSellerInfo] = useState([]);
     const isVideo = (url) => {
         if (!url) return false;
         const videoExtensions = ['.mp4', '.mov', '.avi', '.webm'];
         return videoExtensions.some((ext) => url.toLowerCase().endsWith(ext));
     };
     const navigate = useNavigate();
+    const currentUser = getCurrentUser();
+    const userId = currentUser?.id;
+    const userDetails = localStorage.getItem("user");
+    const parsedUserData = JSON.parse(userDetails);
+    const userName = parsedUserData?.name;
+    const token = localStorage.getItem("token");
 
+    // Fetch single gig
     useEffect(() => {
         const fetchSingleGig = async () => {
             try {
@@ -52,26 +62,40 @@ export default function Gig() {
 
         fetchSingleGig();
     }, [gigId]);
-    // const gig = gigs.find((gig) => gig._id === parseInt(gigId))
 
+    // Selected img display
     useEffect(() => {
         if (mediaFiles.length > 0 && !selectedItem) {
             setSelectedItem(mediaFiles[0]);
         }
     }, [mediaFiles]);
 
-    const token = localStorage.getItem("token");
+    // Fetch gig seller info
+    useEffect(() => {
+        const fetchSellerInfo = async () => {
+            if(!gig) return;
 
-    const currentUser = getCurrentUser();
-    const userId = currentUser?.id;
-    const user = localStorage.getItem("user");
-    const parsedUserData = JSON.parse(user);
-    const userName = parsedUserData?.name;
+            try {
+                const res = await fetch(`http://localhost:5000/api/user/${gig.userId}`)
+                if (res.ok) {
+                    const data = await res.json();
+                    setSellerInfo(data.user);
+                }
+                else {
+                    console.error("Failed to fetch user details:", res.status);
+                }
+            } catch (error) {
+                console.error("Some error occured:", error);
+            }
+        }
+
+        fetchSellerInfo();
+    }, [gig, gigId]);
 
     // console.log(`Buyer Id: ${userId}\nBuyer Name: ${userName}\nSeller Id: ${gig.userId}\nSeller Name:${gig.sellerName}`)
 
     const contactSellerHandler = async (token) => {
-        if(!token){
+        if (!token) {
             alert("You are not logged in!");
             return navigate('/login');
         }
@@ -99,7 +123,7 @@ export default function Gig() {
 
     const initiateGigOrder = async (gigId) => {
 
-        if(!token){
+        if (!token) {
             alert("You are not logged in!");
             return navigate('/login');
         }
@@ -133,17 +157,11 @@ export default function Gig() {
         }
     }
 
-    const [reviews, setReviews] = useState([]);
-
     // Fetch gig reviews
     useEffect(() => {
         const fetchGigReviews = async () => {
             try {
-                const res = await fetch(`http://localhost:5000/api/review/gig-reviews/${gigId}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
+                const res = await fetch(`http://localhost:5000/api/review/gig-reviews/${gigId}`);
 
                 if (res.ok) {
                     const data = await res.json();
@@ -178,7 +196,12 @@ export default function Gig() {
                     </div>
                     <div className="seller-details">
                         <div className="seller-profile-pic">
-                            <i class="fa-solid fa-circle-user"></i>
+                            {
+                                sellerInfo?.profilePic ?
+                                    <img src={sellerInfo?.profilePic} alt="" />
+                                    :
+                                    <FontAwesomeIcon icon="fa-solid fa-circle-user" />
+                            }
                         </div>
                         <div className="seller-info">
                             <span className='seller-name'>{gig?.sellerName}</span>

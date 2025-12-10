@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import './Profile.scss';
 import { AuthContext } from '../../context/AuthContext';
 import { Rating } from '@mui/material';
@@ -8,16 +8,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate } from 'react-router-dom';
 
 export default function Profile() {
-    const { user } = useContext(AuthContext);
+    const { user, login } = useContext(AuthContext);
     const [profilePhoto, setProfilePhoto] = useState(false);
     const [userInfo, setUserInfo] = useState(null);
     const [activeGigs, setActiveGigs] = useState([]);
     const [loading, setLoading] = useState(false);
     const [favGigs, setFavGigs] = useState([]);
     const [isPicMenuOpen, setIsPicMenuOpen] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
 
     const togglePicMenu = () => {
-        console.log("Clicked")
         setIsPicMenuOpen(!isPicMenuOpen)
     }
 
@@ -51,7 +51,7 @@ export default function Profile() {
         };
 
         fetchUserRating();
-    }, [userId]);
+    }, [userId, profilePhoto]);
 
     // Fetch seller's active gigs
     useEffect(() => {
@@ -77,7 +77,7 @@ export default function Profile() {
         }
 
         fetchActiveGigs();
-    }, [userId]);
+    }, [userId, profilePhoto]);
 
     const uploadToS3 = async (file, token) => {
         const response = await fetch(`http://localhost:5000/api/upload/presign?fileName=${file.name}&fileType=${file.type}`, {
@@ -101,6 +101,145 @@ export default function Profile() {
         return fileURL;
     }
 
+    const deleteFromS3 = useCallback(async (url, token) => {
+        if (!url) {
+            console.warn("No url provided!");
+            return true;
+        }
+
+        try {
+            const response = await fetch("http://localhost:5000/api/s3/delete-file", {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ fileUrl: url })
+            })
+
+            if (!response.ok) {
+                console.error("Failed to delete file from s3:\n", response.status);
+            }
+        } catch (error) {
+            console.error("Some error during file deletion from s3:\n", error);
+            throw error;
+        }
+    }, []);
+
+    const removeProfilePhoto = async () => {
+        try {
+            const url = userInfo?.profilePic;
+
+            if (!url) {
+                console.warn("No profile pic to delete!");
+                return;
+            }
+
+            setIsUploading(true);
+
+            await deleteFromS3(url, token);
+
+            const res = await fetch(`http://localhost:5000/api/user/${userId}/remove-profile-photo`, {
+                method: 'PATCH',
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                }
+            })
+
+            if (res.ok) {
+                setProfilePhoto(null);
+                const updatedUserContext = {
+                    ...user,
+                    profilePic: null
+                };
+
+                login(updatedUserContext, token);
+                setUserInfo(prev => ({ ...prev, profilePic: null }));
+            }
+            else {
+                console.error("Failed to remove profile photo");
+            }
+        } catch (error) {
+            console.error("Some error occured:", error);
+        } finally{
+            setIsUploading(false);
+        }
+    }
+
+    const uploadProfilePhoto = async (event) => {
+
+        try {
+            const existingProfilePic = userInfo?.profilePic;
+            if (existingProfilePic) {
+                try {
+                    await removeProfilePhoto();
+                } catch (error) {
+                    console.error("Some error occured:", error);
+                    alert("Failed to delete existing profile photo!");
+                    return;
+                }
+            }
+
+            const file = event.target.files[0];
+
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) { alert('Only image is allowed'); event.target.value = null; return; }
+            if (file.size > 5 * 1024 * 1024) { alert('Image limit is 5MB!'); event.target.value = null; return; }
+
+
+            setIsUploading(true);
+
+            const reader = new FileReader();
+
+            reader.onload = async (e) => {
+                const newFile = {
+                    id: Date.now(),
+                    name: file.name,
+                    dataUrl: e.target.result,
+                    originalFile: file
+                };
+                setProfilePhoto(newFile.dataUrl);
+                console.log("Profile photo before upload:\n", userInfo?.profilePic);
+            };
+
+            reader.readAsDataURL(file);
+
+            const finalImageUrl = await uploadToS3(file, token);
+
+            const saveImage = await fetch(`http://localhost:5000/api/user/${userId}/save-profile-photo`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ profilePic: finalImageUrl })
+            });
+
+            if (saveImage.ok) {
+
+                const updatedUserContext = {
+                    ...user,
+                    profilePic: finalImageUrl
+                };
+
+                login(updatedUserContext, token);
+                setProfilePhoto(prev => ({ ...(prev || {}), imageUrl: finalImageUrl }));
+                console.log("Profile photo after upload:\n", userInfo?.profilePic);
+            }
+            else {
+                console.error("Error in saving profile photo:", saveImage.status);
+                alert("Failed to upload profile photo");
+            }
+        } catch (error) {
+            console.error("Some error occured:", error);
+            alert("Image upload failed!");
+        } finally {
+            setIsUploading(false);
+            event.target.value = null;
+        }
+    }
 
     return (
         <div className='profile-container'>
@@ -145,7 +284,7 @@ export default function Profile() {
 
                                 </tr>
                                 <tr>
-                                    <td><span className='profile-attr'><FontAwesomeIcon icon="fa-solid fa-briefcase" /> Expertise:</span></td>
+                                    <td><span className='profile-attr'><FontAwesomeIcon icon="fa-solid fa-paintbrush" /> Skills:</span></td>
                                     <td>
                                         <div className="skills">
                                             {userInfo?.skills.map((l, index) => (
@@ -162,7 +301,18 @@ export default function Profile() {
                     </div>
                     <div className="profile-photo">
                         <div className="photo">
-                            <img src="./user.png" alt="" />
+                            {
+                                isUploading ?
+                                    <>
+                                        <img src="./loading_icon2.gif" alt="" className='loading-gif-overlay' />
+                                        <img src={userInfo?.profilePic || "./user.png"} alt="" />
+                                    </>
+                                    :
+                                    userInfo?.profilePic ?
+                                    <img src={userInfo?.profilePic} alt="" />
+                                    :
+                                    <img src="./user.png" alt="profile_img" />
+                            }
                         </div>
                         <div className="profile-star-rating">
                             {userInfo?.rating} <Rating name="read-only" value={userInfo?.rating ?? 0} readOnly /> ({userInfo?.ratingCount})
@@ -179,8 +329,9 @@ export default function Profile() {
                         {
                             isPicMenuOpen &&
                             <div className="pic-menu">
-                                <div className="pic-menu-item">Upload Image</div>
-                                <div className="pic-menu-item">Remove Image</div>
+                                <input type="file" id="file" class="hidden" onChange={uploadProfilePhoto} accept='image/*' disabled={isUploading} />
+                                <label htmlFor="file" className='pic-menu-item'>Upload photo <FontAwesomeIcon icon="fa-solid fa-upload" /> </label>
+                                <div className="pic-menu-item"><button onClick={removeProfilePhoto}>Remove photo <FontAwesomeIcon icon="fa-solid fa-trash" /></button></div>
                             </div>
                         }
                     </div>

@@ -1,8 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 
 import './NavBar.scss'
 import { Link, useLocation } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
+// import useClickOutside from '../../customHooks/useClickOutside';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export default function NavBar() {
 
@@ -11,6 +13,7 @@ export default function NavBar() {
   // const [active, setActive] = useState(true)
   const [isLogin, setLogin] = useState(false)
   const [showMenu, setShowMenu] = useState(false)
+  // const menuRef = useRef(null);
 
   const location = useLocation();
   const isHomePage = location.pathname === '/';
@@ -18,9 +21,12 @@ export default function NavBar() {
 
   const navBarForms = `navbar ${isHomePage ? 'navbar-sticky' : 'navbar-default'}`;
 
-  const toggleMenu = () => {
-    setShowMenu(prev => !prev)
+  const toggleMenu = (event) => {
+    // event.stopPropagation();
+    setShowMenu(prev => !prev);
   }
+
+  // useClickOutside(menuRef, toggleMenu);
 
   // const isScroll = () => {
   //   window.scrollY > 0 ? setActive(true) : setActive(false)
@@ -66,7 +72,7 @@ export default function NavBar() {
                 <>
                   <div className="auth-after">
                     <div className="user-profile" onClick={toggleMenu} style={{ cursor: 'pointer' }}>
-                      <span><i class="fa-solid fa-user"></i> {user.name}</span>
+                      <span><FontAwesomeIcon icon="fa-solid fa-user" /> {user.name}</span>
                     </div>
                     {
                       showMenu && (
@@ -82,7 +88,6 @@ export default function NavBar() {
                 </>
                 :
                 <>
-                  <button className='a'> Become Seller</button>
                   <button className='a'>
                     <Link to="/login" className='link'>Login</Link>
                   </button>

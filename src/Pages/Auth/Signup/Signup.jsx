@@ -17,6 +17,9 @@ export default function Signup() {
     email: "",
     password: "",
     confirmPassword: "",
+    country: "",
+    languages: [],
+    skills: [],
     role: "buyer"
   });
 
@@ -30,8 +33,13 @@ export default function Signup() {
     e.preventDefault();
     setError("");
 
-    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+    if (!formData.username || !formData.email || !formData.password || !formData.confirmPassword || !formData.country || !formData.languages || !formData.skills) {
       setError("All fields are required!");
+      return;
+    }
+
+    if(!formData.username){
+      setError("Username is required!");
       return;
     }
 
@@ -46,18 +54,22 @@ export default function Signup() {
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords don't match");
+      setError("Passwords don't match!");
+      return;
+    }
+
+    if (formData.languages.length === 0){
+      setError("Select atleast one language!");
       return;
     }
 
     setLoading(true);
 
     try {
-      const token = localStorage.getItem("token");
       
       const res = await fetch("http://localhost:5000/api/auth/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
       });
 
@@ -70,7 +82,7 @@ export default function Signup() {
 
       if(data.success){
         localStorage.setItem("token", data.token);
-        const user = { email: data.email, name: data.name, role: data.role }
+        const user = { email: data.email, username: data.username, role: data.role, profilePic: data.profilePic || null }
         localStorage.setItem("user", user);
         console.log(data);
         console.log(user);
@@ -101,6 +113,8 @@ export default function Signup() {
       <input type="password" name='password' onChange={onChangeHandler} />
       <label>Confirm Password</label>
       <input type="password" name='confirmPassword' onChange={onChangeHandler} />
+      <label htmlFor="">Country</label>
+      <select name="" id=""></select>
       <div className="radio-buttons">
         <label>Select Role:</label>
         <input type="radio" id='buyer-button' value="buyer" name='role' onChange={onChangeHandler} checked={formData.role === "buyer"} />
