@@ -1,28 +1,96 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import './Chat.scss'
 import profile_img from '../../assets/profile.png'
+import { getCurrentUser } from '../../utils/getCurrentUser'
+import { getSocket } from '../../socket';
 
 export default function Chat({ role, conv, onSelectConversation }) {
 
+  const [recipientDetails, setrecipientDetails] = useState([]);
+  const [lastMsg, setLastMsg] = useState(conv.lastMessage);
+  
+  const token = localStorage.getItem("token");
+  const date = new Date(conv.updatedAt);
+  const formattedTime = date.toLocaleTimeString('en-us', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+  const socket = getSocket();
+
+  let recipientId;
+  if(role === 'buyer'){
+    recipientId = conv?.sellerId._id;
+  }
+  else if(role === 'seller'){
+    recipientId = conv?.buyerId._id;
+  }
+
+  // Fetch recipient details
+  useEffect(() => {
+    const fetchRecipientDetails = async () => {
+      try{
+        const res = await fetch(`http://localhost:5000/api/user/${recipientId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+
+        if(res.ok){
+          const data = await res.json();
+          setrecipientDetails(data.user);
+        }
+        else{
+          console.error("Failed to fetch recipient details:", res.status);
+        }
+      } catch(error){
+        console.error("Some error occured:", error);
+      }
+    };
+
+    fetchRecipientDetails();
+  }, [recipientId]);
+
+  // Last msg socket display
+  useEffect(() => {
+    if(!socket) return;
+    
+    const handleSocketEvent = (payload) => {
+      console.log("Socket exec!")
+      setLastMsg(payload.lastMsg);
+    }
+
+    socket.on("lastMsgReceived", handleSocketEvent);
+
+    return () => {
+      socket.off("lastMsgReceived", handleSocketEvent);
+    }
+
+  }, [socket]);
+
   return (
     <div className="chat" onClick={() => onSelectConversation(conv._id)}>
+
       <div className="chat-profile-photo">
         <div className="chat-profile-photo-container">
-          <img src={profile_img} alt="" />
+          <img src={recipientDetails?.profilePic || profile_img} alt="" />
         </div>
       </div>
+
       <div className="chat-info">
         <div className="chat-name">
           {
             role === 'buyer' ?
-              <span>{conv.sellerName}</span>
+              <div>{conv.sellerName}</div>
               :
-              <span>{conv.buyerName}</span>
+              <div>{conv.buyerName}</div>
           }
+          <div className='last-msg-sent'>{formattedTime}</div>
+          
         </div>
         <div className="chat-last-message">
-          <span>{conv.lastMessage}</span>
+          <span>{lastMsg || conv.lastMessage}</span>
         </div>
       </div>
     </div>

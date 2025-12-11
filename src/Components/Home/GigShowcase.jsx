@@ -32,6 +32,24 @@ const gigs = [
     },
 ];
 
+const transitionVariants = {
+    initial: {
+        x: '100%',
+        opacity: 2,
+        zIndex: 3
+    },
+    animate: {
+        x: 0,
+        opacity: 2,
+        zIndex: 1
+    },
+    exit: {
+        x: 0,
+        opacity: 1,
+        zIndex: 0
+    }
+}
+
 export default function GigShowcase() {
 
     const [index, setIndex] = useState(0)
@@ -39,7 +57,7 @@ export default function GigShowcase() {
     useEffect(() => {
         const interval = setInterval(() => {
             setIndex((prev) => (prev + 1) % gigs.length)
-        }, 5000);
+        }, 4000);
 
         return () => clearInterval(interval)
     }, [])
@@ -47,11 +65,16 @@ export default function GigShowcase() {
     return (
         <>
             <div className="gig-showcase-container">
+                <div className="gig-showcase-title-container">
+                    <div className="gig-showcase-title">
+                        Gig Highlights
+                    </div>
+                </div>
                 <div className="gig-card-showcase">
-                    <AnimatePresence mode="wait">
-                        <motion.div key={gigs[index].id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 1 }} className="gig-showcase">
+                    <AnimatePresence initial={false}>
+                        <motion.div key={gigs[index].id} variants={transitionVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 2, ease: "easeOut" }} className="gig-showcase">
                             <img src={gigs[index].image} alt={gigs[index].title} />
-                            <div key={gigs[index].id} className="gig-card-overlay">
+                            <div key={gigs[index].id} className="gig-card-details-overlay">
                                 <h3>{gigs[index].title}</h3>
                                 <p>by {gigs[index].seller} ⭐ {gigs[index].rating} <br /> {gigs[index].reviews} ratings</p>
                                 <p className='gig-pricing'>Starting at {gigs[index].price}$</p>

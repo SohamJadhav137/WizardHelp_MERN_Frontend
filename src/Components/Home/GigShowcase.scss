@@ -1,23 +1,42 @@
 .gig-showcase-container {
   width: 100%;
   height: 100%;
-  margin: 0px auto;
   text-align: center;
+  margin-bottom: 40px;
   // background: aqua;
 }
 
+.gig-showcase-title-container{
+  width: 100%;
+
+  .gig-showcase-title{
+    max-width: 1300px;
+    width: 100%;
+    margin: 0 auto;
+    font-size: 50px;
+    font-weight: 600;
+    padding: 10px 0px;
+  }
+}
+
 .gig-card-showcase {
-  width: 1300px;
+  max-width: 1300px;
+  width: 100%;
+  height: 550px;
   margin: 0 auto;
   position: relative;
-  // height: 96%;
-  // overflow: hidden;
-  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  box-shadow: 0px 4x 15px rgba(0, 0, 0, 0.15);
+  border-radius: 0px 40px 0px 0px;
 }
 
 .gig-showcase {
-  // background-color: blue;
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 0px 40px 0px 0px;
 }
 
 .gig-showcase::after{
@@ -27,17 +46,19 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.3));
+  border-radius: 0px 40px 0px 0px;
+  background: linear-gradient(to right, rgba(0,0,0,0.9), rgba(0,0,0,0.2));
 }
 
-.gig-card img{
+img{
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+  border-radius: 0px 40px 0px 0px;
 }
 
-.gig-card-overlay {
+.gig-card-details-overlay {
   position: absolute;
   bottom: 120px;
   left: 20px;
@@ -46,7 +67,7 @@
   color: white;
   text-align: left;
   padding: 25px;
-  z-index: 3;
+  z-index: 10;
 }
 
 .gig-card-overlay h3 {

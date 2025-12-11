@@ -6,6 +6,7 @@ import { getSocket } from '../../socket';
 import { Rating } from '@mui/material'
 
 import './Order.scss';
+import { getCurrentUser } from '../../utils/getCurrentUser';
 
 const socket = getSocket();
 
@@ -35,6 +36,10 @@ export default function Order() {
 
     const navigate = useNavigate();
     const token = localStorage.getItem("token");
+
+    const currentUser = getCurrentUser();
+    const currentUsername = user.username;
+    // console.log("Current user:", currentUsername)
 
     // set userId based on role
     useEffect(() => {
@@ -170,22 +175,38 @@ export default function Order() {
         fetchUserName();
     }, [userId]);
 
+    // Names to be sent according to role
+
+    let buyerName, sellerName;
+
+    if (currentUser.role === 'buyer') {
+        buyerName = currentUsername;
+        sellerName = username;
+    }
+    else if (currentUser.role === 'seller') {
+        buyerName = username;
+        sellerName = currentUsername;
+    }
+
     const redirectToChat = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/conversations/${userId}`, {
-                headers: { Authorization: `Bearer ${token}` }
+            const response = await fetch("http://localhost:5000/api/conversations", {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ buyerId: order?.buyerId, buyerName: buyerName, sellerId: order?.sellerId, sellerName: sellerName })
             });
 
             if (response.ok) {
-                const data = await response.json();
-                console.log(data)
-                navigate(`/messages/${data._id}`);
+                navigate(`/messages`);
             }
             else {
-                console.error('Failed to fetch conversationId:', response.status);
+                console.error("BACKEND RESPONSE ERROR:", response.statusText)
             }
         } catch (error) {
-            console.error('Some error occured while fetching conversationId', error);
+            console.error("Error in initiating new conversation!", error);
         }
     }
 
@@ -661,7 +682,7 @@ export default function Order() {
         if (!id) return;
 
         const fetchBuyerRating = async () => {
-            if(user.role === 'buyer') return;
+            if (user.role === 'buyer') return;
 
             try {
                 const res = await fetch(`http://localhost:5000/api/review/buyer-rating/${id}`, {
@@ -719,6 +740,8 @@ export default function Order() {
 
     // Fetch buyer review
     useEffect(() => {
+        if (order?.status !== 'completed') return;
+
         const fetchBuyerReview = async () => {
             if (user.role === 'seller') {
                 return;
@@ -1369,7 +1392,7 @@ export default function Order() {
                                                     <div>
                                                         <button onClick={submitBuyerRatingHandler}>Submit</button>
                                                     </div>
-                                                </div>                                                
+                                                </div>
                                         }
                                     </>
                                 }

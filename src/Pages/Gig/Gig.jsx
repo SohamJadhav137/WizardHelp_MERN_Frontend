@@ -36,7 +36,7 @@ export default function Gig() {
     const userId = currentUser?.id;
     const userDetails = localStorage.getItem("user");
     const parsedUserData = JSON.parse(userDetails);
-    const userName = parsedUserData?.name;
+    const userName = parsedUserData?.username;
     const token = localStorage.getItem("token");
 
     // Fetch single gig

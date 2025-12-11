@@ -19,7 +19,7 @@ export const getSocket = () => {
             withCredentials: true,
             auth: {
                 userId: userId,
-                username: user?.name
+                username: user?.username
             }
         });
         
@@ -29,12 +29,12 @@ export const getSocket = () => {
             console.log(`Frontend connected to server with ID: ${socket.id}`);
             if (userId) {
                 socket.emit("joinRoom", userId);
-                console.log(`${user?.name} has joined fresh room at id:`, userId);
+                console.log(`${user?.username} has joined fresh room at id:`, userId);
             }
         });
 
         socket.on("disconnect", () => {
-            console.log(`${user?.name} disconnected from server`);
+            console.log(`${user?.username} disconnected from server`);
         });
 
         socket.on("connect_error", (err) => {

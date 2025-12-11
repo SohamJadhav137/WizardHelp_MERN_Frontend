@@ -40,6 +40,7 @@ export default function Orders() {
     fetchOrders();
   }, []);
 
+  // Handling orders socket events
   useEffect(() => {
     if(!socket) return;
 

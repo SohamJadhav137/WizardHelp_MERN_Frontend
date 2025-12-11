@@ -10,7 +10,7 @@ export default function NavBar() {
 
   const { user, logout } = useContext(AuthContext);
 
-  // const [active, setActive] = useState(true)
+  const [active, setActive] = useState(true)
   const [isLogin, setLogin] = useState(false)
   const [showMenu, setShowMenu] = useState(false)
   // const menuRef = useRef(null);
@@ -28,25 +28,31 @@ export default function NavBar() {
 
   // useClickOutside(menuRef, toggleMenu);
 
-  // const isScroll = () => {
-  //   window.scrollY > 0 ? setActive(true) : setActive(false)
-  // }
+  const isScroll = () => {
+    window.scrollY > 0 ? setActive(true) : setActive(false)
+  }
 
-  // useEffect(() => {
-  //   window.addEventListener('scroll', isScroll)
-  //   return () => {
-  //     window.removeEventListener('scroll', isScroll)
-  //   }
-  // }, [])
+  useEffect(() => {
+    window.addEventListener('scroll', isScroll)
+    return () => {
+      window.removeEventListener('scroll', isScroll)
+    }
+  }, [])
 
   return (
     <>
-      {/* <div className={active || pathName!=='/' ? "navbar" : 'navbar-title'}> */}
-      <div className={navBarForms}>
+      <div className={active ? "navbar active" : 'navbar'}>
+      {/* <div className={navBarForms}> */}
         <div className="container">
           <div className="website-name">
             <Link to='/' className='link'>
-              <span className='text'>Website</span>
+            <span className='text'>Wi<FontAwesomeIcon icon="fa-solid fa-bolt" className='icon' />ardHelp</span>
+            {/* {
+              active ?
+              :
+              <span className='text'>Wi<FontAwesomeIcon icon="fa-solid fa-bolt" style={{color: "#F4F4F4",}} className='icon' />ardHelp</span>
+              
+            } */}
             </Link>
           </div>
           <div className="titles">
@@ -62,7 +68,7 @@ export default function NavBar() {
                     </>
                   )
                 }
-                <span>Categories</span>
+                <span className='link'>Categories</span>
               </>
             }
           </div>
@@ -72,7 +78,7 @@ export default function NavBar() {
                 <>
                   <div className="auth-after">
                     <div className="user-profile" onClick={toggleMenu} style={{ cursor: 'pointer' }}>
-                      <span><FontAwesomeIcon icon="fa-solid fa-user" /> {user.name}</span>
+                      <span><FontAwesomeIcon icon="fa-solid fa-user" /> {user.username}</span>
                     </div>
                     {
                       showMenu && (

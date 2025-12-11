@@ -31,6 +31,12 @@ export default function Home() {
     {/****************************************** FEATURES SECTION ********************************************/}
       <div className="container2">
 
+        <div className="features-title-container">
+          <div className="features-title">
+            Key Features
+          </div>
+        </div>
+
         <div className="features">
           <div className="f1">
             <img src={analytics_img} alt="image" />
@@ -58,11 +64,13 @@ export default function Home() {
       {/****************************************** HOW IT WORKS SECTION ********************************************/}
 
       <div className="container3">
-        <div className="sub-container">
-          <div className="c1">
-            <h1>How it works ?</h1>
+        <div className="features-title-container">
+          <div className="features-title">
+            How it works ?
           </div>
-          <div className="c2">
+        </div>
+        <div className="sub-container">
+          <div className="c">
             <div className="step">
               <img src={options_pic} alt="image" />
               <span className='title'>Step-1: <br />Choose what you need</span>
@@ -86,9 +94,7 @@ export default function Home() {
       </div>
 
       {/****************************************** GIG SHOWCASE SECTION ********************************************/}
-      <GigShowcase/>
-
-      
+      <GigShowcase/>      
     </>
   )
 }

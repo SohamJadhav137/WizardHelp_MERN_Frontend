@@ -162,7 +162,7 @@ export default function Profile() {
             }
         } catch (error) {
             console.error("Some error occured:", error);
-        } finally{
+        } finally {
             setIsUploading(false);
         }
     }
@@ -283,19 +283,21 @@ export default function Profile() {
                                     </td>
 
                                 </tr>
-                                <tr>
-                                    <td><span className='profile-attr'><FontAwesomeIcon icon="fa-solid fa-paintbrush" /> Skills:</span></td>
-                                    <td>
-                                        <div className="skills">
-                                            {userInfo?.skills.map((l, index) => (
-                                                <div key={index}>
-                                                    {l}{index !== userInfo?.skills.length - 1 && ','}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </td>
-
-                                </tr>
+                                {
+                                    userDetails.role === 'seller' &&
+                                    <tr>
+                                        <td><span className='profile-attr'><FontAwesomeIcon icon="fa-solid fa-paintbrush" /> Skills:</span></td>
+                                        <td>
+                                            <div className="skills">
+                                                {userInfo?.skills.map((l, index) => (
+                                                    <div key={index}>
+                                                        {l}{index !== userInfo?.skills.length - 1 && ','}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
                             </tbody>
                         </table>
                     </div>
@@ -309,9 +311,9 @@ export default function Profile() {
                                     </>
                                     :
                                     userInfo?.profilePic ?
-                                    <img src={userInfo?.profilePic} alt="" />
-                                    :
-                                    <img src="./user.png" alt="profile_img" />
+                                        <img src={userInfo?.profilePic} alt="" />
+                                        :
+                                        <img src="./user.png" alt="profile_img" />
                             }
                         </div>
                         <div className="profile-star-rating">

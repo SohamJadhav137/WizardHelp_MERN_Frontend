@@ -23,6 +23,7 @@ export default function MainContainer() {
     }
   }
 
+  // Fetch conversations
   useEffect(() => {
     const fetchConverstaions = async () => {
       try {

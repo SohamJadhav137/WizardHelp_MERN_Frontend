@@ -14,7 +14,7 @@ export default function ChatWindow() {
   const [messages, setMessages] = useState([]);
 
   const navigate = useNavigate();
-  
+
   const bottomRef = useRef();
 
   const sender = getCurrentUser();
@@ -23,30 +23,32 @@ export default function ChatWindow() {
   const token = localStorage.getItem("token");
   const user = localStorage.getItem("user");
   const parsedUserData = JSON.parse(user);
-  const currentUser = parsedUserData?.name;
+  const currentUser = parsedUserData?.username;
 
-  useEffect(()=> {
+  // Scroll to last msg
+  useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages]);
 
+  // Fetch msgs from DB
   useEffect(() => {
-    if(!conversationId || conversationId === undefined){
+    if (!conversationId || conversationId === undefined) {
       setMessages([]);
       return;
     }
 
     const fetchMessages = async (token) => {
       try {
-        
+
         const response = await fetch(`http://localhost:5000/api/messages/${conversationId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        
-        if(response.ok){
+
+        if (response.ok) {
           const data = await response.json();
           setMessages(data);
         }
-        else{
+        else {
           console.error("BACKEND RESPONSE ERROR:", response.status);
         }
       } catch (error) {
@@ -58,21 +60,23 @@ export default function ChatWindow() {
 
   }, [conversationId]);
 
+  // Join/Leave conv room
   useEffect(() => {
-    if(conversationId){
+    if (conversationId) {
       socket.emit("join_conversation", conversationId);
-      console.log(`💬 ${currentUser} joined conversation room ID:`,conversationId);
+      console.log(`💬 ${currentUser} joined conversation room ID:`, conversationId);
     }
 
     return () => {
-      if(conversationId){
+      if (conversationId) {
         socket.emit("leave_conversation", conversationId);
-        console.log(`💬 ❌ ${currentUser} left conversation room ID:`,conversationId);
+        console.log(`💬 ❌ ${currentUser} left conversation room ID:`, conversationId);
       }
     }
 
   }, [conversationId]);
 
+  // Receive msg socket
   useEffect(() => {
     const receiveMessageHandler = (data) => {
       console.log("Received Message:\n", data);
@@ -81,31 +85,33 @@ export default function ChatWindow() {
     }
 
     socket.on("receive_message", receiveMessageHandler);
-    
+
     return () => {
       socket.off("receive_message", receiveMessageHandler);
     };
   }, []);
-  
+
+  // Send msg socket
   const handleSend = async () => {
-    if(!message.trim()) return;
-    
+    if (!message.trim()) return;
+
     // Some new data to be sent from client
     const msgToSend = {
       conversationId,
       senderId,
       text: message,
       currentUser
-    };    
-    
+    };
+
     socket.emit("send_message", msgToSend);
-    
+
     setMessage("");
   };
   // console.log("Messages:\n",messages);
 
+  // Send msg handler
   const submitKeyHandler = (e) => {
-    if(e.key === 'Enter'){
+    if (e.key === 'Enter') {
       handleSend();
     }
   }
@@ -117,17 +123,25 @@ export default function ChatWindow() {
       </div>
       <div className='messages-list'>
         {
-          messages.map((m, i) => (
-            <Message key={i} msg={m.text} info={ m.senderId._id === senderId ? "You" : m.senderId.username }/>
-          ))
+          !conversationId ?
+            <div className="no-chat-selected-text">
+              Select a chat to view messages
+            </div>
+            :
+            messages.map((m, i) => (
+              <Message key={i} msg={m.text} info={m.senderId._id === senderId ? "You" : m.senderId.username} />
+            ))
         }
 
         <div ref={bottomRef} />
       </div>
-      <div className="input-box">
-        <input type="text" value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={submitKeyHandler} placeholder='Type a message...'/>
-        <button onClick={handleSend}>Send</button>
-      </div>
+      {
+        conversationId &&
+        <div className="input-box">
+          <input type="text" value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={submitKeyHandler} placeholder='Type a message...' />
+          <button onClick={handleSend}>Send</button>
+        </div>
+      }
     </div>
   )
 }

@@ -62,7 +62,7 @@
                 }
 
                 table {
-                    width: 90%;
+                    width: 80%;
                     tbody {
                         .languages {
                             display: flex;
@@ -92,6 +92,7 @@
                 justify-content: center;
                 align-items: center;
                 position: relative;
+                padding: 25px 0px;
                 gap: 10px;
 
                 .photo {

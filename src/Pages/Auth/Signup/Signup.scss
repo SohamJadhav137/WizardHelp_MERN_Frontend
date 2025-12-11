@@ -12,31 +12,32 @@
         font-size: 25px;
     }
 
-    input{
+    input {
         padding: 7px;
         border: none;
         margin-bottom: 5px;
         font-size: 15px;
     }
-    input:focus{
+
+    input:focus {
         outline: none;
     }
 
-    label{
+    label {
         font-size: 18px;
         margin-bottom: 5px;
     }
 
-    .desc{
+    .desc {
         text-align: center;
         margin-top: 20px;
 
-        span{
+        span {
             color: lightcyan;
         }
     }
 
-    .auth-button{
+    .auth-button {
         margin: 0px 90px;
         margin-top: 10px;
         padding: 10px 20px;
@@ -46,19 +47,69 @@
         cursor: pointer;
     }
 
-    .loading-state{
+    .loading-state {
         background-color: rgba(255, 255, 255, 0.719);
         cursor: not-allowed;
     }
 
-    .error{
+    .error {
         color: red;
     }
 
-    .radio-buttons{
+    .radio-buttons-container {
         margin: 10px 0px;
-        label{
+
+        .rb{
+            display: flex;
+        }
+
+        .radio-buttons{
+            padding-top: 10px;
+            display: flex;
+            gap: 30px;
+        }
+
+        label {
             margin-right: 20px;
         }
+    }
+
+    .label-item {
+        // font-size: 20px;
+        margin-right: 20px;
+        margin-top: 8px;
+    }
+
+    input {
+        width: 100%;
+        padding: 8px;
+        font-size: 15px;
+    }
+
+    input:focus {
+        outline: none;
+    }
+
+    select {
+        padding: 8px;
+        font-size: 15px;
+    }
+
+    select:focus {
+        outline: none;
+    }
+
+    .chips-container{
+        padding-top: 10px;
+    }
+
+    .chip {
+        background-color: rgb(186, 186, 248);
+        margin-right: 10px;
+        margin-bottom: 5px;
+        padding: 5px 10px;
+        display: inline-block;
+        border-radius: 8px;
+        cursor: pointer;
     }
 }
