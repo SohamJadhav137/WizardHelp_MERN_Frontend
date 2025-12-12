@@ -4,6 +4,7 @@ import './ChatsContainer.scss'
 // import profile_img from '../../../assets/profile.png'
 import Chat from '../../../Components/Messages/Chat'
 import { getCurrentUser } from '../../../utils/getCurrentUser'
+import { DotLottieReact } from '@lottiefiles/dotlottie-react'
 
 export default function ChatsContainer({ convList, onSelectConversation }) {
   const currentUser = getCurrentUser();
@@ -11,6 +12,9 @@ export default function ChatsContainer({ convList, onSelectConversation }) {
 
   return (
     <div className='chats-container'>
+      <div className="chats-title">
+        Messages
+      </div>
       <div className="search-bar">
         <input type="text" placeholder='Type name...' />
       </div>
@@ -18,8 +22,15 @@ export default function ChatsContainer({ convList, onSelectConversation }) {
         {
           convList.length === 0 ?
             <div className='chat-list-empty'>
-              <img src="empty_ghost.gif" alt="" />
-              Its Quiet<br/>in Here...
+              {/* <img src="empty_ghost.gif" alt="" /> */}
+              <div className="chat-list-empty-gif">
+              <DotLottieReact
+                src="https://lottie.host/fc62c3e2-73cb-45c9-8217-19a12ffe44a1/GzlNQuUcrn.lottie"
+                loop
+                autoplay
+                />
+                </div>
+              Its Quiet<br />in Here...
             </div>
             :
             convList.map(conv => (

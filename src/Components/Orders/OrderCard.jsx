@@ -9,16 +9,18 @@ export default function OrderCard(prop) {
     const { user } = useContext(AuthContext);
 
     const [gigTitle, setGigTitle] = useState(null);
-    const [username, setUsername] = useState(null);
+    const [userDetails, setUserDetails] = useState([]);
+    const [coverImage, setCoverImage] = useState(null);
+    const gigId = prop.order?.gigId;
     let userId = null;
     if (user.role === 'seller') {
-        userId = prop.order.buyerId;
+        userId = prop.order?.buyerId;
     }
     else {
-        userId = prop.order.sellerId;
+        userId = prop.order?.sellerId;
     }
-    const [coverImage, setCoverImage] = useState(null);
-    const dateObject = new Date(prop.order.createdAt);
+    
+    const dateObject = new Date(prop.order?.createdAt);
     const options = {
         year: "numeric",
         month: "short",
@@ -26,23 +28,29 @@ export default function OrderCard(prop) {
         timeZone: "UTC"
     };
     const orderCreationDate = dateObject.toLocaleDateString('en-US', options);
-
+    
     const initialDays = () => {
-        const now = new Date();
-        const deadline = new Date(prop.order.dueDate);
-        return Math.ceil((deadline - now) / (24 * 60 * 60 * 1000));
+        if (prop.order?.status !== "requested") {
+            const currentDate = new Date();
+            const deadline = new Date(prop.order?.dueDate);
+            return Math.ceil((deadline - currentDate) / (24 * 60 * 60 * 1000));
+        }
     };
 
     const [remainingDays, setRemainingDays] = useState(initialDays);
+
+    // Start calculation of due date after order is active
     useEffect(() => {
+        if (prop.order?.status === 'requested') return;
+
         const interval = setInterval(() => {
             const currentDate = new Date();
-            const remainingDaysInMs = new Date(prop.order.dueDate) - currentDate;
+            const remainingDaysInMs = new Date(prop.order?.dueDate) - currentDate;
             setRemainingDays(Math.ceil(remainingDaysInMs / (24 * 60 * 60 * 1000)));
         }, 1000 * 60);
 
         return () => clearInterval(interval);
-    }, [prop.order.dueDate]);
+    }, [prop.order?.dueDate]);
 
     const token = localStorage.getItem("token");
 
@@ -50,17 +58,18 @@ export default function OrderCard(prop) {
 
     // Fetch gig details
     useEffect(() => {
+        if(!gigId) return;
         const fetchGigTitle = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/api/gigs/${prop.order.gigId}`, {
+                const response = await fetch(`http://localhost:5000/api/gigs/${gigId}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 
                 if (response.ok) {
                     const data = await response.json();
                     // console.log(data);
-                    setGigTitle(data.gig.title);
-                    setCoverImage(data.gig.coverImageURL)
+                    setGigTitle(data.gig?.title);
+                    setCoverImage(data.gig?.coverImageURL)
                 }
                 else {
                     console.error("Failed to fetch gig title:\n", response.status);
@@ -71,10 +80,12 @@ export default function OrderCard(prop) {
         }
 
         fetchGigTitle();
-    }, [prop.order.gigId]);
+    }, [gigId]);
 
     // Fetch username
     useEffect(() => {
+        if(!userId) return;
+
         const fetchUserName = async () => {
             try {
                 const response = await fetch(`http://localhost:5000/api/user/${userId}`, {
@@ -83,8 +94,7 @@ export default function OrderCard(prop) {
 
                 if (response.ok) {
                     const data = await response.json();
-                    // console.log(data);
-                    setUsername(data.user.username);
+                    setUserDetails(data.user);
                 }
                 else {
                     console.error("Failed to fetch gig title:\n", response.status);
@@ -95,7 +105,7 @@ export default function OrderCard(prop) {
         }
 
         fetchUserName();
-    }, [prop.order.sellerId]);
+    }, [userId]);
 
     return (
         <div className='order-card'>
@@ -103,34 +113,33 @@ export default function OrderCard(prop) {
                 <div className="order-card-title-preview">
                     <img src={coverImage} alt="" />
                 </div>
-                <div className="order-card-title-info">
-                    <div>
-                        <span className='order-card-title-info-gig-name'>Gig Title: {gigTitle}</span>
-                        <br />
-                        <span>
+                <div className="order-card-title-info-container">
+                    <div className='order-card-title-info'>
+                        <div className='order-card-title-info-gig-name'>Gig Title: {gigTitle}</div>
+                        <div className='username'>
                             {
                                 user.role === 'seller' ?
-                                    `Buyer Name: ${username}`
-                                    :
-                                    `Seller Name: ${username}`
+                                `Buyer: ${userDetails.username}`
+                                :
+                                `Seller: ${userDetails.username}`
                             }
-                        </span>
+                        </div>
                     </div>
                 </div>
             </div>
             <hr />
             <div className="order-card-info">
                 <div>
-                    <span>Order ID: {prop.order._id}</span>
+                    <span>Order ID: {prop.order?._id}</span>
                     <br />
                     <span>Ordered On: {orderCreationDate}</span>
                     <br />
-                    <span>Price: ₹{prop.order.price}</span>
+                    <span>Price: ₹{prop.order?.price}</span>
                     <br />
-                    <span>Status: {prop.order.status}</span>
+                    <span>Status: {prop.order?.status}</span>
                     <br />
                     {
-                        (prop.order.status !== 'completed' && prop.order.status !== 'cancelled') &&
+                        (prop.order?.status !== 'requested' && prop.order?.status !== 'Declined' && prop.order?.status !== 'completed' && prop.order?.status !== 'cancelled') &&
                         (
                             remainingDays > 1 ?
                                 <span>Due: {remainingDays} Days left</span>
@@ -144,7 +153,7 @@ export default function OrderCard(prop) {
                 </div>
             </div>
             <div className="action-bar">
-                <button onClick={() => navigate(`/orders/${prop.order._id}`)}>View Details</button>
+                <button onClick={() => navigate(`/orders/${prop.order?._id}`)}>View Details</button>
             </div>
         </div>
     )

@@ -10,7 +10,7 @@ export default function NavBar() {
 
   const { user, logout } = useContext(AuthContext);
 
-  const [active, setActive] = useState(true)
+  const [active, setActive] = useState(false)
   const [isLogin, setLogin] = useState(false)
   const [showMenu, setShowMenu] = useState(false)
   // const menuRef = useRef(null);
@@ -19,7 +19,7 @@ export default function NavBar() {
   const isHomePage = location.pathname === '/';
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
 
-  const navBarForms = `navbar ${isHomePage ? 'navbar-sticky' : 'navbar-default'}`;
+  // const navBarForms = `navbar ${isHomePage ? 'navbar-sticky' : 'navbar-default'}`;
 
   const toggleMenu = (event) => {
     // event.stopPropagation();
@@ -41,13 +41,13 @@ export default function NavBar() {
 
   return (
     <>
-      <div className={active ? "navbar active" : 'navbar'}>
-      {/* <div className={navBarForms}> */}
+      <div className={active && isHomePage ? "navbar active" : 'navbar'}>
+        {/* <div className={navBarForms}> */}
         <div className="container">
           <div className="website-name">
             <Link to='/' className='link'>
-            <span className='text'>Wi<FontAwesomeIcon icon="fa-solid fa-bolt" className='icon' />ardHelp</span>
-            {/* {
+              <span className='text'>Wi<FontAwesomeIcon icon="fa-solid fa-bolt" className='icon' />ardHelp</span>
+              {/* {
               active ?
               :
               <span className='text'>Wi<FontAwesomeIcon icon="fa-solid fa-bolt" style={{color: "#F4F4F4",}} className='icon' />ardHelp</span>
@@ -93,6 +93,7 @@ export default function NavBar() {
                   </div>
                 </>
                 :
+                !isAuthPage &&
                 <>
                   <button className='a'>
                     <Link to="/login" className='link'>Login</Link>

@@ -12,6 +12,8 @@ export default function ChatWindow() {
   const { conversationId } = useParams();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+  const [conv, setConv] = useState([]);
+  const [recpUserDetails, setRecpUserDetails] = useState([]);
 
   const navigate = useNavigate();
 
@@ -24,6 +26,66 @@ export default function ChatWindow() {
   const user = localStorage.getItem("user");
   const parsedUserData = JSON.parse(user);
   const currentUser = parsedUserData?.username;
+  let recpUserId = null;  
+
+  // Fetch active conversation
+  // useEffect(() => {
+  //   if(!conversationId) return;
+
+  //   const fetchConversation = async () => {
+  //     try {
+  //       const res = await fetch(`http://localhost:5000/api/conversations/${conversationId}/conv`, {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`
+  //         }
+  //       });
+
+  //       if (res.ok) {
+  //         const data = await res.json();
+  //         setConv(data);
+  //       }
+  //       else {
+  //         console.error("Failed to fetch single conversation:", res.status);
+  //       }
+  //     } catch (error) {
+  //       console.error("Some error occured:", error);
+  //     }
+  //   }
+
+  //   fetchConversation();
+  // }, [conversationId]);
+
+  if(sender.role === 'sender'){
+    recpUserId = conv?.buyerId;
+  }
+  else if(sender.role === 'buyer'){
+    recpUserId = conv?.sellerId;
+  }
+
+  // Fetch recipient user details
+  useEffect(() => {
+    if(!recpUserId) return;
+
+    const fetchRecipientUserDetails = async () => {
+      try{
+        const res = await fetch(`http://localhost:5000/api/user/${recpUserId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if(!res.ok)
+          return console.error("Failed to fetch recipient user ID:", res.status);
+        
+        const data = await res.json();
+        setRecpUserDetails(data.user);
+      } catch(error){
+        console.error("Some error occured:", error);
+      }
+    };
+
+    fetchRecipientUserDetails();
+  }, [recpUserId]);
 
   // Scroll to last msg
   useEffect(() => {
@@ -118,9 +180,25 @@ export default function ChatWindow() {
 
   return (
     <div className='chat-window'>
-      <div className="conversation-header">
-        <button onClick={() => navigate('/messages')}>Close</button>
-      </div>
+      {
+        conversationId &&
+        <div className="conversation-header">
+              <div className="conversation-profile-container">
+                <div className="conv-profile">
+                  <div className="conv-profile-main">
+                    <img src='/profile.png' alt="" />
+                  </div>
+                  <div className="conv-profile-detials">
+                    <div className="profile-username">
+                      {recpUserDetails.username}
+                    </div>
+                  </div>
+                </div>
+                <button onClick={() => navigate('/messages')}>Close</button>
+              </div>
+              <div></div>
+        </div>
+      }
       <div className='messages-list'>
         {
           !conversationId ?

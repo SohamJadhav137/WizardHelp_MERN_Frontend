@@ -3,12 +3,10 @@ import React, { useContext, useEffect, useState } from 'react'
 import './Orders.scss';
 import OrderCard from '../../Components/Orders/OrderCard';
 import { getSocket } from '../../socket';
-import { getCurrentUser } from '../../utils/getCurrentUser';
-import { AuthContext } from '../../context/AuthContext';
-
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 export default function Orders() {
-  
+
   const socket = getSocket();
   const [orders, setOrders] = useState([]);
 
@@ -42,15 +40,17 @@ export default function Orders() {
 
   // Handling orders socket events
   useEffect(() => {
-    if(!socket) return;
+    if (!socket) return;
 
     const handleSocketEvents = (payload) => {
       const updatedOrder = payload.updatedOrder;
 
-      setOrders(prevOrders => prevOrders.map(order => order._id === updatedOrder._id ? updatedOrder : order));
+      setOrders(prevOrders => prevOrders.map(order => order?._id === updatedOrder._id ? updatedOrder : order));
     };
 
     const events = [
+      "orderInitiated",
+      "orderDeclined",
       "orderDelivered",
       "orderCompleted",
       "orderRevision",
@@ -73,25 +73,36 @@ export default function Orders() {
       setOrders(prev => [payload.createdOrder, ...prev]);
     }
 
-    socket.on("newOrderReceive", receiveNewOrder);
+    socket.on("orderReceived", receiveNewOrder);
 
     return () => {
-      socket.off("newOrderReceive", receiveNewOrder);
+      socket.off("orderReceived", receiveNewOrder);
     };
   }, []);
 
   return (
     <div className='orders-container'>
       <div className="orders">
+
         <div className="orders-page-title">
-          <span>My Orders</span>
+          My Orders
         </div>
 
         <div className="order-list">
           {
-            orders.map(order => (
-              <OrderCard key={order._id} order={order} />
-            ))
+            orders.length === 0 ?
+              <div className="orders-empty-text">
+                <DotLottieReact
+                  src="https://lottie.host/4902329f-05ba-429e-882a-6c2b90c883fa/DWDDPVY1Mu.lottie"
+                  loop
+                  autoplay
+                />
+                You haven't placed any orders yet...
+              </div>
+              :
+              orders.map(order => (
+                <OrderCard key={order?._id} order={order} />
+              ))
           }
         </div>
       </div>

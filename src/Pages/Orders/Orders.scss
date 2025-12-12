@@ -1,14 +1,28 @@
-.orders-container{
+.orders-container {
     width: 100%;
+    flex: 1;
+    display: flex;
 
-    .orders{
-        width: 1300px;
+    .orders {
+        max-width: 1300px;
+        width: 100%;
         margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
 
-        .orders-page-title{
+        .orders-page-title {
             // font-weight: 700;
             font-size: 40px;
             padding: 20px 0px;
         }
+
+        // .order-list {
+        //     width: 100%;
+        //     flex: 1;
+        //     display: flex;
+        //     flex-direction: column;
+        //     // font-size: 35px;
+        // }
     }
 }

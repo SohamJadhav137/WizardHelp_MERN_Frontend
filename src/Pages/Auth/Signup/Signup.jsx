@@ -216,7 +216,7 @@ export default function Signup() {
         {loading ? 'Signing up...' : 'Signup'}
       </button>
 
-      <span className='desc'>New user ? <Link to='/login' className='link'><span>Login</span></Link> here</span>
+      <span className='desc'>Already a user ? <Link to='/login' className='link'><span>Login</span></Link> here</span>
     </form>
   )
 }

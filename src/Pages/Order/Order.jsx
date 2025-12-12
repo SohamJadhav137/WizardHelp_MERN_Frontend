@@ -39,7 +39,6 @@ export default function Order() {
 
     const currentUser = getCurrentUser();
     const currentUsername = user.username;
-    // console.log("Current user:", currentUsername)
 
     // set userId based on role
     useEffect(() => {
@@ -85,6 +84,9 @@ export default function Order() {
         };
 
         const events = [
+            "orderReceived",
+            "orderInitiated",
+            "orderDeclined",
             "orderDelivered",
             "orderCompleted",
             "orderRevision",
@@ -186,6 +188,37 @@ export default function Order() {
     else if (currentUser.role === 'seller') {
         buyerName = username;
         sellerName = currentUsername;
+    }
+
+    const [rejectButtonToggle, setRejectButtonToggle] = useState(false);
+    const [orderDeclineRequestNote, setOrderDeclineRequestNote] = useState('');
+
+    const OrderRequestHandler = async (responseState) => {
+        try {
+            const res = await fetch(`http://localhost:5000/api/orders/${order?._id}/order-request`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ sellerResponse: responseState, orderRejectNote: orderDeclineRequestNote })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                if (data.success) {
+                    console.log("Order started!");
+                }
+                else {
+                    console.log("Order declined!");
+                }
+            }
+            else {
+                console.error("Failed to handle seller's response:", res.status);
+            }
+        } catch (error) {
+            console.error("Some error occured:", error);
+        }
     }
 
     const redirectToChat = async () => {
@@ -693,7 +726,6 @@ export default function Order() {
 
                 if (res.ok) {
                     const data = await res.json();
-                    console.log(data.rating);
                     setRating(data.rating);
                 }
                 else {
@@ -769,7 +801,7 @@ export default function Order() {
         }
 
         fetchBuyerReview();
-    }, [id]);
+    }, [id, order?.status]);
 
     return (
         <div className='order-container'>
@@ -822,7 +854,7 @@ export default function Order() {
                                 </tr>
                                 <tr>
                                     {
-                                        (order?.status !== 'completed' && order?.status !== 'cancelled') &&
+                                        (order?.status !== 'completed' && order?.status !== 'cancelled' && order?.status !== 'requested' && order?.status !== 'Declined') &&
                                         (
                                             remainingDays > 1 ?
                                                 <>
@@ -843,17 +875,22 @@ export default function Order() {
                                         )
                                     }
                                 </tr>
+
+                                {/* Revisions fields visible ONLY after order is active */}
                                 {
-                                    user.role === 'buyer' ?
-                                        <tr>
-                                            <td><span className='order-attr'>Revisions used:</span></td>
-                                            <td><span>{order?.revisionCount}</span></td>
-                                        </tr>
-                                        :
-                                        <tr>
-                                            <td><span className='order-attr'>Revisions done:</span></td>
-                                            <td><span>{order?.revisionCount}</span></td>
-                                        </tr>
+                                    order?.status !== 'requested' && order?.status !== 'Declined' &&
+                                    (
+                                        user.role === 'buyer' ?
+                                            <tr>
+                                                <td><span className='order-attr'>Revisions used:</span></td>
+                                                <td><span>{order?.revisionCount}</span></td>
+                                            </tr>
+                                            :
+                                            <tr>
+                                                <td><span className='order-attr'>Revisions done:</span></td>
+                                                <td><span>{order?.revisionCount}</span></td>
+                                            </tr>
+                                    )
                                 }
                             </tbody>
                         </table>
@@ -866,6 +903,59 @@ export default function Order() {
                                 <span>--- COMPLETED</span>
                             </div>
                             <div className="order-action">
+                                {
+                                    order?.status === 'requested' && user.role === 'buyer' &&
+                                    (
+                                        <div className="requested-note">
+                                            Seller is yet to accept the order request...
+                                        </div>
+                                    )
+                                }
+                                {
+                                    order?.status === 'requested' && user?.role === 'seller' &&
+                                    (
+                                        <>
+                                            <div className="order-request-actions">
+                                                {
+                                                    !rejectButtonToggle ?
+                                                        <>
+                                                            <button onClick={() => OrderRequestHandler(true)}>Accept Order</button>
+                                                            <button onClick={() => setRejectButtonToggle(true)}>Decline Order</button>
+                                                        </>
+                                                        :
+                                                        <>
+                                                            <label htmlFor="seller-delivery-msg-box">Order Reject Note:</label>
+                                                            <br />
+                                                            <textarea name="delivery-msg" id="seller-delivery-msg-box" value={orderDeclineRequestNote} onChange={(e) => setOrderDeclineRequestNote(e.target.value)} ></textarea>
+                                                            <br />
+                                                            <button onClick={() => setRejectButtonToggle(false)}>Cancel</button>
+                                                            <button onClick={() => OrderRequestHandler(false)}>Decline Order</button>
+                                                        </>
+
+                                                }
+                                            </div>
+                                        </>
+                                    )
+                                }
+                                {
+                                    order?.status === 'Declined' &&
+                                    (
+                                        user?.role === 'buyer' ?
+                                            <div className='order-declined-window'>
+                                                Order was declined by seller due to:
+                                                <br />
+                                                <textarea name="" id="" readOnly value={order.sellerNote}>
+                                                </textarea>
+                                            </div>
+                                            :
+                                            <div className='order-declined-window'>
+                                                Buyer order was declined due to:
+                                                <br />
+                                                <textarea name="" id="" readOnly value={order.sellerNote}>
+                                                </textarea>
+                                            </div>
+                                    )
+                                }
                                 {
                                     order?.status === 'active' && user.role === 'seller' &&
                                     (
@@ -1282,7 +1372,7 @@ export default function Order() {
                                 {/* CANCEL BUTTON */}
                                 <div>
                                     {
-                                        order?.status !== 'cancelled' && order?.status !== 'completed' &&
+                                        order?.status !== 'cancelled' && order?.status !== 'completed' && order?.status !== 'requested' && order?.status !== 'Declined' &&
                                         <button onClick={() => setShowTextBox(true)}>Cancel Order</button>
                                     }
                                     {
