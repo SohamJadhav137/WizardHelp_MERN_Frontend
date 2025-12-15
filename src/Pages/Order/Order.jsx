@@ -372,7 +372,7 @@ export default function Order() {
         });
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: "Presigne URL request failed!" }))
+            const errorData = await response.json().catch(() => ({ message: "Presigned URL request failed!" }))
             console.error("Presign URL fetch error:", errorData.message);
             throw new Error("Failed to get S3 upload link!");
         }

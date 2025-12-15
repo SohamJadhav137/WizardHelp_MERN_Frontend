@@ -4,7 +4,7 @@
     z-index: 1000;
     flex-shrink: 0;
     height: 70px;
-    // background-color: rgb(244, 244, 244);
+
 
     /////////////////// ROUND DESIGN /////////////////////////
     // margin: 0 auto;
@@ -12,13 +12,16 @@
     // padding: 0px 20px;
     // border-radius: 40px;
 
+    color: rgb(0, 84, 97);
     background: rgba(255, 255, 255, 0.17);
+    // background: rgba(0, 0, 0, 0.17);
     border-radius: 0px 0px 16px 16px;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.3);
     transition: 0.5s all ease;
+    // color: white;
     // background-color: black;
     position: sticky;
     top: 0;
@@ -35,6 +38,11 @@
             color: gray;
         }
 
+        .cat-btn {
+            color: gray;
+            cursor: pointer;
+        }
+
         .icon {
             color: rgb(244, 244, 244);
         }
@@ -42,8 +50,6 @@
 
 
     .container {
-        /* From https://css.glass */
-
         width: 100%;
         max-width: 1300px;
         padding: 13px 0px;
@@ -65,6 +71,10 @@
             display: flex;
             gap: 3.75rem;
             font-size: 20px;
+
+            .cat-btn {
+                cursor: pointer;
+            }
         }
 
         .auth {
@@ -82,27 +92,59 @@
                 display: flex;
                 gap: 8px;
 
-                .dropdown-menu {
-                    position: absolute;
-                    top: 28px;
-                    right: 0;
+                .user-profile {
                     display: flex;
-                    color: black;
-                    justify-content: center;
-                    flex-direction: column;
-                    border: 1px solid gray;
-                    width: 150px;
-                    border-radius: 10px;
-                    background-color: rgb(233, 231, 231);
+                    align-items: center;
+                    gap: 10px;
 
-                    .dropdown-item {
-                        padding: 5px 10px;
-                    }
+                    .user-img {
+                        width: 35px;
+                        height: 35px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
 
-                    .dropdown-item-button {
-                        padding: 5px 10px;
+                        img {
+                            width: 100%;
+                            height: 100%;
+                            object-fit: cover;
+                            border-radius: 50%;
+                            border: 2px solid rgba(0, 84, 97, 0.4);
+                        }
                     }
                 }
+
+                .dropdown-menu {
+                    position: absolute;
+                    top: 40px;
+                    right: 0;
+                    display: flex;
+                    background-color: rgb(244, 244, 244);
+                    color: rgb(0, 84, 97);
+                    justify-content: center;
+                    flex-direction: column;
+                    width: 150px;
+                    border-radius: 10px;
+                    background-color: rgb(244, 244, 244);
+                    box-shadow:
+                        /* The main depth shadow */
+                        0 8px 30px rgba(0, 0, 0, 0.25),
+                        /* A subtle shadow for closer lift */
+                        0 0 0 1px rgba(0, 0, 0, 0.05);
+                    /* Very faint outline */
+
+                    .dropdown-item-button {
+                        padding: 6px 20px;
+                        border: none;
+                        border-radius: 10px;
+                    }
+
+                    // .dropdown-item-button:hover {
+                    //     background-color: rgb(1, 135, 144);
+                    //     color: rgb(244, 244, 244);
+                    // }
+                }
+
             }
         }
     }

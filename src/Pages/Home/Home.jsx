@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import './Home.scss'
 import SliderWindow from '../../Components/Home/SliderWindow'
@@ -12,8 +12,20 @@ import options_pic from '../../assets/options_pic.png'
 import personalization_pic from '../../assets/personalization_pic.png'
 import deliver_pic from '../../assets/deliver_pic.png'
 import GigShowcase from '../../Components/Home/GigShowcase'
+import { useLocation } from 'react-router-dom'
 
 export default function Home() {
+
+  const location = useLocation();
+
+  // Scroll to category slider after being redirected from other page
+  useEffect(() => {
+    if(location.state?.scrollTo === 'slider-container'){
+      const section = document.getElementById('slider-container');
+      section?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [location.state]);
+
   return (
     <>
     {/****************************************** FLYER SECTION ********************************************/}
@@ -26,7 +38,8 @@ export default function Home() {
       </div>
 
     {/****************************************** CATEGORIES SECTION ********************************************/}
-      <SliderWindow/>
+    
+    <SliderWindow/>
 
     {/****************************************** FEATURES SECTION ********************************************/}
       <div className="container2">

@@ -22,7 +22,7 @@ export default function CreateGig() {
     const { gigId } = useParams();
 
     const sellerDetails = JSON.parse(localStorage.getItem("user"));
-    const sellerName = sellerDetails.name;
+    const sellerName = sellerDetails.username;
 
     const [formData, setFormData] = useState({
         sellerName,

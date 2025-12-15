@@ -1,13 +1,17 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import './Profile.scss';
 import { AuthContext } from '../../context/AuthContext';
 import { Rating } from '@mui/material';
 import { getCurrentUser } from '../../utils/getCurrentUser';
 import GigCard from '../../Components/Gigs/GigCard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import useClickOutside from '../../customHooks/useClickOutside';
 
 export default function Profile() {
+
+    const { id } = useParams();
+
     const { user, login } = useContext(AuthContext);
     const [profilePhoto, setProfilePhoto] = useState(false);
     const [userInfo, setUserInfo] = useState(null);
@@ -17,6 +21,11 @@ export default function Profile() {
     const [isPicMenuOpen, setIsPicMenuOpen] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
 
+    const menuRef = useRef(null)
+    useClickOutside(menuRef, () => {
+        if (isPicMenuOpen) setIsPicMenuOpen(false);
+    });
+
     const togglePicMenu = () => {
         setIsPicMenuOpen(!isPicMenuOpen)
     }
@@ -24,14 +33,20 @@ export default function Profile() {
     const navigate = useNavigate();
 
     const userDetails = getCurrentUser();
-    const userId = userDetails.id;
+    const currentUserId = userDetails.id;
     const token = localStorage.getItem("token");
+
+    let targetUserId = null;
+    if (id)
+        targetUserId = id;
+    else
+        targetUserId = currentUserId;
 
     // Fetch user rating & number of reviews
     useEffect(() => {
         const fetchUserRating = async () => {
             try {
-                const res = await fetch(`http://localhost:5000/api/user/${userId}`, {
+                const res = await fetch(`http://localhost:5000/api/user/${targetUserId}`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -51,17 +66,17 @@ export default function Profile() {
         };
 
         fetchUserRating();
-    }, [userId, profilePhoto]);
+    }, [targetUserId, profilePhoto]);
 
     // Fetch seller's active gigs
     useEffect(() => {
         const fetchActiveGigs = async () => {
             try {
-                const res = await fetch(`http://localhost:5000/api/user/${userId}/active-gigs`, {
+                const res = await fetch(`http://localhost:5000/api/user/${targetUserId}/active-gigs`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
-                });
+                }); targetUserId
 
                 if (res.ok) {
                     const data = await res.json();
@@ -77,7 +92,7 @@ export default function Profile() {
         }
 
         fetchActiveGigs();
-    }, [userId, profilePhoto]);
+    }, [targetUserId, profilePhoto]);
 
     const uploadToS3 = async (file, token) => {
         const response = await fetch(`http://localhost:5000/api/upload/presign?fileName=${file.name}&fileType=${file.type}`, {
@@ -127,6 +142,9 @@ export default function Profile() {
     }, []);
 
     const removeProfilePhoto = async () => {
+
+        setIsPicMenuOpen(false);
+
         try {
             const url = userInfo?.profilePic;
 
@@ -169,6 +187,8 @@ export default function Profile() {
 
     const uploadProfilePhoto = async (event) => {
 
+        setIsPicMenuOpen(false);
+
         try {
             const existingProfilePic = userInfo?.profilePic;
             if (existingProfilePic) {
@@ -208,7 +228,7 @@ export default function Profile() {
 
             const finalImageUrl = await uploadToS3(file, token);
 
-            const saveImage = await fetch(`http://localhost:5000/api/user/${userId}/save-profile-photo`, {
+            const saveImage = await fetch(`http://localhost:5000/api/user/${targetUserId}/save-profile-photo`, {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json",
@@ -226,6 +246,7 @@ export default function Profile() {
 
                 login(updatedUserContext, token);
                 setProfilePhoto(prev => ({ ...(prev || {}), imageUrl: finalImageUrl }));
+                // setIsPicMenuOpen(false);
                 console.log("Profile photo after upload:\n", userInfo?.profilePic);
             }
             else {
@@ -236,6 +257,7 @@ export default function Profile() {
             console.error("Some error occured:", error);
             alert("Image upload failed!");
         } finally {
+
             setIsUploading(false);
             event.target.value = null;
         }
@@ -247,11 +269,15 @@ export default function Profile() {
             <div className="profile-title-container">
                 <div className="profile-title">
                     <div>
-                        {userId === userInfo?._id ? 'My' : user.name} Profile
+                        {currentUserId === userInfo?._id ? 'My' : `${userInfo?.username}'s`} Profile
                     </div>
-                    <div className='profile-title-edit-button'>
-                        <button onClick={() => navigate('/my-profile/edit')}>Edit <FontAwesomeIcon icon="fa-solid fa-pen" /></button>
-                    </div>
+
+                    {
+                        currentUserId === userInfo?._id &&
+                        <div className='profile-title-edit-button'>
+                            <button onClick={() => navigate('/my-profile/edit')}>Edit <FontAwesomeIcon icon="fa-solid fa-pen" /></button>
+                        </div>
+                    }
                 </div>
             </div>
 
@@ -284,7 +310,7 @@ export default function Profile() {
 
                                 </tr>
                                 {
-                                    userDetails.role === 'seller' &&
+                                    userInfo?.role === 'seller' &&
                                     <tr>
                                         <td><span className='profile-attr'><FontAwesomeIcon icon="fa-solid fa-paintbrush" /> Skills:</span></td>
                                         <td>
@@ -307,13 +333,13 @@ export default function Profile() {
                                 isUploading ?
                                     <>
                                         <img src="./loading_icon2.gif" alt="" className='loading-gif-overlay' />
-                                        <img src={userInfo?.profilePic || "./user.png"} alt="" />
+                                        <img src={userInfo?.profilePic || "/user.png"} alt="" />
                                     </>
                                     :
                                     userInfo?.profilePic ?
                                         <img src={userInfo?.profilePic} alt="" />
                                         :
-                                        <img src="./user.png" alt="profile_img" />
+                                        <img src="/user.png"/>
                             }
                         </div>
                         <div className="profile-star-rating">
@@ -322,18 +348,21 @@ export default function Profile() {
                         <div className="joined-from">
                             Member Since, {new Date(userInfo?.createdAt).toLocaleDateString('en-us', { month: 'short', year: 'numeric' })}
                         </div>
-                        <div className="profile-photo-edit">
-                            {/* <FontAwesomeIcon icon="fa-solid fa-camera" /> */}
-                            <button onClick={togglePicMenu}>
-                                <FontAwesomeIcon icon="fa-solid fa-ellipsis-vertical" />
-                            </button>
-                        </div>
                         {
-                            isPicMenuOpen &&
-                            <div className="pic-menu">
-                                <input type="file" id="file" class="hidden" onChange={uploadProfilePhoto} accept='image/*' disabled={isUploading} />
-                                <label htmlFor="file" className='pic-menu-item'>Upload photo <FontAwesomeIcon icon="fa-solid fa-upload" /> </label>
-                                <div className="pic-menu-item"><button onClick={removeProfilePhoto}>Remove photo <FontAwesomeIcon icon="fa-solid fa-trash" /></button></div>
+                            currentUserId === userInfo?._id &&
+                            <div className="profile-photo-edit" ref={menuRef}>
+                                {/* <FontAwesomeIcon icon="fa-solid fa-camera" /> */}
+                                <button onClick={togglePicMenu}>
+                                    <FontAwesomeIcon icon="fa-solid fa-ellipsis-vertical" />
+                                </button>
+                                {
+                                    isPicMenuOpen &&
+                                    <div className="pic-menu" >
+                                        <input type="file" id="file" className="hidden" onChange={uploadProfilePhoto} accept='image/*' disabled={isUploading} />
+                                        <label htmlFor="file" className='pic-menu-item'>Upload photo <FontAwesomeIcon icon="fa-solid fa-upload" /> </label>
+                                        <div className="pic-menu-item"><button onClick={removeProfilePhoto}>Remove photo <FontAwesomeIcon icon="fa-solid fa-trash" /></button></div>
+                                    </div>
+                                }
                             </div>
                         }
                     </div>
@@ -342,11 +371,11 @@ export default function Profile() {
 
             {/* SELLER ACTIVE GIGS */}
             {
-                user.role === 'seller' &&
+                userInfo?.role === 'seller' &&
                 <div className="active-gigs-container">
                     <div className="active-gigs">
                         <div className="active-gigs-title">
-                            {userId === userInfo?._id ? 'My' : user.name} Active Gigs:
+                            {currentUserId === userInfo?._id ? 'My' : `${userInfo.username}'s`} Active Gigs:
                         </div>
 
                         <div className="active-gigs-display">

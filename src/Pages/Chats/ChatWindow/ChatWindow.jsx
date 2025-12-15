@@ -5,15 +5,17 @@ import Message from '../../../Components/Messages/Message'
 import { getSocket } from '../../../socket';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getCurrentUser } from '../../../utils/getCurrentUser';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const socket = getSocket();
 
 export default function ChatWindow() {
+
   const { conversationId } = useParams();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-  const [conv, setConv] = useState([]);
-  const [recpUserDetails, setRecpUserDetails] = useState([]);
+  const [conv, setConv] = useState(null);
+  const [recpUserDetails, setRecpUserDetails] = useState(null);
 
   const navigate = useNavigate();
 
@@ -26,36 +28,37 @@ export default function ChatWindow() {
   const user = localStorage.getItem("user");
   const parsedUserData = JSON.parse(user);
   const currentUser = parsedUserData?.username;
-  let recpUserId = null;  
 
   // Fetch active conversation
-  // useEffect(() => {
-  //   if(!conversationId) return;
+  useEffect(() => {
+    if(!conversationId) return;
 
-  //   const fetchConversation = async () => {
-  //     try {
-  //       const res = await fetch(`http://localhost:5000/api/conversations/${conversationId}/conv`, {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`
-  //         }
-  //       });
+    const fetchConversation = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/conversations/${conversationId}/conv`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
 
-  //       if (res.ok) {
-  //         const data = await res.json();
-  //         setConv(data);
-  //       }
-  //       else {
-  //         console.error("Failed to fetch single conversation:", res.status);
-  //       }
-  //     } catch (error) {
-  //       console.error("Some error occured:", error);
-  //     }
-  //   }
+        if (res.ok) {
+          const data = await res.json();
+          setConv(data);
+        }
+        else {
+          console.error("Failed to fetch single conversation:", res.status);
+        }
+      } catch (error) {
+        console.error("Some error occured:", error);
+      }
+    }
 
-  //   fetchConversation();
-  // }, [conversationId]);
+    fetchConversation();
+  }, [conversationId]);
 
-  if(sender.role === 'sender'){
+  let recpUserId = null;
+
+  if(sender.role === 'seller'){
     recpUserId = conv?.buyerId;
   }
   else if(sender.role === 'buyer'){
@@ -186,17 +189,18 @@ export default function ChatWindow() {
               <div className="conversation-profile-container">
                 <div className="conv-profile">
                   <div className="conv-profile-main">
-                    <img src='/profile.png' alt="" />
+                    <img src={recpUserDetails?.profilePic || '/profile.png'} alt="" />
                   </div>
                   <div className="conv-profile-detials">
                     <div className="profile-username">
-                      {recpUserDetails.username}
+                      {recpUserDetails?.username}
                     </div>
                   </div>
                 </div>
-                <button onClick={() => navigate('/messages')}>Close</button>
+                <button onClick={() => navigate('/messages')} className='close-chat-btn'>
+                  Close<FontAwesomeIcon icon="fa-solid fa-xmark"/>
+                </button>
               </div>
-              <div></div>
         </div>
       }
       <div className='messages-list'>
@@ -207,7 +211,7 @@ export default function ChatWindow() {
             </div>
             :
             messages.map((m, i) => (
-              <Message key={i} msg={m.text} info={m.senderId._id === senderId ? "You" : m.senderId.username} />
+              <Message key={i} msg={m} info={m.senderId._id === senderId ? "You" : m.senderId.username} recpPrfPic={recpUserDetails?.profilePic} />
             ))
         }
 
@@ -216,8 +220,10 @@ export default function ChatWindow() {
       {
         conversationId &&
         <div className="input-box">
-          <input type="text" value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={submitKeyHandler} placeholder='Type a message...' />
-          <button onClick={handleSend}>Send</button>
+          <input type="text" value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={submitKeyHandler} placeholder='Type a message...' className='input-text-field'/>
+          <button onClick={handleSend}>
+            <FontAwesomeIcon icon="fa-solid fa-paper-plane" />
+          </button>
         </div>
       }
     </div>

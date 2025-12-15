@@ -18,6 +18,7 @@ import CreateGig from './Pages/CreateGig/CreateGig';
 import Order from './Pages/Order/Order';
 import Profile from './Pages/Profile/Profile';
 import EditProfile from './Pages/EditProfile/EditProfile';
+import ScrollToTop from './utils/ScrollToTop';
 
 export default function AppLayout() {
 
@@ -30,6 +31,7 @@ export default function AppLayout() {
     return (
         <>
             <div className="app-layout">
+                <ScrollToTop/>
                 <NavBar />
                 <div className={mainContentForms}>
                     <Routes>
@@ -48,6 +50,7 @@ export default function AppLayout() {
                         <Route path="/create-gig/:gigId" element={<PrivateRoute allowedRoles={"seller"}><CreateGig/></PrivateRoute>} />
                         <Route path="/my-profile" element={<Profile/>} />
                         <Route path="/my-profile/edit" element={<EditProfile/>} />
+                        <Route path="/user/:id" element={<Profile/>} />
                     </Routes>
                 </div>
                 <Footer />

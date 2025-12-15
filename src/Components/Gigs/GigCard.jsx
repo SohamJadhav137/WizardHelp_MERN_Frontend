@@ -4,6 +4,7 @@ import './GigCard.scss'
 import { Link } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { AuthContext } from '../../context/AuthContext'
+import { getCurrentUser } from '../../utils/getCurrentUser'
 
 export default function GigCard({ gig }) {
 
@@ -39,6 +40,9 @@ export default function GigCard({ gig }) {
         fetchSellerInfo();
     }, [gig, gig._id]);
 
+    const currentUser = getCurrentUser();
+    const profileLink = currentUser.id === gig?.userId ? '/my-profile' : `/user/${gig.userId}`;
+
     // useEffect(() => {
     //     const sendFavGigs = async () => {
     //         try {
@@ -65,25 +69,27 @@ export default function GigCard({ gig }) {
                 </div>
             </Link>
             <div className="details">
-                <div className="seller-name">
-                    {
-                        sellerInfo?.profilePic ?
-                            <div className="profile-icon">
-                                <img src={sellerInfo?.profilePic} alt="" /> {gig.sellerName}
-                            </div>
-                            :
-                            <>
-                                <FontAwesomeIcon icon="fa-solid fa-circle-user" className='default-icon' /> {gig.sellerName}
-                            </>
-                    }
-                </div>
+                <Link to={profileLink} className='link'>
+                    <div className="seller-name">
+                        {
+                            sellerInfo?.profilePic ?
+                                <div className="profile-icon">
+                                    <img src={sellerInfo?.profilePic} alt="" /> {gig.sellerName}
+                                </div>
+                                :
+                                <>
+                                    <FontAwesomeIcon icon="fa-solid fa-circle-user" className='default-icon' /> {gig.sellerName}
+                                </>
+                        }
+                    </div>
+                </Link>
                 <Link to={`/gig/${gig._id}`}>
                     <div className="gig-desc">
                         <p>{gig.title}</p>
                     </div>
                 </Link>
                 <div className="gig-rating">
-                    <span><i class="fa-solid fa-star"></i> {gig.starRating} ({gig.totalReviews})</span>
+                    <span><FontAwesomeIcon icon="fa-solid fa-star" /> {gig.starRating} ({gig.totalReviews})</span>
                 </div>
                 <div className="gig-price">
                     <span>From Rs. {gig.price}</span>

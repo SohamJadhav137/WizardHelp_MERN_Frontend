@@ -75,7 +75,7 @@
         align-content: center;
         gap: 2.5rem;
         padding: 2.5rem;
-        border-radius: 0px 40px;
+        border-radius: 0px 40px 0px 0px;
 
         @media (max-width: 768px) {
             grid-template-columns: 1fr;

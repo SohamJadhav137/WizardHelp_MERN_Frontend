@@ -1,19 +1,29 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
 
 import './NavBar.scss'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
 // import useClickOutside from '../../customHooks/useClickOutside';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import useClickOutside from '../../customHooks/useClickOutside';
 
 export default function NavBar() {
 
   const { user, logout } = useContext(AuthContext);
 
-  const [active, setActive] = useState(false)
-  const [isLogin, setLogin] = useState(false)
-  const [showMenu, setShowMenu] = useState(false)
-  // const menuRef = useRef(null);
+  const [active, setActive] = useState(false);
+  const [isLogin, setLogin] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+
+  const toggleMenu = () => {
+    setShowMenu(prev => !prev);
+  };
+
+  const menuRef = useRef(null);
+
+  useClickOutside(menuRef, () => {
+    if (showMenu) setShowMenu(false);
+  });
 
   const location = useLocation();
   const isHomePage = location.pathname === '/';
@@ -21,13 +31,9 @@ export default function NavBar() {
 
   // const navBarForms = `navbar ${isHomePage ? 'navbar-sticky' : 'navbar-default'}`;
 
-  const toggleMenu = (event) => {
-    // event.stopPropagation();
-    setShowMenu(prev => !prev);
-  }
+  const navigate = useNavigate();
 
-  // useClickOutside(menuRef, toggleMenu);
-
+  // Navbar active when scrolled
   const isScroll = () => {
     window.scrollY > 0 ? setActive(true) : setActive(false)
   }
@@ -37,7 +43,25 @@ export default function NavBar() {
     return () => {
       window.removeEventListener('scroll', isScroll)
     }
-  }, [])
+  }, []);
+
+  // Scroll/Redirect to homepage and scroll to category slider
+  const handleCategoryClick = (event) => {
+    event.preventDefault();
+
+    const targetSectionId = 'slider-container';
+
+    if (!isHomePage) {
+      navigate('/', { state: { scrollTo: 'slider-container' } });
+    }
+    else {
+      const targetElement = document.getElementById(targetSectionId);
+
+      targetElement.scrollIntoView({
+        behavior: 'smooth'
+      })
+    }
+  };
 
   return (
     <>
@@ -68,25 +92,38 @@ export default function NavBar() {
                     </>
                   )
                 }
-                <span className='link'>Categories</span>
+                <div className='cat-btn' onClick={handleCategoryClick}>Categories</div>
+                {/* <button onClick={handleCategoryClick}>Categories</button> */}
               </>
             }
           </div>
-          <div className="auth">
+          <div className="auth" ref={menuRef}>
             {
               user ?
                 <>
                   <div className="auth-after">
                     <div className="user-profile" onClick={toggleMenu} style={{ cursor: 'pointer' }}>
-                      <span><FontAwesomeIcon icon="fa-solid fa-user" /> {user.username}</span>
+                      {
+                        user.profilePic ?
+                          <>
+                            <div className="user-img">
+                              <img src={user.profilePic} alt="" />
+                            </div>
+                            <div className="username">{user.username}</div>
+                          </>
+                          :
+                          <>
+                          <FontAwesomeIcon icon="fa-solid fa-user" /> {user.username}
+                          </>
+                      }
                     </div>
                     {
                       showMenu && (
                         <div className="dropdown-menu">
-                          <span className='dropdown-item-button link'>
-                            <Link to='/my-profile' className='link'>My profile</Link>
-                          </span>
-                          <span className='dropdown-item-button link' onClick={logout} style={{ cursor: 'pointer' }}>Logout</span>
+                          <div className='dropdown-item-button link' onClick={() => setShowMenu(false)}>
+                            <Link to='/my-profile' className='link' >My profile</Link>
+                          </div>
+                          <div className='dropdown-item-button link' onClick={logout} style={{ cursor: 'pointer' }}>Logout</div>
                         </div>
                       )
                     }

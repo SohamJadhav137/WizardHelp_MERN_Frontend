@@ -1,9 +1,12 @@
 import React from 'react'
 import './footer.scss'
-import { useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { gigCat } from '../../Data/GigCat';
 
 export default function Footer() {
   
+  const categories = gigCat;
   const location = useLocation();
   const noFooter = location.pathname === '/login'||
   location.pathname === '/signup' ||
@@ -21,10 +24,11 @@ export default function Footer() {
         <div className="top">
           <div className="c1">
             <h3>Categories</h3>
-            <span>Web design</span>
-            <span>Graphics Design</span>
-            <span>3D Modeling</span>
-            <span>Android</span>
+            {
+              categories.map((c,i) => (
+                <span key={i}>{c.name}</span>
+              ))
+            }
           </div>
           <div className="c1">
             <h3>For Buyers</h3>
@@ -51,15 +55,17 @@ export default function Footer() {
       <div className="bottom-container">
         <div className="bottom">
           <div className="left">
-            <span>Website</span>
+            <span>
+              <Link to='/' className='link'>WizardHelp</Link>
+            </span>
             <span className='text'>© 2025 website, Inc.</span>
           </div>
           <div className="right">
             <span>Connect With Us:</span>
-            <span><i class="fa-brands fa-instagram"></i></span>
-            <span><i class="fa-brands fa-facebook"></i></span>
-            <span><i class="fa-brands fa-x-twitter"></i></span>
-            <span><i class="fa-brands fa-linkedin"></i></span>
+            <span><FontAwesomeIcon icon="fa-brands fa-instagram" /></span>
+            <span><FontAwesomeIcon icon="fa-brands fa-facebook" /></span>
+            <span><FontAwesomeIcon icon="fa-brands fa-x-twitter" /></span>
+            <span><FontAwesomeIcon icon="fa-brands fa-linkedin" /></span>
           </div>
         </div>
       </div>

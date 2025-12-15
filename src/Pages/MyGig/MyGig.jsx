@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import './MyGig.scss'
 import { gigs } from '../../Data/GigsData'
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export default function MyGig() {
 
@@ -124,7 +125,7 @@ export default function MyGig() {
                                     </td>
                                     <td>
                                         <Link to={`/create-gig/${gig._id}`} className='link'>
-                                            <i class="fa-solid fa-pen"></i>
+                                            <FontAwesomeIcon icon="fa-solid fa-pen" />
                                         </Link>
                                     </td>
                                     <td>

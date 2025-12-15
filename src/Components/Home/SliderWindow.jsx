@@ -19,7 +19,7 @@ export default function SliderWindow() {
     const navigate = useNavigate();
 
     return (
-        <div className="slider-container">
+        <div id="slider-container">
             <div className="slider">
                 <Slider {...settings}>
                     {
