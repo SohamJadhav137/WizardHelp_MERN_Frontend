@@ -7,6 +7,7 @@ import { Rating } from '@mui/material'
 
 import './Order.scss';
 import { getCurrentUser } from '../../utils/getCurrentUser';
+import Swal from 'sweetalert2';
 
 const socket = getSocket();
 
@@ -433,8 +434,11 @@ export default function Order() {
             });
 
             if (response.ok) {
-                const data = await response.json();
-                alert(data?.message || 'Order delivered');
+                Swal.fire({
+                    title: "Order Delivered",
+                    text: "Now waiting for buyer's approval.",
+                    icon: "info"
+                });
             }
             else {
                 console.error(`Failed to deliver the order\nBackend response status: ${response.status}\nResponse Text: ${response.statusText}`);
@@ -741,7 +745,7 @@ export default function Order() {
 
     const submitBuyerRatingHandler = async () => {
         if (!rating) {
-            alert("Please give rating before submitting!");
+            // alert("Please give rating before submitting!");
             return;
         }
 
@@ -758,7 +762,7 @@ export default function Order() {
             });
 
             if (res.ok) {
-                alert("Rating submitted successfully");
+                console.log("Rating submitted successfully");
             }
             else {
                 console.error("Failed to submit rating:", res.status);
@@ -897,18 +901,27 @@ export default function Order() {
 
                         <div className="order-status">
                             <span className='order-status-title'>Order Status:</span>
-                            <div className='order-status-items'>
+                            {/* <div className='order-status-items'>
                                 <span>ACTIVE </span>
                                 <span>--- DELIVERED </span>
                                 <span>--- COMPLETED</span>
-                            </div>
+                            </div> */}
                             <div className="order-action">
                                 {
                                     order?.status === 'requested' && user.role === 'buyer' &&
                                     (
-                                        <div className="requested-note">
-                                            Seller is yet to accept the order request...
-                                        </div>
+                                        <>
+                                            <div className="buyer-requested">
+
+                                                <div className="req-note">
+                                                    Seller is yet to accept the order request...
+                                                </div>
+                                                <div className="sent-requirements">
+                                                    <div className="title">Your sent requirements:</div>
+                                                    <textarea disabled value={order?.orderReq}></textarea>
+                                                </div>
+                                            </div>
+                                        </>
                                     )
                                 }
                                 {
@@ -919,17 +932,29 @@ export default function Order() {
                                                 {
                                                     !rejectButtonToggle ?
                                                         <>
-                                                            <button onClick={() => OrderRequestHandler(true)}>Accept Order</button>
-                                                            <button onClick={() => setRejectButtonToggle(true)}>Decline Order</button>
+                                                            <div className='buyer-req'>
+                                                                <div className="buyer-req-title">
+                                                                    Buyer requirements:
+                                                                </div>
+                                                                <textarea className="buyer-req-main" disabled value={order?.orderReq}></textarea>
+                                                            </div>
+                                                            <div className="order-request-action-btns">
+                                                                <button className='order-accept-btn' onClick={() => OrderRequestHandler(true)}>Accept Order</button>
+                                                                <button className='order-reject-btn' onClick={() => setRejectButtonToggle(true)}>Decline Order</button>
+                                                            </div>
                                                         </>
                                                         :
                                                         <>
-                                                            <label htmlFor="seller-delivery-msg-box">Order Reject Note:</label>
-                                                            <br />
-                                                            <textarea name="delivery-msg" id="seller-delivery-msg-box" value={orderDeclineRequestNote} onChange={(e) => setOrderDeclineRequestNote(e.target.value)} ></textarea>
-                                                            <br />
-                                                            <button onClick={() => setRejectButtonToggle(false)}>Cancel</button>
-                                                            <button onClick={() => OrderRequestHandler(false)}>Decline Order</button>
+                                                            <div className='buyer-req'>
+                                                                <div className="buyer-req-title">
+                                                                    Order reject reason:
+                                                                </div>
+                                                                <textarea value={orderDeclineRequestNote} onChange={(e) => setOrderDeclineRequestNote(e.target.value)} ></textarea>
+                                                            </div>
+                                                            <div className="order-request-action-btns">
+                                                                <button className='order-reject-cancel-btn' onClick={() => setRejectButtonToggle(false)}>Cancel</button>
+                                                                <button className='order-reject-btn' onClick={() => OrderRequestHandler(false)}>Decline Order</button>
+                                                            </div>
                                                         </>
 
                                                 }
@@ -1013,8 +1038,10 @@ export default function Order() {
                                 }
                                 {
                                     order?.status === 'active' && user.role === 'buyer' &&
-                                    <div>
-                                        <span>Seller has not delivered the order yet.</span>
+                                    <div className='order-active-buyer'>
+                                        <div className="text">
+                                            Seller has not delivered the order yet.
+                                        </div>
                                     </div>
                                 }
                                 {
@@ -1365,25 +1392,28 @@ export default function Order() {
                                 }
 
                                 {/* Redirect Chat Button */}
-                                <div>
-                                    <button className='order-open-chat-button' onClick={redirectToChat}>Open Chat <FontAwesomeIcon icon="fa-solid fa-comment" /></button>
+                                <div className='order-open-chat-button-container'>
+                                    <button className='order-open-chat-button' onClick={redirectToChat}>Chat <FontAwesomeIcon icon="fa-solid fa-comment" /></button>
                                 </div>
 
                                 {/* CANCEL BUTTON */}
-                                <div>
+                                <div className='order-cancel'>
                                     {
                                         order?.status !== 'cancelled' && order?.status !== 'completed' && order?.status !== 'requested' && order?.status !== 'Declined' &&
-                                        <button onClick={() => setShowTextBox(true)}>Cancel Order</button>
+                                        !showTextBox &&
+                                        <button className='cancel-btn' onClick={() => setShowTextBox(true)}>Cancel Order</button>
                                     }
                                     {
                                         showTextBox &&
-                                        <div>
-                                            <p>Why do you want to cancel this order ?</p>
+                                        <div className='order-cancel-reason-container'>
+                                            <div className="title">
+                                                Why do you want to cancel this order ?
+                                            </div>
                                             <textarea name="" id="" onChange={handleCancelNote} value={textAreaCancelNote} placeholder='Explain in detail...'></textarea>
-                                            <br />
-                                            <button onClick={() => setShowTextBox(false)}>Hide</button>
-                                            <br />
-                                            <button onClick={cancelOrderRequestHandler}>Request Cancellation</button>
+                                            <div className="order-cancel-action-btns">
+                                            <button className='hide-btn' onClick={() => setShowTextBox(false)}>Hide</button>
+                                            <button className='cancel-btn' onClick={cancelOrderRequestHandler}>Request Cancellation</button>
+                                            </div>
                                         </div>
                                     }
 
@@ -1430,7 +1460,6 @@ export default function Order() {
                                                             value={rating}
                                                             onChange={(event, newValue) => {
                                                                 setRating(newValue)
-                                                                console.log(newValue);
                                                             }}
                                                             defaultValue={0}
                                                             precision={0.5}
@@ -1458,7 +1487,7 @@ export default function Order() {
                                                     </div>
                                                     <div className='review-rating'>
                                                         Rating:
-                                                        <Rating name="read-only" value={rating} readOnly />
+                                                        <Rating name="read-only" value={rating || order?.buyerRating} readOnly />
                                                     </div>
                                                 </div>
                                                 :
@@ -1473,7 +1502,6 @@ export default function Order() {
                                                             value={rating}
                                                             onChange={(event, newValue) => {
                                                                 setRating(newValue)
-                                                                console.log(newValue);
                                                             }}
                                                             defaultValue={0}
                                                             precision={0.5}

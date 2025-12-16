@@ -38,6 +38,10 @@
             color: gray;
         }
 
+        .username {
+            color: white;
+        }
+
         .cat-btn {
             color: gray;
             cursor: pointer;
@@ -81,9 +85,24 @@
             display: flex;
             gap: 0.625rem;
 
-            .a {
-                border: 1px solid gray;
-                padding: 5px 10px;
+            .auth-btns {
+                .login-btn {
+                    padding: 8px 13px;
+                    border: 1px solid rgb(1, 135, 144);
+                    border-right: none;
+                    background-color: transparent;
+                    color: rgb(1, 135, 144);
+                    border-radius: 5px 0px 0px 5px;
+                }
+
+                .signup-btn {
+                    padding: 8px 13px;
+                    border: 1px solid rgb(1, 135, 144);
+                    background-color: rgb(1, 135, 144);
+                    border-left: none;
+                    color: white;
+                    border-radius: 0px 5px 5px 0px;
+                }
             }
 
             .auth-after {
@@ -109,7 +128,8 @@
                             height: 100%;
                             object-fit: cover;
                             border-radius: 50%;
-                            border: 2px solid rgba(0, 84, 97, 0.4);
+                            border: 3px solid rgba(0, 84, 97, 0.4);
+                            // border: 3px solid rgb(0, 84, 97);
                         }
                     }
                 }
@@ -136,13 +156,12 @@
                     .dropdown-item-button {
                         padding: 6px 20px;
                         border: none;
-                        border-radius: 10px;
+                        display: flex;
+                        align-items: center;
+                        cursor: pointer;
+                        gap: 10px;
+                        justify-content: flex-start;
                     }
-
-                    // .dropdown-item-button:hover {
-                    //     background-color: rgb(1, 135, 144);
-                    //     color: rgb(244, 244, 244);
-                    // }
                 }
 
             }

@@ -75,6 +75,7 @@
         .order-status {
             width: 100%;
             padding-top: 20px;
+            position: relative;
 
             .order-status-title {
                 font-weight: 500;
@@ -89,8 +90,84 @@
             }
 
             .order-action {
-                padding-left: 30px;
                 width: 50%;
+
+                .buyer-requested{
+                    width: 100%;
+                    padding: 10px 0px;
+
+                    .req-note{
+                        font-size: 27px;
+                        padding: 20px 0px;
+                    }
+
+                    .sent-requirements{
+                        display: flex;
+                        flex-direction: column;
+                        gap: 10px;
+
+                        .title{
+                            font-size: 20px;
+                        }
+
+                        textarea{
+                            padding: 10px;
+                        }
+                    }
+                }
+
+                .order-request-actions {
+
+                    .buyer-req {
+                        width: 100%;
+                        padding: 10px 0px;
+                        // background-color: aqua;
+
+                        .buyer-req-title {
+                            font-size: 23px;
+                            padding: 10px 0px;
+                        }
+                    }
+
+                    .order-request-action-btns {
+                        display: flex;
+                        gap: 10px;
+                        justify-content: center;
+
+                        .order-accept-btn {
+                            padding: 10px 20px;
+                            color: white;
+                            border: none;
+                            background-color: green;
+                            border-radius: 10px;
+                            cursor: pointer;
+                        }
+
+                        .order-reject-btn {
+                            padding: 10px 20px;
+                            color: white;
+                            border: none;
+                            background-color: red;
+                            border-radius: 10px;
+                            cursor: pointer;
+                        }
+
+                        .order-reject-cancel-btn{
+                            padding: 10px 20px;
+                            color: white;
+                            border: none;
+                            background-color: rgb(1, 135, 144);
+                            border-radius: 10px;
+                            cursor: pointer;
+                        }
+                    }
+                }
+
+                // ORDER = ACTIVE && ROLE = BUYER
+                .order-active-buyer{
+                    flex: 1;
+                    width: 100%;
+                }
 
                 .order-upload-file-input {
                     display: none;
@@ -112,7 +189,6 @@
                         max-width: 400px;
                         width: 100%;
                         min-height: 100px;
-                        background-color: aqua;
                         width: 100%;
                         height: 100%;
 
@@ -204,23 +280,23 @@
                         align-items: center;
                         border-radius: 10px;
 
-                        .delivered-file-info{
+                        .delivered-file-info {
                             width: 100%;
 
-                            .delivered-file-name{
+                            .delivered-file-name {
                                 display: flex;
                                 justify-content: center;
                                 width: 100%;
                             }
 
-                            .delivered-file-size{
+                            .delivered-file-size {
                                 display: flex;
                                 justify-content: center;
                                 width: 100%;
                             }
 
                         }
-                        
+
                         img {
                             width: 70px;
                             height: 70px;
@@ -234,7 +310,7 @@
                             display: flex;
                             align-items: center;
                         }
-                        
+
                         .audio_icon {
                             width: 70px;
                             height: 70px;
@@ -242,7 +318,7 @@
                             display: flex;
                             align-items: center;
                         }
-                        
+
                         .file_icon {
                             width: 70px;
                             height: 70px;
@@ -250,8 +326,8 @@
                             display: flex;
                             align-items: center;
                         }
-                        
-                        .deliver-file-button{
+
+                        .deliver-file-button {
                             font-size: 20px;
                             padding: 10px 15px;
                             background: none;
@@ -261,23 +337,34 @@
                     }
                 }
 
-                .order-action-buttons{
+                .order-action-buttons {
                     display: flex;
                     gap: 10px;
                     padding: 5px 10px;
                 }
 
-                
-                .order-open-chat-button {
-                    padding: 5px 10px;
+
+                .order-open-chat-button-container{
+                    display: flex;
+                    
+                    .order-open-chat-button {
+                        padding: 10px 15px;
+                        font-size: 18px;
+                        border: none;
+                        border-radius: 10px;
+                        background-color: rgb(1, 135, 144);
+                        color: white;
+                        cursor: pointer;
+                    }
                 }
             }
 
             // Other sections
 
-            .order-request-actions{
+            .order-request-actions {
                 padding: 10px 0px;
-                textarea{
+
+                textarea {
                     width: 100%;
                     padding: 10px;
                     resize: none;
@@ -285,12 +372,13 @@
                 }
             }
 
-            .order-declined-window{
+            .order-declined-window {
                 padding: 10px 0px;
                 display: flex;
                 flex-direction: column;
                 gap: 10px;
-                textarea{
+
+                textarea {
                     width: 100%;
                     padding: 10px;
                     resize: none;
@@ -299,30 +387,31 @@
             }
         }
 
-        .buyer-review-container{
+        .buyer-review-container {
             padding: 15px 0px;
 
-            .review-title{
+            .review-title {
                 font-size: 30px;
                 padding: 15px 0px;
             }
 
-            .review-rating-and-timestamp{
+            .review-rating-and-timestamp {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
                 padding: 10px 0px;
                 font-size: 20px;
-                
+
             }
-            .review-rating{
+
+            .review-rating {
                 display: flex;
                 gap: 5px;
                 align-items: center;
-                
+
             }
-                
-            textarea{
+
+            textarea {
                 width: 100%;
                 height: 150px;
                 resize: vertical;
@@ -330,17 +419,17 @@
                 font-size: 20px;
             }
 
-            button{
+            button {
                 padding: 10px 20px;
                 margin-top: 10px;
             }
 
-            .thanks-msg{
+            .thanks-msg {
                 font-size: 25px;
                 font-weight: 600;
             }
 
-            .review-subtitle{
+            .review-subtitle {
                 padding: 15px 0px;
                 font-size: 30px;
             }

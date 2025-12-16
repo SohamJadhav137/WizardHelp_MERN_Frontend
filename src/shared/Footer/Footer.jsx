@@ -12,10 +12,11 @@ export default function Footer() {
   location.pathname === '/signup' ||
   location.pathname === '/messages' ||
   location.pathname === '/my-gigs' ||
-  location.pathname === '/create-gig' ||
-  location.pathname === '/orders' ||
-  location.pathname.startsWith('/messages/') ||
-  location.pathname === '/my-profile/edit' ;
+  location.pathname.startsWith('/create-gig') ||
+  location.pathname.startsWith('/orders') ||
+  location.pathname.startsWith('/messages') ||
+  location.pathname === '/my-profile/edit' ||
+  location.pathname.startsWith('/gig') && location.pathname.endsWith('/order-checkout');
   
   const footerForms = `footer-container ${noFooter ? 'footer-container-none' : ''}`
   return (

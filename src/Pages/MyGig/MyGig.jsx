@@ -4,6 +4,7 @@ import './MyGig.scss'
 import { gigs } from '../../Data/GigsData'
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Swal from 'sweetalert2';
 
 export default function MyGig() {
 
@@ -36,26 +37,39 @@ export default function MyGig() {
     }, []);
 
     const deleteGigHandler = async (gigId) => {
-        if (confirm("Do you want to delete this gig ?") === true) {
-            try {
-                const response = await fetch(`http://localhost:5000/api/gigs/${gigId}`, {
-                    method: 'DELETE',
-                    headers: { Authorization: `Bearer ${token}` },
-                    body: { gigId: gigId }
+        const result = await Swal.fire({
+            title: "Delete Gig ?",
+            text: "This action cannot be undone!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Delete",
+            cancelButtonText: "Cancel"
+        })
+
+        if(!result.isConfirmed) return;
+        
+        try {
+            const response = await fetch(`http://localhost:5000/api/gigs/${gigId}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${token}` },
+                body: { gigId: gigId }
+            });
+
+            if (response.ok) {
+                const msg = await response.json();
+                setUserGigs(userGigs.filter(gig => gig._id !== gigId))
+                Swal.fire({
+                    title: "Gig Deleted",
+                    text: "Your gig was deleted successfully!",
+                    icon: "success"
                 });
-
-                if (response.ok) {
-                    const msg = await response.json();
-                    setUserGigs(userGigs.filter(gig => gig._id !== gigId))
-                    alert(msg.message);
-                }
-                else {
-                    throw new Error("Failed to delete the gig! error status:", response.status);
-                }
-
-            } catch (error) {
-                console.error("CUSTOM ERROR:", error);
             }
+            else {
+                throw new Error("Failed to delete the gig! error status:", response.status);
+            }
+
+        } catch (error) {
+            console.error("CUSTOM ERROR:", error);
         }
     }
 
@@ -73,15 +87,19 @@ export default function MyGig() {
                 body: JSON.stringify({ isPublished: newState })
             })
 
-            if(response.ok){
-                setUserGigs(prevGigs => prevGigs.map(gig => gig._id === gigId ? { ...gig, isPublished : newState } : gig));
-                alert(`Gig status was changed to ${newState}`);
+            if (response.ok) {
+                setUserGigs(prevGigs => prevGigs.map(gig => gig._id === gigId ? { ...gig, isPublished: newState } : gig));
+                Swal.fire({
+                    title: "Gig Status Changed",
+                    text: `Gig status was changed to ${newState ? 'published' : 'unpublished'}`,
+                    icon: "warning"
+                });
             }
-            else{
+            else {
                 throw new Error("Failed to update gig's state:", response.status);
             }
         } catch (error) {
-            console.error("Some FRONTEND error occured while updating gig's state\nError:",error);
+            console.error("Some FRONTEND error occured while updating gig's state\nError:", error);
         }
     }
 
@@ -129,7 +147,7 @@ export default function MyGig() {
                                         </Link>
                                     </td>
                                     <td>
-                                        <button className= {gig.isPublished ? "gig-state-button published" : "gig-state-button draft"} onClick={() => toggleGigPublishState(gig._id, gig.isPublished)}>
+                                        <button className={gig.isPublished ? "gig-state-button published" : "gig-state-button draft"} onClick={() => toggleGigPublishState(gig._id, gig.isPublished)}>
                                             {gig.isPublished ? "Revoke" : "Publish"}
                                         </button>
                                         <button className='delete-button' onClick={() => deleteGigHandler(gig._id)}>Delete</button>

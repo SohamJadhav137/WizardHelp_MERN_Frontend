@@ -19,6 +19,13 @@ import Order from './Pages/Order/Order';
 import Profile from './Pages/Profile/Profile';
 import EditProfile from './Pages/EditProfile/EditProfile';
 import ScrollToTop from './utils/ScrollToTop';
+import OrderCheckOut from './Pages/OrderCheckOut/OrderCheckOut';
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { fas } from '@fortawesome/free-solid-svg-icons'
+import { far } from '@fortawesome/free-regular-svg-icons'
+import { fab } from '@fortawesome/free-brands-svg-icons'
+
+library.add(fas, far, fab)
 
 export default function AppLayout() {
 
@@ -49,8 +56,9 @@ export default function AppLayout() {
                         <Route path="/create-gig" element={<PrivateRoute allowedRoles={"seller"}><CreateGig/></PrivateRoute>} />
                         <Route path="/create-gig/:gigId" element={<PrivateRoute allowedRoles={"seller"}><CreateGig/></PrivateRoute>} />
                         <Route path="/my-profile" element={<Profile/>} />
-                        <Route path="/my-profile/edit" element={<EditProfile/>} />
+                        <Route path="/my-profile/edit" element={<PrivateRoute><EditProfile/></PrivateRoute>} />
                         <Route path="/user/:id" element={<Profile/>} />
+                        <Route path="/gig/:gigId/order-checkout" element={<PrivateRoute><OrderCheckOut/></PrivateRoute>}/>
                     </Routes>
                 </div>
                 <Footer />

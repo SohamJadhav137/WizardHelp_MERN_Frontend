@@ -1,26 +1,17 @@
 import React, { useContext, useEffect, useState } from 'react'
 
 import './Gig.scss'
-import { gigs } from '../../Data/GigsData'
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
-import { Slider } from 'infinite-react-carousel'
-import axios from 'axios'
-import ImageSlider from '../../Components/Gig/ImageSlider'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { library } from '@fortawesome/fontawesome-svg-core'
-
-import { fas } from '@fortawesome/free-solid-svg-icons'
-import { far } from '@fortawesome/free-regular-svg-icons'
-import { fab } from '@fortawesome/free-brands-svg-icons'
 import { getCurrentUser } from '../../utils/getCurrentUser'
 import ReviewBox from '../../Components/Gig/ReviewBox'
+import Swal from 'sweetalert2'
 import { AuthContext } from '../../context/AuthContext'
-
-library.add(fas, far, fab)
 
 export default function Gig() {
 
     const { gigId } = useParams()
+    const { user } = useContext(AuthContext);
     const [gig, setGig] = useState(null);
     const [mediaFiles, setMediaFiles] = useState([]);
     const [selectedItem, setSelectedItem] = useState(mediaFiles[0]);
@@ -96,9 +87,32 @@ export default function Gig() {
 
     const contactSellerHandler = async (token) => {
         if (!token) {
-            alert("You are not logged in!");
+            Swal.fire({
+                title: "Not Authenticated!",
+                text: "Please login to use such feature.",
+                icon: "info"
+            });
             return navigate('/login');
         }
+
+        if(userId === gig?.userId){
+            Swal.fire({
+                title: "Not Allowed!",
+                text: "You cannot chat with other yourself.",
+                icon: "info"
+            });
+            return;
+        }
+
+        if(user.role === 'seller'){
+            Swal.fire({
+                title: "Not Allowed!",
+                text: "Seller cannot chat with other sellers.",
+                icon: "info"
+            });
+            return;
+        }
+            
 
         try {
             const response = await fetch("http://localhost:5000/api/conversations", {
@@ -121,40 +135,23 @@ export default function Gig() {
         }
     }
 
-    const initiateGigOrder = async (gigId) => {
-
+    const orderCheckout = () => {
         if (!token) {
             alert("You are not logged in!");
             return navigate('/login');
         }
 
-        const isConfirmed = window.confirm("Do you want to place this gig order ?");
-
-        if (!isConfirmed) return;
-
-        if (!gigId) return;
-
-        try {
-            const response = await fetch(`http://localhost:5000/api/orders/${gigId}`, {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                }
+        if(user.role === 'seller'){
+            Swal.fire({
+                title: "Action Not Allowed",
+                text: "Seller cannot place order",
+                icon: "info",
+                confirmButtonText: "Ok"
             });
-
-            if (response.ok) {
-                const data = await response.json();
-                alert(data.message);
-                navigate('/orders');
-            }
-            else {
-                alert(response.message);
-                console.error("Failed to create order!", response.status);
-            }
-        } catch (error) {
-            console.error("Some error occured while creating order\n", error);
+            return;
         }
+
+        navigate(`/gig/${gigId}/order-checkout`);
     }
 
     // Fetch gig reviews
@@ -296,7 +293,7 @@ export default function Gig() {
                             </div>
                         </div> */}
                         <div className="buy-gig-btn-container">
-                            <button className='buy-gig-btn' onClick={() => initiateGigOrder(gig?._id)}>Continue</button>
+                            <button className='buy-gig-btn' onClick={orderCheckout}>Continue</button>
                         </div>
                         <div className="contact-seller-container">
                             <span>Want to discuss or negotiate about this gig ? <span className='contact-seller-text' onClick={() => contactSellerHandler(token)}>Contact seller</span></span>

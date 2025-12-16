@@ -74,7 +74,7 @@ export default function Chat({ role, conv, onSelectConversation }) {
 
       <div className="chat-profile-photo">
         <div className="chat-profile-photo-container">
-          <img src={recipientDetails?.profilePic || profile_img} alt="" />
+          <img src={recipientDetails?.profilePic || '/user.png'} alt="" />
         </div>
       </div>
 

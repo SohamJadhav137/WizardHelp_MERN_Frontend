@@ -8,6 +8,7 @@ import { faS } from '@fortawesome/free-solid-svg-icons';
 import { far } from '@fortawesome/free-regular-svg-icons';
 import { fab } from '@fortawesome/free-brands-svg-icons';
 import { extractFileNameFromURL } from '../../utils/extractFileName';
+import Swal from 'sweetalert2';
 
 const formatBytesToSize = (bytes) => {
     var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
@@ -164,7 +165,7 @@ export default function CreateGig() {
 
     const imageDeleteHandler = (fileId) => {
         const fileToDelete = selectedImage.find(file => file.id === fileId);
-        if(fileToDelete && !fileToDelete.originalFile){
+        if (fileToDelete && !fileToDelete.originalFile) {
             setDeletedImageURLs(prev => [...prev, fileToDelete.dataURL]);
         }
         setSelectedImage(prev => prev.filter(file => file.id !== fileId));
@@ -274,9 +275,10 @@ export default function CreateGig() {
         return fileURL;
     }
 
+    let errors = [];
+
     const validateForm = () => {
         const { title, category, description, imageURLs, price, deliveryDays, revisions } = formData
-        let errors = [];
 
         if (!title.trim()) errors.push("Title field is empty!");
         if (!category || category === '') errors.push("Category is required!")
@@ -311,7 +313,11 @@ export default function CreateGig() {
                 const url = await uploadToS3(img.originalFile, token);
                 uploadImageUrls.push(url);
             } catch (error) {
-                alert("Failed to upload image!");
+                Swal.fire({
+                    title: "Upload Error",
+                    text: "Failed to upload image!",
+                    icon: "error"
+                });
                 console.error(error)
                 return;
             }
@@ -323,11 +329,25 @@ export default function CreateGig() {
             try {
                 uploadVideoUrl = await uploadToS3(formData.videoURL, token);
             } catch (error) {
-                alert("Failed to upload video!");
+                Swal.fire({
+                    title: "Upload Error",
+                    text: "Failed to upload video!",
+                    icon: "error"
+                });
                 console.error(error);
                 return;
             }
         }
+
+        Swal.fire({
+            title: "Creating Your Gig...",
+            text: "Please wait a while.",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+                Swal.showLoading();
+            },
+        });
 
         // let uploadDocUrls = [];
         // for (const doc of formData.docURLs) {
@@ -359,11 +379,22 @@ export default function CreateGig() {
         })
 
         if (response.ok) {
-            alert("Gig created successfully");
+            Swal.fire({
+                title: "Gig Created!",
+                text: "Your gig was saved to My-Gigs",
+                icon: "success",
+            });
+
+            navigate('/my-gigs');
+
             console.log("Created gigd:", responseData);
         }
         else {
-            alert(`Gig creation failed: ${responseData.message || response.statusText}`);
+            Swal.fire({
+                title: "Gig Creation Error!",
+                text: "Failed to create your gig",
+                icon: "error"
+            });
         }
     }
 
@@ -385,7 +416,11 @@ export default function CreateGig() {
                         const url = await uploadToS3(img.originalFile, token);
                         uploadImageUrls.push(url);
                     } catch (error) {
-                        alert("Failed to upload images!");
+                        Swal.fire({
+                            title: "Upload Error",
+                            text: "Failed to upload image!",
+                            icon: "error"
+                        });
                         console.error(error);
                         return;
                     }
@@ -400,7 +435,11 @@ export default function CreateGig() {
                     try {
                         uploadVideoUrl = await uploadToS3(selectedVideo.originalFile, token);
                     } catch (error) {
-                        alert("Failed to upload video!");
+                        Swal.fire({
+                            title: "Upload Error",
+                            text: "Failed to upload video!",
+                            icon: "error"
+                        });
                         console.error(error);
                         return;
                     }
@@ -439,13 +478,21 @@ export default function CreateGig() {
 
             if (response.ok) {
                 // const newGig = await response.json();
-                alert("Gig updated successfully");
+                Swal.fire({
+                    title: "Gig Edited!",
+                    text: "Gig updated with new values",
+                    icon: "success",
+                });
                 console.log("Updated gigd:", responseData);
                 setDeletedImageURLs([]);
                 navigate('/my-gigs');
             }
             else {
-                alert(`Gig updation failed: ${responseData.message || response.statusText}`);
+                Swal.fire({
+                    title: "Gig Edit Failed!",
+                    text: "Some error occured while updating gig",
+                    icon: "error",
+                });
             }
         } catch (error) {
             console.error("Gig submission error:\n", error);
@@ -456,6 +503,12 @@ export default function CreateGig() {
         <div className='create-gig-container' onKeyDown={submitKeyHandler}>
             <form className="create-gig" onSubmit={gigId ? formUpdateHandler : formSubmitHandler}>
                 <div className='main-heading'>{gigId ? "Edit your gig" : "Create your gig"}</div>
+                {
+                    errors.length !== 0 &&
+                    <div className="error-msg">
+                        {errors[0]}
+                    </div>
+                }
                 <div className="phase-item">
                     <span className='sub-heading'>Step-1: Gig Overview</span>
                     <table>
@@ -650,22 +703,25 @@ export default function CreateGig() {
                     </table>
                 </div>
 
-                <div className="phase-item">
+                <div className="phase-item last">
                     <span className='sub-heading'>Step-4: Publish</span>
                     <table>
                         <tbody>
                             <tr>
                                 <td>
-                                    <span>Final actions</span>
+                                    <span className='label-item'>Final actions</span>
                                 </td>
                                 <td>
                                     {
                                         gigId ?
-                                            <button type='submit'>Finish Edit</button>
+                                            <>
+                                                <button className='gig-draft-btn' type="button" onClick={() => navigate('/my-gigs')} >Cancel</button>
+                                                <button className='gig-publish-btn' type='submit'>Finish Edit</button>
+                                            </>
                                             :
                                             <>
-                                                <button type='submit' onClick={() => gigStateSubmissionHandler(false)}>Create Gig (Draft)</button>
-                                                <button type='submit' onClick={() => gigStateSubmissionHandler(true)}>Create & Publish Gig</button>
+                                                <button className='gig-draft-btn' type='submit' onClick={() => gigStateSubmissionHandler(false)}>Create Gig (Draft)</button>
+                                                <button className='gig-publish-btn' type='submit' onClick={() => gigStateSubmissionHandler(true)}>Create & Publish Gig</button>
                                             </>
                                     }
                                 </td>

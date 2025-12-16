@@ -87,24 +87,29 @@ export default function Orders() {
         <div className="orders-page-title">
           My Orders
         </div>
-
-        <div className="order-list">
-          {
-            orders.length === 0 ?
-              <div className="orders-empty-text">
+        {
+          orders.length === 0 ?
+            <div className="orders-empty-text">
+              <div className="gif-container">
                 <DotLottieReact
                   src="https://lottie.host/4902329f-05ba-429e-882a-6c2b90c883fa/DWDDPVY1Mu.lottie"
                   loop
                   autoplay
+                  style={{ height: '350px'}}
                 />
-                You haven't placed any orders yet...
               </div>
-              :
-              orders.map(order => (
-                <OrderCard key={order?._id} order={order} />
-              ))
-          }
-        </div>
+              You haven't placed any orders yet...
+            </div>
+            :
+            <div className="order-list">
+              {
+                orders.map(order => (
+                  <OrderCard key={order?._id} order={order} />
+                ))
+              }
+            </div>
+        }
+
       </div>
     </div>
   )

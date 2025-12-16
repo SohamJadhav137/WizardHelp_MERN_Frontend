@@ -7,6 +7,7 @@ import GigCard from '../../Components/Gigs/GigCard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate, useParams } from 'react-router-dom';
 import useClickOutside from '../../customHooks/useClickOutside';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 export default function Profile() {
 
@@ -157,7 +158,7 @@ export default function Profile() {
 
             await deleteFromS3(url, token);
 
-            const res = await fetch(`http://localhost:5000/api/user/${userId}/remove-profile-photo`, {
+            const res = await fetch(`http://localhost:5000/api/user/${targetUserId}/remove-profile-photo`, {
                 method: 'PATCH',
                 headers: {
                     "Content-Type": "application/json",
@@ -339,7 +340,7 @@ export default function Profile() {
                                     userInfo?.profilePic ?
                                         <img src={userInfo?.profilePic} alt="" />
                                         :
-                                        <img src="/user.png"/>
+                                        <img src="/user.png" />
                             }
                         </div>
                         <div className="profile-star-rating">

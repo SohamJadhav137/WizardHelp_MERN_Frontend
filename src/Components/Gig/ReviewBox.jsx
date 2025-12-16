@@ -9,7 +9,7 @@ export default function ReviewBox(prop) {
                 </div>
                 <div className="customer-info">
                     <div className="customer-name">
-                        <span>{prop.review.buyerId.username} | From: Null</span>
+                        <span>{prop.review.buyerId.username} | From: {prop.review.buyerId.country}</span>
                     </div>
                     <div className="customer-rating">
                         <span>5 <i class="fa-solid fa-star"></i></span>

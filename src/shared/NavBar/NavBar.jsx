@@ -103,27 +103,18 @@ export default function NavBar() {
                 <>
                   <div className="auth-after">
                     <div className="user-profile" onClick={toggleMenu} style={{ cursor: 'pointer' }}>
-                      {
-                        user.profilePic ?
-                          <>
-                            <div className="user-img">
-                              <img src={user.profilePic} alt="" />
-                            </div>
-                            <div className="username">{user.username}</div>
-                          </>
-                          :
-                          <>
-                          <FontAwesomeIcon icon="fa-solid fa-user" /> {user.username}
-                          </>
-                      }
+                      <div className="user-img">
+                        <img src={user.profilePic || '/user.png'} alt="" />
+                      </div>
+                      <div className="username">{user.username}</div>
                     </div>
                     {
                       showMenu && (
                         <div className="dropdown-menu">
-                          <div className='dropdown-item-button link' onClick={() => setShowMenu(false)}>
-                            <Link to='/my-profile' className='link' >My profile</Link>
+                          <div className='dropdown-item-button' onClick={() => { navigate('/my-profile'); setShowMenu(false); }}>
+                            <FontAwesomeIcon icon="fa-solid fa-user" /> My profile
                           </div>
-                          <div className='dropdown-item-button link' onClick={logout} style={{ cursor: 'pointer' }}>Logout</div>
+                          <div className='dropdown-item-button' onClick={logout}><FontAwesomeIcon icon="fa-solid fa-arrow-right-from-bracket" /> Logout</div>
                         </div>
                       )
                     }
@@ -132,12 +123,10 @@ export default function NavBar() {
                 :
                 !isAuthPage &&
                 <>
-                  <button className='a'>
-                    <Link to="/login" className='link'>Login</Link>
-                  </button>
-                  <button className='a'>
-                    <Link to="/signup" className='link'>Signup</Link>
-                  </button>
+                  <div className="auth-btns">
+                      <Link to="/login" className='link login-btn'>Login</Link>
+                      <Link to="/signup" className='signup-btn link'>Signup</Link>
+                  </div>
                 </>
             }
           </div>
