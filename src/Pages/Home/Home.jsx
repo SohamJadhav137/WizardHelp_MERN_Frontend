@@ -35,6 +35,7 @@ export default function Home() {
             <h1>Turn your ideas into reality<br />with <span className='style-word'>creative wizards</span></h1>
           </div>
         </div>
+        <video src="/home_bg.mp4" autoPlay loop muted playsInline></video>
       </div>
 
     {/****************************************** CATEGORIES SECTION ********************************************/}

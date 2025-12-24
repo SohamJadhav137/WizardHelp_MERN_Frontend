@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import './OrderCard.scss';
 import { AuthContext } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export default function OrderCard(prop) {
 
@@ -154,8 +155,17 @@ export default function OrderCard(prop) {
                     ${prop.order?.status === 'requested' && 'requested'}
                     ${prop.order?.status === 'cancelled' && 'cancelled'}
                     ${prop.order?.status === 'declined' && 'declined'}
+                    ${prop.order?.status === 'delivered' && 'delivered'}
+                    ${prop.order?.status === 'revision' && 'revision'}
+                    ${prop.order?.status === 'request-cancellation' && 'req-cancel'}
                     ${prop.order?.status === 'active' && 'active'}`}>
-                        {prop.order?.status}
+                        {
+                            prop.order?.status === 'request-cancellation' ?
+                            <span title='order-cancellation request' style={{cursor:'default'}}>Cancel-Req !</span>
+                            // <span data-tooltip='Order cancellation request'>Cancel-req <FontAwesomeIcon icon="fa-solid fa-circle-info" /></span>
+                            :
+                            prop.order?.status
+                        }
                     </span>
                 </div>
 

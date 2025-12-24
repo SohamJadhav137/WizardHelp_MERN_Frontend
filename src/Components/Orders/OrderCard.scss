@@ -91,6 +91,7 @@
                 color: rgb(77, 76, 76);
                 border: 1px solid transparent;
                 text-transform: capitalize;
+                cursor: default;
             }
 
             .completed {
@@ -153,6 +154,27 @@
                 color: #5F6368;
                 border: 1px solid #D1D1D1;
                 opacity: 0.8;
+            }
+
+            .delivered{
+                font-weight: 500;
+                background-color: #E0F2FE;
+                color: #0369A1;
+                border-color: #0369A1;
+            }
+
+            .req-cancel{
+                font-weight: 500;
+                background-color: #FEF2F2;
+                color: #DC2626;
+                border-color: #DC2626;
+            }
+
+            .revision{
+                font-weight: 500;
+                background-color: #F5F3FF;
+                color: #5B21B6;
+                border-color: #5B21B6;
             }
         }
 

@@ -78,6 +78,8 @@ export default function Order() {
 
     // Handler socket events
     useEffect(() => {
+        if(!socket) return;
+
         const handlerOrderEvent = (payload) => {
             if (payload.updatedOrder._id === id) {
                 setOrder(payload.updatedOrder)
@@ -807,6 +809,8 @@ export default function Order() {
         fetchBuyerReview();
     }, [id, order?.status]);
 
+    console.log(order?.orderReq)
+
     return (
         <div className='order-container'>
             <div className="order">
@@ -936,7 +940,7 @@ export default function Order() {
                                                                 <div className="buyer-req-title">
                                                                     Buyer requirements:
                                                                 </div>
-                                                                <textarea className="buyer-req-main" disabled value={order?.orderReq}></textarea>
+                                                                <textarea className="buyer-req-main" value={order?.orderReq} disabled></textarea>
                                                             </div>
                                                             <div className="order-request-action-btns">
                                                                 <button className='order-accept-btn' onClick={() => OrderRequestHandler(true)}>Accept Order</button>
@@ -1397,9 +1401,10 @@ export default function Order() {
                                 </div>
 
                                 {/* CANCEL BUTTON */}
+                                
                                 <div className='order-cancel'>
                                     {
-                                        order?.status !== 'cancelled' && order?.status !== 'completed' && order?.status !== 'requested' && order?.status !== 'Declined' &&
+                                        order?.status !== 'cancelled' && order?.status !== 'completed' && order?.status !== 'requested' && order?.status !== 'Declined' && order?.status !== 'request-cancellation' &&
                                         !showTextBox &&
                                         <button className='cancel-btn' onClick={() => setShowTextBox(true)}>Cancel Order</button>
                                     }
