@@ -36,20 +36,23 @@
         color: rgb(0, 183, 181);
 
         .website-name .text-half{
-            color: rgb(244, 244, 244) !important;
             transition: all 0.5s ease;
+            color: rgb(244, 244, 244) !important;
         }
 
         .titles .link {
-            color: gray;
+            transition: all 0.5s ease;
+            color: rgb(0, 183, 181);
         }
 
         .username {
+            transition: all 0.5s ease;
             color: rgb(244, 244, 244);
         }
 
         .cat-btn {
-            color: gray;
+            transition: all 0.5s ease;
+            color: rgb(0, 183, 181);
             cursor: pointer;
         }
 

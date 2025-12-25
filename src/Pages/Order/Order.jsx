@@ -78,7 +78,7 @@ export default function Order() {
 
     // Handler socket events
     useEffect(() => {
-        if(!socket) return;
+        if (!socket) return;
 
         const handlerOrderEvent = (payload) => {
             if (payload.updatedOrder._id === id) {
@@ -196,7 +196,29 @@ export default function Order() {
     const [rejectButtonToggle, setRejectButtonToggle] = useState(false);
     const [orderDeclineRequestNote, setOrderDeclineRequestNote] = useState('');
 
-    const OrderRequestHandler = async (responseState) => {
+    const orderDeclineHandler = async (responseState) => {
+        console.log('Clicked!')
+        const { value: declineReason } = await Swal.fire({
+            title: 'Decline Order Request',
+            input: 'textarea',
+            inputLabel: 'Reason for declining:',
+            inputPlaceholder: 'Explain why you are declining this order...',
+            inputAttributes: {
+                'arial-label': 'decline reason'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Decline Order',
+            cancelButtonText: 'Cancel',
+            cancelButtonColor: '#d33',
+            inputValidator: (value) => {
+                if (!value || !value.trim()) {
+                    return 'Decline reason is required!';
+                }
+            }
+        });
+
+        if (!declineReason) return;
+
         try {
             const res = await fetch(`http://localhost:5000/api/orders/${order?._id}/order-request`, {
                 method: 'POST',
@@ -204,7 +226,46 @@ export default function Order() {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify({ sellerResponse: responseState, orderRejectNote: orderDeclineRequestNote })
+                body: JSON.stringify({ sellerResponse: responseState, orderRejectNote: declineReason })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                if (data.success) {
+                    console.log("Order started!");
+                }
+                else {
+                    console.log("Order declined!");
+                }
+            }
+            else {
+                console.error("Failed to handle seller's response:", res.status);
+            }
+        } catch (error) {
+            console.error("Some error occured:", error);
+        }
+    }
+
+    const OrderRequestHandler = async (responseState) => {
+        if (!id) return;
+
+        const initiateOrderDate = new Date();
+        const options = {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            timeZone: "UTC"
+        };
+        const initiateOrderDateDisplay = initiateOrderDate.toLocaleDateString('en-US', options);
+
+        try {
+            const res = await fetch(`http://localhost:5000/api/orders/${id}/order-request`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ sellerResponse: responseState, orderRejectNote: declineReason, orderStartDate: initiateOrderDateDisplay })
             });
 
             if (res.ok) {
@@ -809,11 +870,19 @@ export default function Order() {
         fetchBuyerReview();
     }, [id, order?.status]);
 
-    console.log(order?.orderReq)
+    // Truncate Order ID
+    const truncateId = (id, startIndex = 5, endIndex = 5) => {
+        if (!id) return;
+
+        if (id.length <= startIndex + endIndex) return id;
+        return `${id.substring(0, startIndex)}...${id.substring(id.length - endIndex)}`;
+    }
 
     return (
         <div className='order-container'>
             <div className="order">
+
+                {/* "<- Orders" Button */}
                 <div className="order-back-button">
                     <span>
                         <Link to='/orders' className='link'>
@@ -821,151 +890,111 @@ export default function Order() {
                         </Link>
                     </span>
                 </div>
-                <div className="order-title">
 
-                    <div className="order-title-preview">
-                        <img src={coverImage} alt="" />
-                    </div>
-                    <div className="order-title-info">
-                        <div>
-                            <span className='order-title-info-gig-name'>{gigTitle}</span>
-                            <br />
-                            <span>
-                                {
-                                    user.role === 'seller' ?
-                                        `Buyer Name: ${username}`
-                                        :
-                                        `Seller Name: ${username}`
-                                }
-                            </span>
+                <div className="order-header">
+
+                    <div className="order-header-major">
+                        <div className="order-title-preview">
+                            <img src={coverImage} alt="" />
+                        </div>
+                        <div className="order-title-info">
+                            <div>
+                                <span className='order-title-info-gig-name'>{gigTitle}</span>
+                                <br />
+                                <span>
+                                    {
+                                        user.role === 'seller' ?
+                                            `Buyer: ${username}`
+                                            :
+                                            `Seller: ${username}`
+                                    }
+                                </span>
+                            </div>
                         </div>
                     </div>
+
                     <div className='order-title-status'>
-                        <span>STATUS: {order?.status}</span>
+                        <span>{order?.status}</span>
                     </div>
                 </div>
+
+                <div className="chat-btn">
+                    <button onClick={redirectToChat}>
+                        <span>Chat <FontAwesomeIcon icon="fa-solid fa-comment" /></span>
+                    </button>
+                </div>
+
+                <div className="order-main">
+                    <div className="order-content">
+
+                        {/* ORDER REQUESTED STATE */}
+                        {
+                            order?.status === 'requested' &&
+                            <>
+                                {
+                                    user.role === 'buyer' &&
+                                    <div className="warning-box">
+                                        <FontAwesomeIcon icon="fa-solid fa-triangle-exclamation" /> Waiting for seller to accept your order
+                                    </div>
+                                }
+                                <div className="buyer-req-box">
+                                    <div className="title">
+                                        {currentUser.role === 'buyer' ? 'Your' : 'Buyer'} Requirements:
+                                    </div>
+                                    <div className="req">
+                                        {order?.orderReq}
+                                    </div>
+                                </div>
+                            </>
+                        }
+                    </div>
+
+                    {/* ORDER SUMMARY CARD */}
+                    <div className="order-summary">
+                        <div className="order-summary-card">
+                            <div className="title">
+                                Order Summary
+                            </div>
+                            <div className="order-summary-table">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td>Order ID:</td>
+                                            <td title={order?._id}>{truncateId(order?._id)} <button onClick={() => { navigator.clipboard.writeText(order?._id) }}><FontAwesomeIcon icon="fa-regular fa-copy" /></button></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Ordered On:</td>
+                                            <td>{new Date(order?.createdAt).toLocaleDateString("en-US", options)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Initiated On:</td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Price:</td>
+                                            <td>₹{order?.price}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* ORDER REQUESTED STATE */}
+                            {
+                                order?.status === 'requested' && currentUser.role === 'seller' &&
+                                <div className="order-actions">
+                                    <button className='accept-order' onClick={() => OrderRequestHandler(true)}>Accept Order</button>
+                                    <button className='decline-order' onClick={() => orderDeclineHandler(false)}>Decline Order</button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
                 <div className="order-desc">
                     <div className="order-desc-attr">
-                        <table>
-                            <tbody>
-                                <tr>
-                                    <td><span className='order-attr'>Order ID:</span></td>
-                                    <td><span>{order?._id}</span></td>
-                                </tr>
-                                <tr>
-                                    <td><span className='order-attr'>Ordered On:</span></td>
-                                    <td><span>{new Date(order?.createdAt).toLocaleDateString("en-US", options)}</span></td>
-                                </tr>
-                                <tr>
-                                    <td><span className='order-attr'>Price:</span></td>
-                                    <td><span>₹{price}</span></td>
-                                </tr>
-                                <tr>
-                                    {
-                                        (order?.status !== 'completed' && order?.status !== 'cancelled' && order?.status !== 'requested' && order?.status !== 'Declined') &&
-                                        (
-                                            remainingDays > 1 ?
-                                                <>
-                                                    <td><span className='order-attr'>Due:</span></td>
-                                                    <td><span>{remainingDays} Days left</span></td>
-                                                </>
-                                                :
-                                                remainingDays === 0 ?
-                                                    <>
-                                                        <td><span className='order-attr'>Due:</span></td>
-                                                        <td><span>Due Today</span></td>
-                                                    </>
-                                                    :
-                                                    <>
-                                                        <td><span className='order-attr'>Due:</span></td>
-                                                        <td><span>{Math.abs(remainingDays)} Days late</span></td>
-                                                    </>
-                                        )
-                                    }
-                                </tr>
-
-                                {/* Revisions fields visible ONLY after order is active */}
-                                {
-                                    order?.status !== 'requested' && order?.status !== 'Declined' &&
-                                    (
-                                        user.role === 'buyer' ?
-                                            <tr>
-                                                <td><span className='order-attr'>Revisions used:</span></td>
-                                                <td><span>{order?.revisionCount}</span></td>
-                                            </tr>
-                                            :
-                                            <tr>
-                                                <td><span className='order-attr'>Revisions done:</span></td>
-                                                <td><span>{order?.revisionCount}</span></td>
-                                            </tr>
-                                    )
-                                }
-                            </tbody>
-                        </table>
-
                         <div className="order-status">
                             <span className='order-status-title'>Order Status:</span>
-                            {/* <div className='order-status-items'>
-                                <span>ACTIVE </span>
-                                <span>--- DELIVERED </span>
-                                <span>--- COMPLETED</span>
-                            </div> */}
                             <div className="order-action">
-                                {
-                                    order?.status === 'requested' && user.role === 'buyer' &&
-                                    (
-                                        <>
-                                            <div className="buyer-requested">
-
-                                                <div className="req-note">
-                                                    Seller is yet to accept the order request...
-                                                </div>
-                                                <div className="sent-requirements">
-                                                    <div className="title">Your sent requirements:</div>
-                                                    <textarea disabled value={order?.orderReq}></textarea>
-                                                </div>
-                                            </div>
-                                        </>
-                                    )
-                                }
-                                {
-                                    order?.status === 'requested' && user?.role === 'seller' &&
-                                    (
-                                        <>
-                                            <div className="order-request-actions">
-                                                {
-                                                    !rejectButtonToggle ?
-                                                        <>
-                                                            <div className='buyer-req'>
-                                                                <div className="buyer-req-title">
-                                                                    Buyer requirements:
-                                                                </div>
-                                                                <textarea className="buyer-req-main" value={order?.orderReq} disabled></textarea>
-                                                            </div>
-                                                            <div className="order-request-action-btns">
-                                                                <button className='order-accept-btn' onClick={() => OrderRequestHandler(true)}>Accept Order</button>
-                                                                <button className='order-reject-btn' onClick={() => setRejectButtonToggle(true)}>Decline Order</button>
-                                                            </div>
-                                                        </>
-                                                        :
-                                                        <>
-                                                            <div className='buyer-req'>
-                                                                <div className="buyer-req-title">
-                                                                    Order reject reason:
-                                                                </div>
-                                                                <textarea value={orderDeclineRequestNote} onChange={(e) => setOrderDeclineRequestNote(e.target.value)} ></textarea>
-                                                            </div>
-                                                            <div className="order-request-action-btns">
-                                                                <button className='order-reject-cancel-btn' onClick={() => setRejectButtonToggle(false)}>Cancel</button>
-                                                                <button className='order-reject-btn' onClick={() => OrderRequestHandler(false)}>Decline Order</button>
-                                                            </div>
-                                                        </>
-
-                                                }
-                                            </div>
-                                        </>
-                                    )
-                                }
                                 {
                                     order?.status === 'Declined' &&
                                     (
@@ -1395,13 +1424,8 @@ export default function Order() {
                                     <p>You have accepted the order cancellation request. Order was cancelled successfully.</p>
                                 }
 
-                                {/* Redirect Chat Button */}
-                                <div className='order-open-chat-button-container'>
-                                    <button className='order-open-chat-button' onClick={redirectToChat}>Chat <FontAwesomeIcon icon="fa-solid fa-comment" /></button>
-                                </div>
-
                                 {/* CANCEL BUTTON */}
-                                
+
                                 <div className='order-cancel'>
                                     {
                                         order?.status !== 'cancelled' && order?.status !== 'completed' && order?.status !== 'requested' && order?.status !== 'Declined' && order?.status !== 'request-cancellation' &&
@@ -1416,8 +1440,8 @@ export default function Order() {
                                             </div>
                                             <textarea name="" id="" onChange={handleCancelNote} value={textAreaCancelNote} placeholder='Explain in detail...'></textarea>
                                             <div className="order-cancel-action-btns">
-                                            <button className='hide-btn' onClick={() => setShowTextBox(false)}>Hide</button>
-                                            <button className='cancel-btn' onClick={cancelOrderRequestHandler}>Request Cancellation</button>
+                                                <button className='hide-btn' onClick={() => setShowTextBox(false)}>Hide</button>
+                                                <button className='cancel-btn' onClick={cancelOrderRequestHandler}>Request Cancellation</button>
                                             </div>
                                         </div>
                                     }

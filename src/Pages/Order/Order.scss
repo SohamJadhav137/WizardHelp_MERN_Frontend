@@ -12,37 +12,190 @@
             cursor: pointer;
         }
 
-        .order-title {
+        .header-separator {
+            border-top: 2px solid rgb(235, 234, 234);
+            margin-top: 25px;
+        }
+
+        .order-header {
             // width: 100%;
             display: flex;
             margin-top: 30px;
             justify-content: space-between;
 
-            .order-title-preview {
-                width: 180px;
-                height: 120px;
+            .order-header-major {
+                flex: 5;
+                display: flex;
 
-                img {
-                    width: 100%;
-                    height: 100%;
+                .order-title-preview {
+                    width: 180px;
+                    height: 120px;
+
+                    img {
+                        width: 100%;
+                        height: 100%;
+                    }
+                }
+
+                .order-title-info {
+                    flex: 2;
+                    display: flex;
+                    align-items: center;
+                    font-size: 30px;
+                    padding: 0px 30px;
                 }
             }
 
-            .order-title-info {
-                flex: 2;
-                display: flex;
-                align-items: center;
-                font-size: 30px;
-                padding-left: 30px;
-            }
-
             .order-title-status {
-                flex: 1;
+                flex: 2;
+
                 display: flex;
                 justify-content: center;
                 align-items: center;
+                text-transform: capitalize;
                 font-size: 40px;
-                border-left: 1px solid black;
+                border-left: 2px solid rgb(221, 221, 221);
+            }
+        }
+
+        //////////// CHAT BUTTON FIXED /////////////////
+        .chat-btn {
+            position: fixed;
+            right: 44px;
+            bottom: 44px;
+            z-index: 999;
+            
+            button {
+                border-radius: 15px;
+                padding: 20px 10px;
+                background-color: rgb(1, 135, 144);
+                color: white;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                font-size: 18px;
+                border: none;
+                cursor: pointer;
+            }
+        }
+
+        .order-main {
+            width: 100%;
+            display: flex;
+            padding-top: 30px;
+
+            .order-content {
+                flex: 5;
+                padding-right: 20px;
+                
+                ////////////// ORDER REQUEST STATE ///////////////
+                .warning-box{
+                    padding: 20px;
+                    background-color: orange;
+                    font-size: 20px;
+                    border-radius: 20px;
+                    margin-bottom: 20px;
+                }
+                
+                .buyer-req-box {
+                    background-color: rgb(228, 228, 228);
+                    border-radius: 20px;
+                    padding: 0px 30px;
+                    padding-bottom: 20px;
+
+                    .title {
+                        font-size: 25px;
+                        padding: 15px 0px;
+                        font-weight: 500;
+                    }
+
+                    .req {
+                        padding: 10px 0px;
+                        font-size: 18px;
+                    }
+                }
+            }
+
+            .order-summary {
+                flex: 2;
+                display: flex;
+                justify-content: center;
+                align-items: flex-start;
+            }
+
+            .order-summary-card {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                padding-top: 10px;
+                border: 1px solid gray;
+                border-radius: 15px;
+
+                .title {
+                    font-size: 28px;
+                    font-weight: 700;
+                    padding: 0px 20px;
+                }
+
+                .order-summary-table {
+                    width: 100%;
+                    padding: 13px 20px;
+
+                    table {
+                        width: 100%;
+
+                        td:nth-child(1) {
+                            font-weight: 500;
+                        }
+
+                        tr:nth-child(1) td:nth-child(2) {
+                            cursor: default;
+
+                            button {
+                                background-color: none;
+                                border: none;
+                                cursor: pointer;
+                            }
+                        }
+
+                        tr:nth-child(4) {
+                            font-size: 24px;
+                            font-weight: 500;
+
+                            td {
+                                padding: 5px 0px;
+                            }
+                        }
+                    }
+                }
+
+                .order-actions {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                    background-color: rgb(244, 244, 244);
+                    padding: 20px 20px;
+                    border-radius: 0px 0px 15px 15px;
+
+                    button {
+                        padding: 8px 0px;
+                        font-size: 18px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        transition: all 0.2s ease-in-out;
+                    }
+
+                    .accept-order {
+                        background-color: green;
+                        border: 1px solid green;
+                        color: white;
+                    }
+
+                    .decline-order {
+                        background-color: none;
+                        color: red;
+                        border: 1px solid red;
+                    }
+                }
             }
         }
 
@@ -92,25 +245,25 @@
             .order-action {
                 width: 50%;
 
-                .buyer-requested{
+                .buyer-requested {
                     width: 100%;
                     padding: 10px 0px;
 
-                    .req-note{
+                    .req-note {
                         font-size: 27px;
                         padding: 20px 0px;
                     }
 
-                    .sent-requirements{
+                    .sent-requirements {
                         display: flex;
                         flex-direction: column;
                         gap: 10px;
 
-                        .title{
+                        .title {
                             font-size: 20px;
                         }
 
-                        textarea{
+                        textarea {
                             padding: 10px;
                         }
                     }
@@ -152,7 +305,7 @@
                             cursor: pointer;
                         }
 
-                        .order-reject-cancel-btn{
+                        .order-reject-cancel-btn {
                             padding: 10px 20px;
                             color: white;
                             border: none;
@@ -164,7 +317,7 @@
                 }
 
                 // ORDER = ACTIVE && ROLE = BUYER
-                .order-active-buyer{
+                .order-active-buyer {
                     flex: 1;
                     width: 100%;
                 }
@@ -344,9 +497,9 @@
                 }
 
 
-                .order-open-chat-button-container{
+                .order-open-chat-button-container {
                     display: flex;
-                    
+
                     .order-open-chat-button {
                         padding: 10px 15px;
                         font-size: 18px;
