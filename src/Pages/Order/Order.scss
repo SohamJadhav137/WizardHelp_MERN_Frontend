@@ -10,11 +10,27 @@
         .order-back-button {
             font-size: 25px;
             cursor: pointer;
+            transition: color 0.2s;
+
+            &:hover {
+                color: rgb(1, 135, 144);
+            }
         }
 
-        .header-separator {
-            border-top: 2px solid rgb(235, 234, 234);
-            margin-top: 25px;
+        .order-status-header{
+            width: 100%;
+            display: flex;
+            padding-top: 20px;
+
+            .status-icon{
+                flex: 1;
+                background-color: lightcoral;
+            }
+
+            .status-info{
+                flex: 7;
+                background-color: lightblue;
+            }
         }
 
         .order-header {
@@ -193,18 +209,16 @@
 
                     .order-file-preview-container {
                         background-color: #F4F4F4;
-                        // height: 100%;
                         width: 100%;
 
                         .order-file-preview {
                             width: 100%;
-                            // min-height: 100%;
                             display: flex;
                             flex-wrap: wrap;
                             align-items: center;
                             justify-content: center;
                             gap: 20px;
-                            padding-bottom: 10px;
+                            padding-bottom: 28px;
 
                             .files-empty-text {
                                 font-size: 30px;
@@ -301,7 +315,7 @@
                 align-items: flex-start;
 
                 .order-summary-card {
-                    width: 100%;
+                    width: 90%;
                     display: flex;
                     flex-direction: column;
                     justify-content: center;

@@ -653,13 +653,13 @@ export default function Order() {
                 if (!value || !value.trim()) {
                     return 'Cancel reason is required!';
                 }
-                else if(value.length < 10){
+                else if (value.length < 10) {
                     return 'Atleast 10 characters are required!'
                 }
             }
         });
 
-        if(!textAreaCancelNote) return;
+        if (!textAreaCancelNote) return;
 
         if (!id) return;
 
@@ -898,8 +898,26 @@ export default function Order() {
                     </span>
                 </div>
 
-                <div className="order-header">
+                <div className="order-status-header">
+                    {
+                        order?.status === 'active' &&
+                        <>
+                        <div className="status-icon">
 
+                        </div>
+                        <div className="status-info">
+                            <div className="heading">
+                                Status: {order?.status} - In Progress
+                            </div>
+                            <div className="sub-heading">
+
+                            </div>
+                        </div>
+                        </>
+                    }
+                </div>
+
+                <div className="order-header">
                     <div className="order-header-major">
                         <div className="order-title-preview">
                             <img src={coverImage} alt="" />
@@ -1029,11 +1047,11 @@ export default function Order() {
                                             </div>
                                         </div>
                                     </div>
-
-
                                 </>
                                 :
-                                <div></div>
+                                <div>
+
+                                </div>
                         }
                     </div>
 
@@ -1061,6 +1079,16 @@ export default function Order() {
                                                 <td>{new Date(order?.startDate).toLocaleDateString('en-us', options)}</td>
                                             </tr>
                                         }
+                                        {
+                                            order?.status !== 'requested' &&
+                                            order?.status !== 'Declined' &&
+                                            order?.status !== 'completed' &&
+                                            order?.status !== 'cancelled' &&
+                                            <tr>
+                                                <td>Due:</td>
+                                                <td>{new Date(order?.dueDate).toLocaleDateString("en-US", options)}</td>
+                                            </tr>
+                                        }
                                         <tr className='price-field'>
                                             <td>Price:</td>
                                             <td>₹{order?.price}</td>
@@ -1082,7 +1110,7 @@ export default function Order() {
                                 order?.status === 'active' &&
                                 <div className="order-actions">
                                     {
-                                        currentUser.role === 'seller'&&
+                                        currentUser.role === 'seller' &&
                                         <button className='deliver-order' onClick={deliverOrder}>Deliver Work</button>
                                     }
                                     <button className='cancel-order' onClick={cancelOrderRequestHandler}>Cancel Order</button>
