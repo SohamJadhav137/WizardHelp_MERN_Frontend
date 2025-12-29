@@ -8,6 +8,8 @@ import { Rating } from '@mui/material'
 import './Order.scss';
 import { getCurrentUser } from '../../utils/getCurrentUser';
 import Swal from 'sweetalert2';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import ORDER_STATES from '../../Data/OrderStates';
 
 const socket = getSocket();
 
@@ -40,6 +42,7 @@ export default function Order() {
 
     const currentUser = getCurrentUser();
     const currentUsername = user.username;
+    const currentRole = user.role;
 
     // set userId based on role
     useEffect(() => {
@@ -105,27 +108,6 @@ export default function Order() {
             events.forEach(event => socket.off(event, handlerOrderEvent));
         };
     }, [id]);
-
-    // Handle order request reject event to requester 
-    useEffect(() => {
-        const handleSingleEvent = (payload) => {
-            if (user.role === 'buyer' && payload.updatedOrder.cancellationRequestedBy === 'buyer') {
-                alert("Seller has rejected order cancellation request. Order is rollbacked to previous state.");
-            }
-            else if (user.role === 'seller' && payload.updatedOrder.cancellationRequestedBy === 'seller') {
-                alert("Buyer has rejected order cancellation request. Order is restored back to previous state");
-            }
-            else {
-                alert("You rejected order cancellation request. Order is rollbackend to previous state.");
-            }
-        };
-
-        socket.on("orderCancelReject", handleSingleEvent);
-
-        return () => {
-            socket.off("orderCancelReject", handleSingleEvent);
-        };
-    }, [user.role]);
 
     // Fetch gig details
     useEffect(() => {
@@ -361,7 +343,7 @@ export default function Order() {
 
         if (isImage) {
             return (
-                <img src={file.dataUrl} alt={file.name} />
+                <img src={`http://localhost:5000/api/preview/${order?._id}/file/${file._id}`} alt={file.name} />
             )
         }
         else if (isVideo) {
@@ -394,7 +376,7 @@ export default function Order() {
 
         if (isImage) {
             return (
-                <img src={file.url} alt={file.fileName} />
+                <img src={`http://localhost:5000/api/preview/${order?._id}/file/${file._id}`} alt={file.fileName} />
             )
         }
         else if (isVideo) {
@@ -431,7 +413,7 @@ export default function Order() {
             throw new Error("Failed to get S3 upload link!");
         }
 
-        const { uploadURL, fileURL } = await response.json();
+        const { uploadURL, key, fileName } = await response.json();
 
         await fetch(uploadURL, {
             method: 'PUT',
@@ -439,7 +421,7 @@ export default function Order() {
             body: file
         });
 
-        return fileURL;
+        return { key, fileName, type: file.type, size: file.size };
     }
 
     const [textareaNote, setTextareaNote] = useState('');
@@ -451,72 +433,78 @@ export default function Order() {
 
     const deliverOrder = async () => {
         if (orderFiles.length === 0) {
-            alert("No files attached!");
-            return;
-        }
-
-        let uploadFileUrls = [];
-
-        for (const file of orderFiles) {
-            try {
-                const url = await uploadToS3(file.originalFile, token);
-                uploadFileUrls.push({
-                    url,
-                    name: file.originalFile.name,
-                    type: file.originalFile.type,
-                    size: file.originalFile.size
-                });
-            } catch (error) {
-                alert("Failed to fetch s3 url for file!");
-                console.error(error)
-                return;
-            }
-        }
-
-        try {
-            const response = await fetch(`http://localhost:5000/api/orders/${id}/deliver`, {
-                method: 'PATCH',
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    deliveryFiles: uploadFileUrls,
-                    sellerNote: textareaNote
-                })
+            return Swal.fire({
+                icon: 'error',
+                title: 'No files uploaded',
+                text: 'Please upload atleast one file to deliver a order.',
+                confirmButtonColor: '#005461'
             });
+        }
 
-            if (response.ok) {
-                Swal.fire({
-                    title: "Order Delivered",
-                    text: "Now waiting for buyer's approval.",
-                    icon: "info"
+        const result = await Swal.fire({
+            title: 'Deliver Order ?',
+            text: 'Are you sure you want to submit these files ?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#018790',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Deliver',
+            cancelButtonText: 'Cancel'
+        });
+
+        if (result.isConfirmed) {
+
+            let uploadFileUrls = [];
+
+            for (const file of orderFiles) {
+                try {
+                    const uploaded = await uploadToS3(file.originalFile, token);
+                    uploadFileUrls.push({
+                        key: uploaded.key,
+                        fileName: uploaded.fileName,
+                        fileType: uploaded.type,
+                        fileSize: uploaded.size
+                    });
+                } catch (error) {
+                    console.error(error)
+                    Swal.fire('Error', 'Faile to upload a file', 'error'); // Failed to fetch s3 url for certain file
+                    return;
+                }
+            }
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/orders/${id}/deliver`, {
+                    method: 'PATCH',
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        deliveryFiles: uploadFileUrls,
+                        sellerNote: textareaNote
+                    })
                 });
-            }
-            else {
-                console.error(`Failed to deliver the order\nBackend response status: ${response.status}\nResponse Text: ${response.statusText}`);
-            }
 
-        } catch (error) {
-            console.error("Some error occured while updating order's status or sending the order.\n", error);
+                if (response.ok) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Order Delivered",
+                        text: "Now waiting for buyer's approval.",
+                    });
+                }
+                else {
+                    console.error(`Failed to deliver the order\nBackend response status: ${response.status}\nResponse Text: ${response.statusText}`);
+                    Swal.fire('Error', 'Something went wrong during delivery', 'error');
+                }
+
+            } catch (error) {
+                console.error("Some error occured while updating order's status or sending the order.\n", error);
+            }
         }
     }
 
-    const downloadFile = async (file) => {
-        const response = await fetch(file.url);
-        const blob = await response.blob();
-        const blobURL = window.URL.createObjectURL(blob);
-
-        const link = document.createElement("a");
-        link.href = blobURL;
-        link.download = file.fileName;
-
-        document.body.appendChild(link);
-        link.click();
-
-        document.body.removeChild(link);
-
-        window.URL.revokeObjectURL(blobURL);
+    const downloadFile = async (fileId) => {
+        document.location.assign(`http://localhost:5000/api/download/${order?._id}/file/${fileId}`);
     };
 
     const acceptOrderHandler = async () => {
@@ -627,12 +615,6 @@ export default function Order() {
     }
 
     const [orderCancelText, setOrderCancelText] = useState(false);
-    const [showTextBox, setShowTextBox] = useState(false);
-    const [textAreaCancelNote, setTextAreaCancelNote] = useState('');
-
-    const handleCancelNote = (e) => {
-        setTextAreaCancelNote(e.target.value);
-    };
 
     const [msg, setMsg] = useState(null);
 
@@ -885,6 +867,8 @@ export default function Order() {
         return `${id.substring(0, startIndex)}...${id.substring(id.length - endIndex)}`;
     }
 
+    let orderState = ORDER_STATES[order?.status];
+
     return (
         <div className='order-container'>
             <div className="order">
@@ -898,23 +882,39 @@ export default function Order() {
                     </span>
                 </div>
 
-                <div className="order-status-header">
-                    {
-                        order?.status === 'active' &&
-                        <>
-                        <div className="status-icon">
-
+                <div className={`order-status-header ${orderState?.styleClass}`}>
+                    <div className="status-icon">
+                        <DotLottieReact
+                            src={orderState?.lottie}
+                            loop
+                            autoplay
+                        />
+                    </div>
+                    <div className="status-info">
+                        <div className="heading">
+                            {orderState?.heading}
                         </div>
-                        <div className="status-info">
-                            <div className="heading">
-                                Status: {order?.status} - In Progress
-                            </div>
-                            <div className="sub-heading">
-
-                            </div>
+                        <div className="sub-heading">
+                            {
+                                order?.status === 'request-cancellation' ?
+                                    currentRole === 'buyer' ?
+                                        order?.cancellationRequestedBy === 'buyer' ?
+                                            orderState?.byBuyer.buyerSub
+                                            :
+                                            orderState?.bySeller.buyerSub
+                                        :
+                                        order?.cancellationRequestedBy === 'seller' ?
+                                            orderState?.bySeller.sellerSub
+                                            :
+                                            orderState?.byBuyer.sellerSub
+                                    :
+                                    currentRole === 'buyer' ?
+                                        orderState?.buyerSub
+                                        :
+                                        orderState?.sellerSub
+                            }
                         </div>
-                        </>
-                    }
+                    </div>
                 </div>
 
                 <div className="order-header">
@@ -939,14 +939,15 @@ export default function Order() {
                     </div>
 
                     <div className='order-title-status'>
-                        <span>{order?.status}</span>
+                        <span>
+                            {
+                                remainingDays < 0 ?
+                                    'N/A'
+                                    :
+                                    remainingDays
+                            }
+                        </span>
                     </div>
-                </div>
-
-                <div className="chat-btn">
-                    <button onClick={redirectToChat}>
-                        <span>Chat <FontAwesomeIcon icon="fa-solid fa-comment" /></span>
-                    </button>
                 </div>
 
                 <div className="order-main">
@@ -999,59 +1000,102 @@ export default function Order() {
                         {/* ORDER ACTIVE STATE */}
                         {
                             order?.status === 'active' &&
+                            (
                                 currentUser.role === 'seller' ?
-                                <>
-                                    <div className="delivery-note">
-                                        <div className="title">
-                                            <label htmlFor="deliveryNote">Delivery Note:</label>
+                                    <>
+                                        <div className="delivery-note">
+                                            <div className="title">
+                                                <label htmlFor="deliveryNote">Delivery Note:</label>
+                                            </div>
+                                            <textarea name="" id="deliveryNote" value={textareaNote} onChange={handleChange} placeholder='Add a short note about the delivery (optional)'></textarea>
                                         </div>
-                                        <textarea name="" id="deliveryNote" value={textareaNote} onChange={handleChange} placeholder='Add a short note about the delivery (optional)'></textarea>
-                                    </div>
 
-                                    <div className="upload-file-box">
-                                        <input type="file" id='order-upload-file' onChange={uploadFilesHandler} className='order-upload-file-input' multiple accept='image/*, video/*, audio/*, .pdf, .doc, .docx, .zip' disabled={isUploading} />
+                                        <div className="upload-file-box">
+                                            <input type="file" id='order-upload-file' onChange={uploadFilesHandler} className='order-upload-file-input' multiple accept='image/*, video/*, audio/*, .pdf, .doc, .docx, .zip' disabled={isUploading} />
 
-                                        <label htmlFor='order-upload-file' className='order-upload-file-button'>
-                                            <FontAwesomeIcon icon="fa-solid fa-plus" /> Add Files
-                                        </label>
+                                            <label htmlFor='order-upload-file' className='order-upload-file-button'>
+                                                <FontAwesomeIcon icon="fa-solid fa-plus" /> Add Files
+                                            </label>
 
-                                        <div className="order-file-preview-container">
+                                            <div className="order-file-preview-container">
+                                                <div className={`order-file-preview ${orderFiles.length > 0 && 'contains'}`}>
+                                                    {
+                                                        orderFiles.length === 0 ?
+                                                            (
+                                                                <div className='files-empty-text'>No files uploaded yet !</div>
+                                                            )
+                                                            :
+                                                            (
+                                                                orderFiles.map(file => (
+                                                                    <div key={file.id} className='order-file'>
+                                                                        <div className="file-preview">
+                                                                            <FilePreview file={file} />
+                                                                        </div>
+                                                                        <div className='file-info'>
+                                                                            <span title={file.name}>{file.name}</span>
+                                                                            <br />
+                                                                            <span>{formatBytesToSize(file.size)}</span>
+                                                                        </div>
 
-
-                                            <div className={`order-file-preview ${orderFiles.length > 0 && 'contains'}`}>
-                                                {
-                                                    orderFiles.length === 0 ?
-                                                        (
-                                                            <div className='files-empty-text'>No files uploaded yet !</div>
-                                                        )
-                                                        :
-                                                        (
-                                                            orderFiles.map(file => (
-                                                                <div key={file.id} className='order-file'>
-                                                                    <div className="file-preview">
-                                                                        <FilePreview file={file} />
+                                                                        <button onClick={() => deleteFileHandler(file.id)} className='delete-img-button'>
+                                                                            <FontAwesomeIcon icon="fa-solid fa-trash" />
+                                                                        </button>
                                                                     </div>
-                                                                    <div className='file-info'>
-                                                                        <span title={file.name}>{file.name}</span>
-                                                                        <br />
-                                                                        <span>{formatBytesToSize(file.size)}</span>
-                                                                    </div>
-
-                                                                    <button onClick={() => deleteFileHandler(file.id)} className='delete-img-button'>
-                                                                        <FontAwesomeIcon icon="fa-solid fa-trash" />
-                                                                    </button>
-                                                                </div>
-                                                            ))
-                                                        )
-                                                }
+                                                                ))
+                                                            )
+                                                    }
+                                                </div>
                                             </div>
                                         </div>
+                                    </>
+                                    :
+                                    <div className="upload-file-box emtpy">
+                                        <div className='files-empty-text'>Delivered files will appear here</div>
                                     </div>
-                                </>
-                                :
-                                <div>
+                            )
+                        }
 
+                        {/* ORDER STATUS DELIVERED */}
+                        {
+                            order?.status === 'delivered' &&
+                            <>
+                                <div className="delivered-note">
+                                    <div className="title">
+                                        Delivery Note:
+                                    </div>
+                                    <div className="note">
+                                        {order?.sellerNote !== '' ? order?.sellerNote : '*Note is empty'}
+                                    </div>
                                 </div>
+
+                                <div className="upload-file-box">
+                                    <div className="title">
+                                        Delivered Files:
+                                    </div>
+                                    <div className="order-file-preview-container">
+                                        <div className="order-file-preview contains">
+                                            {
+                                                order?.deliveryFiles.map((file, index) => (
+                                                    <div key={index} className='order-file'>
+                                                        {/* <FilePreview2 file={file} /> */}
+                                                        <div className="file-preview">
+                                                            <FilePreview2 file={file} />
+                                                        </div>
+                                                        <div className='file-info'>
+                                                            <span title={file.fileName}>{file.fileName}</span>
+                                                            <br />
+                                                            <span>{formatBytesToSize(file.fileSize)}</span>
+                                                        </div>
+                                                        <button onClick={() => downloadFile(file._id)} className='deliver-file-button'>
+                                                            <FontAwesomeIcon icon="fa-regular fa-circle-down" />
+                                                        </button>
+                                                    </div>
+                                                ))
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
                         }
                     </div>
 
@@ -1085,8 +1129,23 @@ export default function Order() {
                                             order?.status !== 'completed' &&
                                             order?.status !== 'cancelled' &&
                                             <tr>
-                                                <td>Due:</td>
+                                                <td>Due Date:</td>
                                                 <td>{new Date(order?.dueDate).toLocaleDateString("en-US", options)}</td>
+                                            </tr>
+                                        }
+                                        {
+                                            order?.status !== 'requested' &&
+                                            order?.status !== 'declined' &&
+                                            <tr>
+                                                <td>Delivered On:</td>
+                                                <td>
+                                                    {
+                                                        order?.deliveredAt ?
+                                                            new Date(order?.deliveredAt).toLocaleDateString('en-us', options)
+                                                            :
+                                                            'N/A'
+                                                    }
+                                                </td>
                                             </tr>
                                         }
                                         <tr className='price-field'>
@@ -1097,14 +1156,18 @@ export default function Order() {
                                 </table>
                             </div>
 
+
+
                             {/* ORDER SUMMARY REQUESTED STATE */}
                             {
                                 order?.status === 'requested' && currentUser.role === 'seller' &&
                                 <div className="order-actions">
                                     <button className='accept-order' onClick={() => OrderRequestHandler(true)}>Accept Order</button>
+                                    <button className='chat-button' onClick={redirectToChat}>Chat With {currentRole === 'buyer' ? 'Seller' : 'Buyer'} <FontAwesomeIcon icon="fa-solid fa-comment" /></button>
                                     <button className='decline-order' onClick={() => orderDeclineHandler(false)}>Decline Order</button>
                                 </div>
                             }
+
                             {/* ORDER SUMMARY ACTIVE STATE */}
                             {
                                 order?.status === 'active' &&
@@ -1113,6 +1176,23 @@ export default function Order() {
                                         currentUser.role === 'seller' &&
                                         <button className='deliver-order' onClick={deliverOrder}>Deliver Work</button>
                                     }
+                                    <button className='chat-button' onClick={redirectToChat}>Chat With {currentRole === 'buyer' ? 'Seller' : 'Buyer'} <FontAwesomeIcon icon="fa-solid fa-comment" /></button>
+                                    <button className='cancel-order' onClick={cancelOrderRequestHandler}>Cancel Order</button>
+                                </div>
+                            }
+
+                            {/* ORDER SUMMARY DELIVERED STATE */}
+                            {
+                                order?.status === 'delivered' &&
+                                <div className="order-actions">
+                                    {
+                                        currentUser.role === 'buyer' &&
+                                        <>
+                                            <button className='accept-work' onClick={acceptOrderHandler}>Accept Work</button>
+                                            <button className='revise-order' onClick={requestRevisionHandler} disabled={order?.revisionCount === order?.totalRevisions}>Revise Work</button>
+                                        </>
+                                    }
+                                    <button className='chat-button' onClick={redirectToChat}>Chat With {currentRole === 'buyer' ? 'Seller' : 'Buyer'} <FontAwesomeIcon icon="fa-solid fa-comment" /></button>
                                     <button className='cancel-order' onClick={cancelOrderRequestHandler}>Cancel Order</button>
                                 </div>
                             }
@@ -1125,97 +1205,6 @@ export default function Order() {
                         <div className="order-status">
                             {/* <span className='order-status-title'>Order Status:</span> */}
                             <div className="order-action">
-                                {
-                                    order?.status === 'active' && user.role === 'buyer' &&
-                                    <div className='order-active-buyer'>
-                                        <div className="text">
-                                            Seller has not delivered the order yet.
-                                        </div>
-                                    </div>
-                                }
-                                {
-                                    order?.status === 'delivered' && user.role === 'buyer' &&
-                                    <div className="order-complete">
-                                        <table>
-                                            <tbody>
-                                                <tr>
-                                                    <td><span>Delivered On: </span></td>
-                                                    <td><span>{new Date(order?.deliveredAt).toLocaleDateString("en-US", options)}</span></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td><span>Seller Note:</span></td>
-                                                    <td><span>{order?.sellerNote !== '' ? order?.sellerNote : 'Note is empty'}</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <span>Files: </span>
-                                                    </td>
-                                                    <td>
-                                                        <div className="delivered-files">
-                                                            {
-                                                                order?.deliveryFiles.map((file, index) => (
-                                                                    <div key={index} className='delivered-file'>
-                                                                        <FilePreview2 file={file} />
-                                                                        <div className='delivered-file-info'>
-                                                                            <div className='delivered-file-name'>
-                                                                                <span>{file.fileName}</span>
-                                                                            </div>
-                                                                            <div className='delivered-file-size'>
-                                                                                <span>{formatBytesToSize(file.fileSize)}</span>
-                                                                            </div>
-                                                                        </div>
-                                                                        <button onClick={() => downloadFile(file)} className='deliver-file-button'>
-                                                                            <FontAwesomeIcon icon="fa-regular fa-circle-down" />
-                                                                        </button>
-                                                                    </div>
-                                                                ))
-                                                            }
-                                                        </div>
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td>
-                                                        <span>Note for seller: <br /> (Optional)</span>
-                                                    </td>
-                                                    <td>
-                                                        <textarea name="" id="" className='' onChange={handleChange}></textarea>
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td>
-                                                        <div className="order-action-buttons">
-                                                            <button className='order-accept-button' onClick={acceptOrderHandler}>Accept Order</button>
-                                                            <button className={`order-revise-button ${order?.revisionCount === order?.totalRevisions && 'order-revise-button-disable'}`} onClick={requestRevisionHandler} disabled={order?.revisionCount === order?.totalRevisions}>Revise Order</button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                }
-
-                                {
-                                    order?.status === 'delivered' && user.role === 'seller' &&
-                                    <div className="order-complete">
-                                        <table>
-                                            <tbody>
-                                                <tr>
-                                                    <td><span>Delivered On: </span></td>
-                                                    <td><span>{new Date(order?.deliveredAt).toLocaleDateString("en-US", options)}</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <span>Waiting for buyer's approval...</span>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                }
-
                                 {
                                     order?.status === 'completed' && user.role === 'buyer' &&
                                     <div className="order-complete">

@@ -179,12 +179,12 @@ export default function OrderCard(prop) {
                         :
                         remainingDays < 0 ?
                         <>
-                        <span className='due'>{Math.abs(remainingDays)}</span>
-                        <span className='due-label'>Days Overdue</span>
+                        <span className='due'>{Math.abs(remainingDays)} days</span>
+                        <span className='due-label' style={{fontSize: '20px'}}>Overdue!</span>
                         </>
                             :
                             remainingDays === 0 ?
-                            <span className='due'>Due Today!</span>
+                            <span className='due'>Due <br/> Today!</span>
                             :
                             <>
                             <span className='due'>{remainingDays}</span>

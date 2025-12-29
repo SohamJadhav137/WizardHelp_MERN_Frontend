@@ -6,35 +6,101 @@
         max-width: 1300px;
         width: 100%;
         margin: 0 auto;
+        padding-bottom: 30px;
 
         .order-back-button {
             font-size: 25px;
             cursor: pointer;
             transition: color 0.2s;
+            padding-bottom: 20px;
+            display: inline-block;
 
             &:hover {
                 color: rgb(1, 135, 144);
             }
         }
 
-        .order-status-header{
+        .order-status-header {
             width: 100%;
             display: flex;
-            padding-top: 20px;
+            justify-content: center;
+            align-items: center;
+            border-radius: 20px;
 
-            .status-icon{
-                flex: 1;
-                background-color: lightcoral;
+            .status-icon {
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                canvas,
+                svg {
+                    width: 100px !important;
+                    height: 80px !important;
+                    background: transparent !important;
+                }
             }
 
-            .status-info{
-                flex: 7;
-                background-color: lightblue;
+            .status-info {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                gap: 5px;
+                padding: 20px 0px;
+
+                .heading {
+                    font-size: 40px;
+                    font-weight: 700;
+                }
+
+                .sub-heading {
+                    font-size: 20px;
+                    font-weight: 500;
+                }
+            }
+
+            &.requested {
+                background-color: #D97706;
+                color: #FFFBEB;
+            }
+
+            &.active {
+                background-color: #018790;
+                color: #F0F9FA;
+            }
+
+            &.delivered {
+                background-color: #16A34A;
+                color: #F0FDF4;
+            }
+
+            &.revision {
+                background-color: #5B21B6;
+                color: #F5F3FF;
+            }
+
+            &.declined {
+                background-color: #4B5563;
+                color: #F9FAFB;
+            }
+
+            &.req-cancellation {
+                background-color: #C2410C;
+                color: #FFF7ED;
+            }
+
+            &.cancelled {
+                background-color: #991B1B;
+                color: #FEF2F2;
+            }
+
+            &.completed {
+                background-color: #059669;
+                color: #FFFFFF;
             }
         }
 
         .order-header {
-            // width: 100%;
             display: flex;
             margin-top: 30px;
             justify-content: space-between;
@@ -50,6 +116,7 @@
                     img {
                         width: 100%;
                         height: 100%;
+                        border-radius: 13px;
                     }
                 }
 
@@ -64,32 +131,12 @@
 
             .order-title-status {
                 flex: 2;
-
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 text-transform: capitalize;
                 font-size: 40px;
                 border-left: 2px solid rgb(221, 221, 221);
-            }
-        }
-
-        //////////// CHAT BUTTON FIXED /////////////////
-        .chat-btn {
-            position: fixed;
-            right: 44px;
-            bottom: 44px;
-            z-index: 999;
-
-            button {
-                border-radius: 15px;
-                padding: 20px 10px;
-                background-color: rgb(1, 135, 144);
-                color: white;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                font-size: 18px;
-                border: none;
-                cursor: pointer;
             }
         }
 
@@ -101,6 +148,9 @@
             .order-content {
                 flex: 5;
                 padding-right: 20px;
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
 
                 ////////////// ORDER REQUEST STATE ///////////////
                 .warning-box {
@@ -183,19 +233,37 @@
                     // background-color: #018790;
                     background-color: #F4F4F4;
                     padding: 20px 10px;
+                    padding-bottom: 17px;
                     display: flex;
                     flex-direction: column;
+                    height: 100%;
                     gap: 20px;
                     align-items: flex-start;
                     border-radius: 20px;
                     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 
+                    &.empty {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                    }
+
                     .order-upload-file-input {
                         display: none;
                     }
 
+                    .files-empty-text {
+                        font-size: 30px;
+                        width: 100%;
+                        flex: 1;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+
                     .order-upload-file-button {
                         padding: 8px 13px;
+                        margin-left: 10px;
                         background-color: #005461;
                         border: none;
                         border-radius: 8px;
@@ -210,6 +278,8 @@
                     .order-file-preview-container {
                         background-color: #F4F4F4;
                         width: 100%;
+                        flex: 1;
+                        display: flex;
 
                         .order-file-preview {
                             width: 100%;
@@ -218,12 +288,8 @@
                             align-items: center;
                             justify-content: center;
                             gap: 20px;
-                            padding-bottom: 28px;
 
-                            .files-empty-text {
-                                font-size: 30px;
-                                padding-bottom: 40px;
-                            }
+                            // .files-empty-text IS ABOVE
 
                             .order-file {
                                 // background-color: rgb(196, 196, 196);
@@ -301,11 +367,184 @@
                         }
 
                         .contains {
-                            align-items: initial;
+                            align-items: center;
                             justify-content: flex-start;
                         }
                     }
                 }
+
+                //////////// ORDER DELIVERED STATE ////////
+                .delivered-note {
+                    padding: 20px;
+                    border-radius: 20px;
+                    display: flex;
+                    flex-direction: column;
+                    background-color: #e0e0e0;
+                    gap: 15px;
+                    line-height: 1.5;
+
+                    .title {
+                        font-size: 25px;
+                        font-weight: 500;
+                        color: #333;
+                    }
+
+                    .note {
+                        font-size: 20px;
+                        color: #555;
+                    }
+                }
+
+                .upload-file-box {
+                    background-color: #F4F4F4;
+                    padding: 20px 10px;
+                    padding-bottom: 17px;
+                    display: flex;
+                    flex-direction: column;
+                    height: 100%;
+                    gap: 20px;
+                    align-items: flex-start;
+                    border-radius: 20px;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+                    .title {
+                        font-size: 25px;
+                        font-weight: 500;
+                        padding-bottom: 5px;
+                    }
+
+                    &.empty {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                    }
+
+                    .order-upload-file-input {
+                        display: none;
+                    }
+
+                    .files-empty-text {
+                        font-size: 30px;
+                        width: 100%;
+                        flex: 1;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+
+                    .order-upload-file-button {
+                        padding: 8px 13px;
+                        margin-left: 10px;
+                        background-color: #005461;
+                        border: none;
+                        border-radius: 8px;
+                        font-size: initial;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        gap: 5px;
+                        color: white;
+                    }
+
+                    .order-file-preview-container {
+                        background-color: #F4F4F4;
+                        width: 100%;
+                        flex: 1;
+                        display: flex;
+
+                        .order-file-preview {
+                            width: 100%;
+                            display: flex;
+                            flex-wrap: wrap;
+                            align-items: center;
+                            justify-content: center;
+                            gap: 20px;
+
+                            // .files-empty-text IS ABOVE
+
+                            .order-file {
+                                // background-color: rgb(196, 196, 196);
+                                width: 130px;
+                                height: 210px;
+                                background-color: #018790;
+                                color: white;
+                                display: flex;
+                                flex-direction: column;
+                                // padding: 10px;
+                                justify-content: space-between;
+                                align-items: center;
+                                border-radius: 12px;
+                            }
+
+                            .file-preview {
+                                width: 100%;
+                                height: 90px;
+
+                                img {
+                                    width: 100%;
+                                    height: 100%;
+                                    object-fit: cover;
+                                    border-radius: 12px 12px 0 0;
+                                }
+
+                                .video_icon {
+                                    width: 100%;
+                                    height: 100%;
+                                    font-size: 25px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                }
+
+                                .audio_icon {
+                                    width: 100%;
+                                    height: 100%;
+                                    font-size: 25px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                }
+
+                                .file_icon {
+                                    width: 100%;
+                                    height: 100%;
+                                    font-size: 25px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                }
+                            }
+
+                            .file-info {
+                                padding: 5px 5px;
+                                text-align: center;
+                                white-space: nowrap;
+                                text-overflow: ellipsis;
+                                overflow: hidden;
+                                max-width: 80px;
+                                min-width: 0;
+                                color: white;
+                                font-weight: 500;
+                            }
+
+                            .deliver-file-button {
+                                padding: 10px;
+                                color: white;
+                                background: none;
+                                font-size: 24px;
+                                border: none;
+                                cursor: pointer;
+                            }
+                        }
+
+                        .contains {
+                            align-items: center;
+                            justify-content: flex-start;
+                        }
+                    }
+                }
+
+
             }
 
             .order-summary {
@@ -389,6 +628,24 @@
                             border: 1px solid red;
                         }
 
+                        .revise-order {
+                            background-color: transparent;
+                            color: #4B5563;
+                            border: 1px solid #D1D5DB;
+
+                            &:hover {
+                                background-color: #F9FAFB;
+                                color: #111827;
+                            }
+                        }
+
+                        .chat-button {
+                            background-color: rgb(1, 135, 144);
+                            color: white;
+                            border: none;
+                            border: 1px solid rgb(1, 135, 144);
+                        }
+
                         // ORDER SUMMARY ACTIVE STATE
 
                         .deliver-order {
@@ -412,6 +669,20 @@
                                 background-color: #F9FAFB;
                                 border-color: #EF4444;
                                 color: #EF4444;
+                            }
+                        }
+
+                        .accept-work {
+                            background-color: #018790; // Your Brand Teal
+                            color: white;
+                            padding: 12px;
+                            border-radius: 8px;
+                            border: none;
+                            cursor: pointer;
+                            transition: background 0.2s;
+
+                            &:hover {
+                                background-color: #00737a;
                             }
                         }
                     }
