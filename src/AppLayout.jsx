@@ -2,8 +2,6 @@ import React, { useContext } from 'react'
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import NavBar from './shared/NavBar/NavBar';
 import Footer from './shared/Footer/footer';
-import Login from './Pages/Auth/Login/Login';
-import Signup from './Pages/Auth/Signup/Signup';
 import Home from './Pages/Home/Home';
 import Gigs from './Pages/Gigs/Gigs';
 import Orders from './Pages/Orders/Orders';
@@ -24,6 +22,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { far } from '@fortawesome/free-regular-svg-icons'
 import { fab } from '@fortawesome/free-brands-svg-icons'
+import AuthPage from './Pages/Auth/AuthPage';
 
 library.add(fas, far, fab)
 
@@ -42,8 +41,7 @@ export default function AppLayout() {
                 <NavBar />
                 <div className={mainContentForms}>
                     <Routes>
-                        <Route path="/login" element={!user ? <Login /> : <Home/>} />
-                        <Route path="/signup" element={<Signup />} />
+                        <Route path="/auth/:mode" element={!user ? <AuthPage /> : <Home/>} />
                         <Route path="/" element={<Home />} />
                         <Route path="/category/:categoryName" element={<Gigs />} />
                         <Route path="/orders" element={<PrivateRoute><Orders /></PrivateRoute>} />

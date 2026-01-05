@@ -123,8 +123,8 @@ export default function NavBar() {
                 !isAuthPage &&
                 <>
                   <div className="auth-btns">
-                      <Link to="/login" className='link login-btn'>Login</Link>
-                      <Link to="/signup" className='signup-btn link'>Signup</Link>
+                      <Link to="/auth/login" className='link login-btn'>Login</Link>
+                      <Link to="/auth/signup" className='signup-btn link'>Signup</Link>
                   </div>
                 </>
             }

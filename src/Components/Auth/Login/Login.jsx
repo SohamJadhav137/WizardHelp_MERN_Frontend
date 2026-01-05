@@ -1,14 +1,13 @@
 import React, { useContext, useState } from 'react'
-import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
+
 import './login.scss';
-import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../context/AuthContext';
+import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Login() {
 
   const { login } = useContext(AuthContext);
-
-  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -72,45 +71,31 @@ export default function Login() {
   }
 
   return (
-    <div className="base">
-      <div className="left">
-        <div className="img-container">
-          <img src="/auth_bg_final.png" alt="" />
-        </div>
-        <div className='auth-tagline'>
-          Your creative workspace awaits
-        </div>
+    <form className="login" onSubmit={submitHandler}>
+      <h3>Welcome back !</h3>
+      <div className="error-slot">
+        {error && <span className='error-text'>{error}</span>}
       </div>
-      <div className="right">
 
-        <form className="login" onSubmit={submitHandler}>
-          <h3>Welcome back !</h3>
-          <div className="error-slot">
-          {error && <span className='error-text'>{error}</span>}
-          </div>
-
-          <label>Email</label>
-          <div className="input-wrapper">
-            <Mail className='input-icon' size={20} />
-            <input type="text" name='email' onChange={onChangeHandler} />
-          </div>
-
-          <label>Password</label>
-          <div className="input-wrapper">
-            <Lock className='input-icon' size={20} />
-            <input type={showPassword ? 'text' : 'password'} name='password' onChange={onChangeHandler} />
-            <button type='button' className='eye-icon' onClick={() => setShowPassword(!showPassword)}>
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          </div>
-
-          <button type="submit" disabled={loading} className={`auth-button ${loading && 'loading-state'}`}>
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-          <span className='desc'>New user ? <Link to='/signup' className='link'><span>Signup</span></Link> here</span>
-        </form>
-
+      <label>Email</label>
+      <div className="input-wrapper">
+        <Mail className='input-icon' size={20} />
+        <input type="text" name='email' value={formData.email} onChange={onChangeHandler} />
       </div>
-    </div>
+
+      <label>Password</label>
+      <div className="input-wrapper">
+        <Lock className='input-icon' size={20} />
+        <input type={showPassword ? 'text' : 'password'} name='password' value={formData.password} onChange={onChangeHandler} />
+        <button type='button' className='eye-icon' onClick={() => setShowPassword(!showPassword)}>
+          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+        </button>
+      </div>
+
+      <button type="submit" disabled={loading} className={`auth-button ${loading && 'loading-state'}`}>
+        {loading ? 'Logging in...' : 'Login'}
+      </button>
+      <span className='desc'>New user ? <Link to='/auth/signup' className='link'><span>Signup</span></Link> here</span>
+    </form>
   )
 }

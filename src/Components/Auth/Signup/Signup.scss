@@ -1,0 +1,177 @@
+.signup {
+    width: 65%;
+    max-width: 370px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    background-color: #F4F4F4;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 77, 77, 0.15);
+    padding: 25px 30px;
+    color: #005461;
+
+    .progress-bar {
+        display: flex;
+        gap: 10px;
+        // margin-bottom: 2rem;
+    }
+
+    .progress-segment {
+        height: 4px;
+        flex: 1;
+        background: #e2e8f0;
+        border-radius: 2px;
+    }
+
+    .progress-segment.active {
+        background: #008080;
+        /* Your Teal */
+    }
+
+    h3 {
+        font-size: 30px;
+        padding: 10px 0px;
+        text-align: center;
+    }
+
+    .error-slot {
+        min-height: 24px;
+    }
+
+    .error-text {
+        color: #dc2626;
+        padding: 15px 0px;
+    }
+
+    h4 {
+        font-size: 20px;
+        text-align: center;
+        padding: 15px 0px;
+    }
+
+    .error-slot {
+        min-height: 24px;
+    }
+
+    .error-text {
+        color: #dc2626;
+        padding: 15px 0px;
+    }
+
+    label {
+        font-size: 18px;
+        margin-bottom: 5px;
+    }
+
+    .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        padding-bottom: 8px;
+
+        .input-icon {
+            position: absolute;
+            left: 12px;
+            color: #94a3b8;
+            pointer-events: none;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            font-size: 18px;
+            border-radius: 30px;
+            border: 1px solid lightgray;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #018790;
+        }
+
+        .eye-icon {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+    }
+
+    .desc {
+        text-align: center;
+        margin-top: 12px;
+        color: #005461;
+
+        span {
+            font-weight: 500;
+            color: #018790;
+        }
+    }
+
+    .auth-button {
+        width: 100%;
+        margin-top: 18px;
+        padding: 10px 20px;
+        background-color: rgb(1, 135, 144);
+        border: white;
+        border-radius: 30px;
+        font-size: 17px;
+        color: white;
+        cursor: pointer;
+
+        &:hover {
+            background-color: rgb(1, 111, 118);
+        }
+    }
+
+    .loading-state {
+        background-color: rgba(1, 135, 144, 0.719);
+        cursor: not-allowed;
+    }
+
+    .radio-buttons-container {
+        margin: 10px 0px;
+
+        .rb {
+            display: flex;
+        }
+
+        .radio-buttons {
+            padding-top: 10px;
+            display: flex;
+            gap: 30px;
+        }
+
+        label {
+            margin-right: 20px;
+        }
+    }
+
+    select {
+        padding: 8px;
+        font-size: 15px;
+    }
+
+    select:focus {
+        outline: none;
+    }
+
+    .chips-container {
+        padding-top: 10px;
+    }
+
+    .chip {
+        background-color: rgb(186, 186, 248);
+        margin-right: 10px;
+        margin-bottom: 5px;
+        padding: 5px 10px;
+        display: inline-block;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+}

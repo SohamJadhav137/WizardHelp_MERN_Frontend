@@ -8,8 +8,6 @@ import Orders from "./Pages/Orders/Orders"
 import Footer from "./shared/Footer/footer"
 import NavBar from "./shared/NavBar/NavBar"
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
-import Login from "./Pages/Auth/Login/Login"
-import Signup from "./Pages/Auth/Signup/Signup"
 import AppLayout from "./AppLayout"
 import { AuthProvider } from "./context/AuthContext"
 

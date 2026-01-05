@@ -8,8 +8,8 @@ export default function Footer() {
   
   const categories = gigCat;
   const location = useLocation();
-  const noFooter = location.pathname === '/login'||
-  location.pathname === '/signup' ||
+  const noFooter = location.pathname === '/auth/login'||
+  location.pathname === '/auth/signup' ||
   location.pathname === '/messages' ||
   location.pathname === '/my-gigs' ||
   location.pathname.startsWith('/create-gig') ||
