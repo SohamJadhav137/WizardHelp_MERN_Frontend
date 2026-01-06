@@ -7,7 +7,7 @@
     background-color: #F4F4F4;
     border-radius: 20px;
     box-shadow: 0 20px 40px rgba(0, 77, 77, 0.15);
-    padding: 25px 30px;
+    padding: 15px 30px;
     color: #005461;
 
     .progress-bar {
@@ -28,19 +28,175 @@
         /* Your Teal */
     }
 
+    .animate-left {
+        animation: slideLeft 0.4s ease-out;
+    }
+
+    @keyframes slideLeft {
+        from {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .animate-right {
+        animation: slideRight 0.4s ease-out;
+    }
+
+    @keyframes slideRight {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0px);
+        }
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    .step-container {
+        display: flex;
+        flex-direction: column;
+
+        .prev-step-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            padding: 10px 0px;
+            cursor: pointer;
+            color: #005461;
+
+            &:hover {
+                color: #017586;
+            }
+        }
+
+        .role-grid {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+            margin-bottom: 10px;
+        }
+
+        .role-card {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+
+            &:hover {
+                border-color: rgb(1, 221, 221);
+                background: #f0fdfa;
+                color: #01bebe;
+            }
+        }
+
+        .role-card.active {
+            border-color: #01cccc;
+            background: #f0fdfa;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding-bottom: 8px;
+
+            .input-icon {
+                position: absolute;
+                left: 12px;
+                color: #94a3b8;
+                pointer-events: none;
+            }
+
+            input {
+                width: 100%;
+                padding: 12px 12px 12px 40px;
+                font-size: 18px;
+                border-radius: 30px;
+                border: 1px solid lightgray;
+                transition: border-color 0.2s;
+                outline: none;
+            }
+
+            input:focus {
+                border-color: #018790;
+            }
+
+            select {
+                width: 100%;
+                padding: 12px 40px 12px 40px;
+                font-size: 18px;
+                border-radius: 30px;
+                border: 1px solid lightgray;
+                transition: border-color 0.2s;
+                outline: none;
+                cursor: pointer;
+
+                appearance: none;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+            }
+
+            select:focus {
+                border-color: #018790;
+            }
+
+            .eye-icon {
+                position: absolute;
+                right: 12px;
+                background: none;
+                border: none;
+                color: #94a3b8;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+            }
+
+            .dropdown-icon {
+                position: absolute;
+                right: 12px;
+                background: none;
+                border: none;
+                color: #94a3b8;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                pointer-events: none;
+            }
+        }
+    }
+
     h3 {
         font-size: 30px;
-        padding: 10px 0px;
+        padding: 5px 0px;
         text-align: center;
-    }
-
-    .error-slot {
-        min-height: 24px;
-    }
-
-    .error-text {
-        color: #dc2626;
-        padding: 15px 0px;
     }
 
     h4 {
@@ -63,45 +219,6 @@
         margin-bottom: 5px;
     }
 
-    .input-wrapper {
-        position: relative;
-        display: flex;
-        align-items: center;
-        padding-bottom: 8px;
-
-        .input-icon {
-            position: absolute;
-            left: 12px;
-            color: #94a3b8;
-            pointer-events: none;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px 12px 12px 40px;
-            font-size: 18px;
-            border-radius: 30px;
-            border: 1px solid lightgray;
-            transition: border-color 0.2s;
-            outline: none;
-        }
-
-        input:focus {
-            border-color: #018790;
-        }
-
-        .eye-icon {
-            position: absolute;
-            right: 12px;
-            background: none;
-            border: none;
-            color: #94a3b8;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-        }
-    }
-
     .desc {
         text-align: center;
         margin-top: 12px;
@@ -115,7 +232,7 @@
 
     .auth-button {
         width: 100%;
-        margin-top: 18px;
+        margin-top: 8px;
         padding: 10px 20px;
         background-color: rgb(1, 135, 144);
         border: white;
@@ -134,40 +251,14 @@
         cursor: not-allowed;
     }
 
-    .radio-buttons-container {
-        margin: 10px 0px;
-
-        .rb {
-            display: flex;
-        }
-
-        .radio-buttons {
-            padding-top: 10px;
-            display: flex;
-            gap: 30px;
-        }
-
-        label {
-            margin-right: 20px;
-        }
-    }
-
-    select {
-        padding: 8px;
-        font-size: 15px;
-    }
-
-    select:focus {
-        outline: none;
-    }
-
     .chips-container {
-        padding-top: 10px;
+        padding-bottom: 3px;
     }
 
     .chip {
         background-color: rgb(186, 186, 248);
         margin-right: 10px;
+        font-size: 13px;
         margin-bottom: 5px;
         padding: 5px 10px;
         display: inline-block;

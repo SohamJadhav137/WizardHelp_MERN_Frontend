@@ -23,6 +23,7 @@ export default function AuthPage() {
 
   return (
     <div className="base">
+
       <div className="left">
         <div className="img-container">
           <img src="/auth_bg_final.png" alt="" />
@@ -31,6 +32,7 @@ export default function AuthPage() {
           Your creative workspace awaits
         </div>
       </div>
+      
       <div className="right">
         <div key={mode} className="form-fade-container">
         {mode === 'login' ? <Login /> : <Signup />}

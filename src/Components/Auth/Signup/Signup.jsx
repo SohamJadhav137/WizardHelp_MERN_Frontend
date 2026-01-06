@@ -1,11 +1,12 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
 import './signup.scss';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../context/AuthContext';
 import countries from '../../../Data/Countries';
 import languages from '../../../Data/Languages';
-import { Briefcase, Eye, EyeOff, Languages, Lock, Mail, MapPin, User, WandSparkles } from 'lucide-react';
+import { Briefcase, Brush, CheckCircle, ChevronDown, Eye, EyeOff, Languages, Lock, Mail, MapPin, User, WandSparkles, XCircle } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export default function Signup() {
 
@@ -14,25 +15,61 @@ export default function Signup() {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [chipInput, setChipInput] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [step, setStep] = useState(1);
-
-  const nextStep = () => setStep(step + 1);
-  const prevStep = () => setStep(step - 1)
-
+  const [usernameStatus, setUsernameStatus] = useState(null);
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
-    confirmPassword: "",
     country: "",
     languages: [],
     skills: [],
     role: "buyer"
   });
 
-  const [error, setError] = useState("");
-  const [chipInput, setChipInput] = useState('');
+  // Check username is unique
+  useEffect(() => {
+    if(formData.username.length < 3){
+      setUsernameStatus(null);
+      return;
+    }
+
+    const delayDebounceFunc = setTimeout(async () => {
+      setUsernameStatus('checking');
+
+      try{
+        const res = await fetch(`/api/auth/check-availability?field=username&value=${encodeURIComponent(formData.username)}`);
+        
+        if(!res.ok){
+          const errorBody = await res.text();
+          console.error("Server error:", errorBody);
+          return;
+        }
+
+        const data = await res.json();
+        console.log("Response:", data);
+
+        if(data.available){
+          setUsernameStatus('available');
+        }
+        else{
+          setUsernameStatus('taken');
+        }
+      } catch(error){
+        console.error("Lookup Failed:", error);
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFunc);
+  }, [formData.username]);
+
+  const nextStep = () => setStep(step + 1);
+  const prevStep = () => setStep(step - 1)
+
+    
 
   const onChangeHandler = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -51,17 +88,17 @@ export default function Signup() {
   const firstValidation = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if(!formData.username || !formData.email || !formData.password){
+    if (!formData.username || !formData.email || !formData.password) {
       setError("All fields are required!");
       return;
     }
 
-    if(!emailRegex.test(formData.email)){
+    if (!emailRegex.test(formData.email)) {
       setError("Please enter a valid email!");
       return;
     }
 
-    if(formData.password.length < 6){
+    if (formData.password.length < 6) {
       setError("Password must be at least 6 characters");
       return;
     }
@@ -69,6 +106,25 @@ export default function Signup() {
     setError('');
 
     nextStep();
+  }
+
+  const secondValidation = () => {
+    if(!formData.country){
+      setError("Please select your country!");
+      return;
+    }
+
+    if(formData.languages.length === 0){
+      setError("Please select atleast one language!");
+      return;
+    }
+
+    if(formData.role === 'seller' && formData.skills.length === 0){
+      setError("Please enter atleast one skill!");
+      return;
+    }
+
+    setError('');
   }
 
   const deleteLang = (langToDelete) => {
@@ -92,7 +148,7 @@ export default function Signup() {
     setFormData({ ...formData, skills: formData.skills.filter(c => c !== chipToDelete) });
   };
 
-
+  
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -178,9 +234,12 @@ export default function Signup() {
     <form className="signup" onSubmit={submitHandler}>
       <h3>Signup</h3>
 
-      <div className="error-slot">
-        {error && <span className='error-text'>{error}</span>}
-      </div>
+      {
+        step === 1 &&
+        <div className="error-slot">
+          {error && <span className='error-text'>{error}</span>}
+        </div>
+      }
 
       {/* <div className="progress-bar">
         <div className={`progress-segment ${step >= 1 ? 'active' : ''}`}></div>
@@ -189,12 +248,17 @@ export default function Signup() {
 
       {
         step === 1 &&
-        <div className="step-container animate-in">
+        <div className="step-container animate-left">
           {/* <h4>Basic Details</h4> */}
           <label htmlFor='username'>Username</label>
           <div className="input-wrapper">
             <User className='input-icon' size={20} />
             <input type="text" name='username' id='username' value={formData.username} onChange={onChangeHandler} />
+            <div className="status-indicator">
+              {usernameStatus === 'checking' && <span className='eye-icon'>...</span>}
+              {usernameStatus === 'available' && <CheckCircle className='eye-icon' size={18} color='green'/>}
+              {usernameStatus === 'available' && <XCircle className='eye-icon' size={18} color='red'/>}
+            </div>
           </div>
 
           <label htmlFor='email'>Email</label>
@@ -212,7 +276,8 @@ export default function Signup() {
             </button>
           </div>
 
-          <button type="button" className='auth-button' onClick={firstValidation}>
+          {/* APPLY onclick later: onClick={firstValidation} */}
+          <button type="button" className='auth-button' onClick={nextStep}>
             Next
           </button>
         </div>
@@ -220,9 +285,15 @@ export default function Signup() {
 
       {
         step === 2 &&
-        <div className="step-container animate-in">
+        <div className="step-container animate-right">
           <div>
-            <button onClick={prevStep}>Back</button>
+            <button onClick={prevStep} className='prev-step-btn'>
+              <FontAwesomeIcon icon="fa-solid fa-arrow-left" /> Back
+            </button>
+          </div>
+
+          <div className="error-slot">
+            {error && <span className='error-text'>{error}</span>}
           </div>
 
           <label htmlFor="">Select role:</label>
@@ -254,27 +325,47 @@ export default function Signup() {
                 ))
               }
             </select>
+            <ChevronDown className='eye-icon' size={18}/>
           </div>
 
-          <label htmlFor="edit-language" className='label-item'>Spoken Languages</label>
+          <label htmlFor="edit-language" className='label-item'>Spoken Language(s)</label>
           <div className="input-wrapper">
             <Languages className='input-icon' size={18} />
             <select name="language" id="edit-language" defaultValue='' onChange={(e) => { addLang(e.target.value); e.target.value = ''; }}>
-              <option value="" disabled>Select a language</option>
+              <option value="" disabled>Select language</option>
               {
                 languages.map((l, i) => (
                   <option key={l} value={l}>{l}</option>
                 ))
               }
             </select>
-            <div className="chips-container">
-              {
-                formData.languages.map((l, i) => (
-                  <div className="chip" key={i} onClick={() => deleteLang(l)}>{l} &times;</div>
-                ))
-              }
-            </div>
+            <ChevronDown className='eye-icon' size={18}/>
           </div>
+          <div className="chips-container">
+            {
+              formData.languages.map((l, i) => (
+                <div className="chip" key={i} onClick={() => deleteLang(l)}>{l} &times;</div>
+              ))
+            }
+          </div>
+
+          {
+            formData.role === 'seller' &&
+            <>
+              <label htmlFor="edit-skill" className='label-item'>Skill(s)</label>
+              <div className="input-wrapper">
+                <Brush className='input-icon' size={18} />
+                <input type="text" onChange={(e) => setChipInput(e.target.value)} onKeyDown={addChip} value={chipInput} placeholder='Type a skill and press enter' />
+              </div>
+              <div className="chips-container">
+                {
+                  formData.skills.map((s, i) => (
+                    <div className="chip" key={i} onClick={() => deleteChip(s)}>{s} &times;</div>
+                  ))
+                }
+              </div>
+            </>
+          }
 
           <button type="submit" disabled={loading} className={`auth-button ${loading && 'loading-state'}`}>
             {loading ? 'Signing up...' : 'Signup'}
