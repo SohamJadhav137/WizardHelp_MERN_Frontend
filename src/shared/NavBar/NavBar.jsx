@@ -27,7 +27,7 @@ export default function NavBar() {
 
   const location = useLocation();
   const isHomePage = location.pathname === '/';
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
+  const isAuthPage = location.pathname === '/auth/login' || location.pathname === '/auth/signup';
 
   const navigate = useNavigate();
 
@@ -36,6 +36,7 @@ export default function NavBar() {
     window.scrollY > 0 ? setActive(true) : setActive(false)
   }
 
+  // Navbar scroll effect
   useEffect(() => {
     window.addEventListener('scroll', isScroll)
     return () => {

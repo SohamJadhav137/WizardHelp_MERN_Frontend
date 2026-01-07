@@ -3,11 +3,12 @@ import React, { useContext, useState } from 'react'
 import './login.scss';
 import { AuthContext } from '../../../context/AuthContext';
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Login() {
 
   const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -59,8 +60,6 @@ export default function Login() {
       console.log(data);
       console.log(user);
       login(user, data.token);
-      // alert("User logged in successfully");
-      navigate('/');
 
     } catch (error) {
       console.error(error)

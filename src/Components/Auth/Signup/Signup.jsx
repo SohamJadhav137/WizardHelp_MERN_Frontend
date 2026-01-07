@@ -5,8 +5,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../context/AuthContext';
 import countries from '../../../Data/Countries';
 import languages from '../../../Data/Languages';
-import { Briefcase, Brush, CheckCircle, ChevronDown, Eye, EyeOff, Languages, Lock, Mail, MapPin, User, WandSparkles, XCircle } from 'lucide-react';
+import { Briefcase, Brush, CheckCircle, ChevronDown, Eye, EyeOff, Info, Languages, Lock, Mail, MapPin, User, WandSparkles, XCircle } from 'lucide-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import loadingIcon from '../../.././assets/loading_icon.svg';
+import Swal from 'sweetalert2';
 
 export default function Signup() {
 
@@ -20,6 +22,7 @@ export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [step, setStep] = useState(1);
   const [usernameStatus, setUsernameStatus] = useState(null);
+  const [emailStatus, setEmailStatus] = useState(null);
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -32,7 +35,9 @@ export default function Signup() {
 
   // Check username is unique
   useEffect(() => {
-    if(formData.username.length < 3){
+    setError("");
+
+    if (formData.username.length < 3) {
       setUsernameStatus(null);
       return;
     }
@@ -40,10 +45,10 @@ export default function Signup() {
     const delayDebounceFunc = setTimeout(async () => {
       setUsernameStatus('checking');
 
-      try{
-        const res = await fetch(`/api/auth/check-availability?field=username&value=${encodeURIComponent(formData.username)}`);
-        
-        if(!res.ok){
+      try {
+        const res = await fetch(`http://localhost:5000/api/auth/check-availability?field=username&value=${encodeURIComponent(formData.username)}`);
+
+        if (!res.ok) {
           const errorBody = await res.text();
           console.error("Server error:", errorBody);
           return;
@@ -52,13 +57,14 @@ export default function Signup() {
         const data = await res.json();
         console.log("Response:", data);
 
-        if(data.available){
+        if (data.available) {
           setUsernameStatus('available');
         }
-        else{
+        else {
           setUsernameStatus('taken');
+          setError("This username is already claimed!")
         }
-      } catch(error){
+      } catch (error) {
         console.error("Lookup Failed:", error);
       }
     }, 500);
@@ -66,10 +72,60 @@ export default function Signup() {
     return () => clearTimeout(delayDebounceFunc);
   }, [formData.username]);
 
+  // Check email format & uniqueness
+  useEffect(() => {
+    setError("");
+
+    const email = formData.email;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!email) {
+      setEmailStatus(null);
+      return;
+    }
+
+    if (!emailRegex.test(email)) {
+      setEmailStatus('invalid');
+      setError('Invalid Email!')
+      return;
+    }
+
+    setError('');
+
+    const delayDebounceFunc = setTimeout(async () => {
+      setEmailStatus('checking');
+
+      try {
+        const res = await fetch(`http://localhost:5000/api/auth/check-availability?field=email&value=${encodeURIComponent(formData.email)}`);
+
+        if (!res.ok) {
+          const errorBody = await res.text();
+          console.error("Server error:", errorBody);
+          return;
+        }
+
+        const data = await res.json();
+        console.log("Response:", data);
+
+        if (data.available) {
+          setEmailStatus('available');
+        }
+        else {
+          setEmailStatus('taken');
+          setError("This email is already registered!")
+        }
+      } catch (error) {
+        console.error("Lookup Failed:", error);
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFunc);
+  }, [formData.email]);
+
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1)
 
-    
+
 
   const onChangeHandler = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -86,10 +142,37 @@ export default function Signup() {
   };
 
   const firstValidation = () => {
+    setError("");
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!formData.username || !formData.email || !formData.password) {
       setError("All fields are required!");
+      return;
+    }
+
+    if (usernameStatus === 'taken') {
+      setError("This name is already claimed!");
+      return;
+    }
+
+    if (usernameStatus === 'checking') {
+      setError("Hold on, we're still checking this name...");
+      return;
+    }
+
+    if (emailStatus === 'invalid') {
+      setError("Please enter a valid email address!");
+      return;
+    }
+
+    if (emailStatus === 'taken') {
+      setError("This email is already registered!");
+      return;
+    }
+
+    if (emailStatus === 'checking') {
+      setError("Hold on, we're still checking this email...");
       return;
     }
 
@@ -98,33 +181,14 @@ export default function Signup() {
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters");
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters");
       return;
     }
 
     setError('');
 
     nextStep();
-  }
-
-  const secondValidation = () => {
-    if(!formData.country){
-      setError("Please select your country!");
-      return;
-    }
-
-    if(formData.languages.length === 0){
-      setError("Please select atleast one language!");
-      return;
-    }
-
-    if(formData.role === 'seller' && formData.skills.length === 0){
-      setError("Please enter atleast one skill!");
-      return;
-    }
-
-    setError('');
   }
 
   const deleteLang = (langToDelete) => {
@@ -148,47 +212,28 @@ export default function Signup() {
     setFormData({ ...formData, skills: formData.skills.filter(c => c !== chipToDelete) });
   };
 
-  
-
+  // SUBMIT form handler
   const submitHandler = async (e) => {
     e.preventDefault();
     setError("");
 
-    // if (!formData.username || !formData.email || !formData.password || !formData.confirmPassword || !formData.country || !formData.languages) {
-    //   setError("All fields are required!");
-    //   return;
-    // }
-
-    console.log(formData.username);
-
-    if (!formData.username) {
-      setError("Username is required!");
-      return;
-    }
-
-    if (!formData.email.includes('@')) {
-      setError("Invalid email format!");
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError("Password should be of min 6 characters!");
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords don't match!");
+    // Second stage form validation
+    if (!formData.country) {
+      setError("Please select your country!");
       return;
     }
 
     if (formData.languages.length === 0) {
-      setError("Select atleast one language!");
+      setError("Please select atleast one language!");
       return;
     }
 
-    if (!formData.skills) {
-      formData.skills = [];
+    if (formData.role === 'seller' && formData.skills.length === 0) {
+      setError("Please enter atleast one skill!");
+      return;
     }
+
+    setError('');
 
     setLoading(true);
 
@@ -209,16 +254,39 @@ export default function Signup() {
 
       if (data.success) {
         localStorage.setItem("token", data.token);
-        const user = { email: data.email, username: data.username, role: data.role, profilePic: data.profilePic || null }
+        const user = { email: data.email, username: data.username, role: data.role }
         localStorage.setItem("user", user);
         console.log(data);
         console.log(user);
         login(user, data.token);
-        alert("User registered successfully");
+
+        Swal.fire({
+          title: 'Registration Successful!',
+          html: `Welcome <b>${formData.username}</b>!<br>Your journey begins now.`,
+          icon: 'success',
+          customClass: {
+            popup: 'swal-custom-popup',
+            title: 'swal-custom-title'
+          },
+          iconColor: '#018790',
+          showConfirmButton: true,
+          timer: 3000, // Optional: automatically closes after 3 seconds
+          timerProgressBar: true,
+          background: '#ffffff'
+        });
+
         navigate('/');
       }
       else {
-        alert("User registration failed!");
+        Swal.fire({
+          title: 'Error',
+          text: 'Ritual Failed. Try again!',
+          icon: 'error',
+          customClass: {
+            popup: 'swal-custom-popup',
+            title: 'swal-custom-title'
+          }
+        });
       }
 
     } catch (error) {
@@ -250,21 +318,25 @@ export default function Signup() {
         step === 1 &&
         <div className="step-container animate-left">
           {/* <h4>Basic Details</h4> */}
-          <label htmlFor='username'>Username</label>
+          <div className='username-label'>
+            <label htmlFor='username'>Username</label>
+            <div className="input-helper-text"> <Info size={12} /> Cannot be changed later.</div>
+          </div>
           <div className="input-wrapper">
             <User className='input-icon' size={20} />
             <input type="text" name='username' id='username' value={formData.username} onChange={onChangeHandler} />
-            <div className="status-indicator">
-              {usernameStatus === 'checking' && <span className='eye-icon'>...</span>}
-              {usernameStatus === 'available' && <CheckCircle className='eye-icon' size={18} color='green'/>}
-              {usernameStatus === 'available' && <XCircle className='eye-icon' size={18} color='red'/>}
-            </div>
+            {usernameStatus === 'checking' && <img src={loadingIcon} alt="Loading..." className='loading-icon' />}
+            {usernameStatus === 'available' && <CheckCircle className='eye-icon' size={18} color='green' />}
+            {usernameStatus === 'taken' && <XCircle className='eye-icon' size={18} color='red' />}
           </div>
 
           <label htmlFor='email'>Email</label>
           <div className="input-wrapper">
             <Mail className='input-icon' size={20} />
             <input type="email" name='email' id='email' value={formData.email} onChange={onChangeHandler} />
+            {emailStatus === 'checking' && <img src={loadingIcon} alt="Loading..." className='loading-icon' />}
+            {emailStatus === 'available' && <CheckCircle className='eye-icon' size={18} color='green' />}
+            {emailStatus === 'taken' && <XCircle className='eye-icon' size={18} color='red' />}
           </div>
 
           <label htmlFor='password'>Password</label>
@@ -277,7 +349,7 @@ export default function Signup() {
           </div>
 
           {/* APPLY onclick later: onClick={firstValidation} */}
-          <button type="button" className='auth-button' onClick={nextStep}>
+          <button type="button" className='auth-button' onClick={firstValidation}>
             Next
           </button>
         </div>
@@ -300,7 +372,7 @@ export default function Signup() {
           <div className="role-grid">
             <div
               className={`role-card ${formData.role === 'buyer' ? 'active' : ''}`}
-              onClick={() => setFormData({ ...formData, role: 'buyer' })}
+              onClick={() => setFormData({ ...formData, role: 'buyer', skills: [] })}
             >
               <Briefcase size={24} />
               <span>I want to Hire</span>
@@ -325,7 +397,7 @@ export default function Signup() {
                 ))
               }
             </select>
-            <ChevronDown className='eye-icon' size={18}/>
+            <ChevronDown className='eye-icon' size={18} />
           </div>
 
           <label htmlFor="edit-language" className='label-item'>Spoken Language(s)</label>
@@ -339,7 +411,7 @@ export default function Signup() {
                 ))
               }
             </select>
-            <ChevronDown className='eye-icon' size={18}/>
+            <ChevronDown className='eye-icon' size={18} />
           </div>
           <div className="chips-container">
             {

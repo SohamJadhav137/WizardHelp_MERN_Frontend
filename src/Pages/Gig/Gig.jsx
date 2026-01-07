@@ -96,7 +96,7 @@ export default function Gig() {
                     title: 'swal-custom-title'
                 }
             });
-            return navigate('/login');
+            return navigate('/auth/login');
         }
 
         if (userId === gig?.userId) {
@@ -158,7 +158,7 @@ export default function Gig() {
                     title: 'swal-custom-title'
                 }
             });
-            return navigate('/login');
+            return navigate('/auth/login');
         }
 
         if (user.role === 'seller') {

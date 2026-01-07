@@ -29,7 +29,7 @@ library.add(fas, far, fab)
 export default function AppLayout() {
 
     const location = useLocation();
-    const isAuth = location.pathname === '/login' || location.pathname === '/signup';
+    const isAuth = location.pathname === '/auth/login' || location.pathname === '/auth/signup';
     const mainContentForms = `main-content ${isAuth ? 'main-content-align' : ''}`
 
     const { user } = useContext(AuthContext);

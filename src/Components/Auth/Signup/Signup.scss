@@ -122,6 +122,35 @@
             background: #f0fdfa;
         }
 
+        .username-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 5px;
+            justify-content: space-between;
+            
+            label {
+                font-size: 18px;
+            }
+            
+            .input-helper-text {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                font-size: 0.85rem;
+                color: #64748b; // A soft slate gray
+                // margin-left: 2px;
+                font-style: italic;
+                line-height: 1;
+                
+                svg {
+                    color: #018790; // Your brand teal for the info icon
+                }
+            }
+        }
+
+
+
         .input-wrapper {
             position: relative;
             display: flex;
@@ -190,6 +219,13 @@
                 align-items: center;
                 pointer-events: none;
             }
+
+            .loading-icon {
+                width: 25px;
+                height: 25px;
+                position: absolute;
+                right: 12px;
+            }
         }
     }
 
@@ -212,6 +248,7 @@
     .error-text {
         color: #dc2626;
         padding: 15px 0px;
+        font-weight: 500;
     }
 
     label {

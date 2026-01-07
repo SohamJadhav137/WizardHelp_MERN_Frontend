@@ -127,6 +127,8 @@ export default function ChatWindow() {
 
   // Join/Leave conv room
   useEffect(() => {
+    if(!socket) return;
+
     if (conversationId) {
       socket.emit("join_conversation", conversationId);
       console.log(`💬 ${currentUser} joined conversation room ID:`, conversationId);
@@ -160,6 +162,8 @@ export default function ChatWindow() {
 
   // Send msg socket
   const handleSend = async () => {
+    if(!socket) return;
+    
     if (!message.trim()) return;
 
     // Some new data to be sent from client
