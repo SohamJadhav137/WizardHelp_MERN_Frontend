@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { getCurrentUser } from "../utils/getCurrentUser";
@@ -9,19 +9,31 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || null);
     const [token, setToken] = useState(localStorage.getItem("token") || null);
-
     const navigate = useNavigate();
+    const currentUser = getCurrentUser();
+
+    useEffect(() => {
+        if(user){
+            createSocket({
+                userId: currentUser.id,
+                username: user.username
+            });
+        }
+        else{
+            disconnectSocket();
+        }
+    }, [user]);
 
     const login = (userData, token) => {
         setUser(userData);
         setToken(token);
         localStorage.setItem("user", JSON.stringify(userData));
         localStorage.setItem("token", token);
-        const currentUser = getCurrentUser();
-        createSocket({
-            userId: currentUser.id,
-            username: userData.username
-        })
+        
+        // createSocket({
+        //     userId: currentUser.id,
+        //     username: userData.username
+        // })
         navigate('/');
     }
 
@@ -48,7 +60,7 @@ export const AuthProvider = ({ children }) => {
             console.error("Logout error!", error);
         }
 
-        disconnectSocket();
+        // disconnectSocket();
 
         setUser(null);
         setToken(null);

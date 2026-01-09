@@ -4,18 +4,16 @@ import './MainContainer.scss'
 import ChatsContainer from '../ChatsContainer/ChatsContainer'
 import ChatWindow from '../ChatWindow/ChatWindow'
 import { useNavigate, useParams } from 'react-router-dom'
+import { getSocket } from '../../../socket'
 
 export default function MainContainer() {
-
-  // const convId = useParams();
+  
   const [convList, setConvList] = useState([]);
-  const [selectedConvId, setSelectedConvId] = useState(null);
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
   const handleSelectedConv = (conv) => {
-    if(conv){
-      setSelectedConvId(conv);
+    if (conv) {
       navigate(`/messages/${conv}`);
     }
   }
@@ -25,14 +23,14 @@ export default function MainContainer() {
     const fetchConverstaions = async () => {
       try {
         const response = await fetch(`http://localhost:5000/api/conversations`, {
-          headers: { Authorization: `Bearer ${token}`}
+          headers: { Authorization: `Bearer ${token}` }
         })
-        
-        if(response.ok){
+
+        if (response.ok) {
           const data = await response.json();
           setConvList(data);
         }
-        else{
+        else {
           console.error("BACKEND RESPONSE ERROR:", response);
         }
       } catch (error) {
@@ -43,6 +41,28 @@ export default function MainContainer() {
     fetchConverstaions();
   }, []);
 
+  // Updates last msg in chat bubble
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) return;
+
+    const handleLastMessageUpdate = ({ conversationId, lastMessage, updatedAt }) => {
+      setConvList(prev => prev.map(
+        conv => conv._id === conversationId ?
+          { ...conv, lastMessage, updatedAt }
+          :
+          conv
+      ).sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+      );
+    };
+
+    socket.on('last_message_update', handleLastMessageUpdate);
+
+    return () => {
+      socket.off('last_message_update', handleLastMessageUpdate);
+    };
+  }, []);
+
   return (
     <div className='chat-app'>
       {/* <div className="messages-website-title">
@@ -51,8 +71,8 @@ export default function MainContainer() {
         </div>
       </div> */}
       <div className='chat-app-container'>
-      <ChatsContainer convList = {convList} onSelectConversation={handleSelectedConv} />
-      <ChatWindow conversationId={selectedConvId} />
+        <ChatsContainer convList={convList} onSelectConversation={handleSelectedConv} />
+        <ChatWindow />
       </div>
     </div>
   )

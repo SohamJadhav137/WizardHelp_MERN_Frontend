@@ -7,10 +7,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { getCurrentUser } from '../../../utils/getCurrentUser';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-const socket = getSocket();
 
 export default function ChatWindow() {
-
+  const socket = getSocket();
   const { conversationId } = useParams();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
@@ -127,7 +126,7 @@ export default function ChatWindow() {
 
   // Join/Leave conv room
   useEffect(() => {
-    if(!socket) return;
+    if(!socket || !socket.connected) return;
 
     if (conversationId) {
       socket.emit("join_conversation", conversationId);
@@ -141,7 +140,7 @@ export default function ChatWindow() {
       }
     }
 
-  }, [conversationId]);
+  }, [conversationId, socket]);
 
   // Receive msg socket
   useEffect(() => {

@@ -3,11 +3,11 @@ import React, { useEffect, useState } from 'react'
 import './Chat.scss'
 import profile_img from '../../assets/profile.png'
 import { getCurrentUser } from '../../utils/getCurrentUser'
+import { formatChatTimestamp } from '../../utils/formatChatTimestamp';
 
 export default function Chat({ role, conv, onSelectConversation }) {
 
   const [recipientDetails, setrecipientDetails] = useState([]);
-  const [lastMsg, setLastMsg] = useState(conv.lastMessage);
   
   const token = localStorage.getItem("token");
   const date = new Date(conv.updatedAt);
@@ -84,11 +84,11 @@ export default function Chat({ role, conv, onSelectConversation }) {
               :
               <div>{conv.buyerName}</div>
           }
-          <div className='last-msg-sent'>{formattedTime}</div>
+          <div className='last-msg-sent'>{formatChatTimestamp(conv.updatedAt)}</div>
           
         </div>
         <div className="chat-last-message">
-          <span>{lastMsg || conv.lastMessage}</span>
+          <span>{conv.lastMessage}</span>
         </div>
       </div>
     </div>

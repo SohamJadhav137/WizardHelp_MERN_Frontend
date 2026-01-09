@@ -74,7 +74,7 @@ const ORDER_STATES = {
         heading: "Order Completed",
         buyerSub: "You've accepted the delivery and completed the order. Thank you for working with this seller!",
         sellerSub: "Buyer has accepted the delivery. The order is now complete and funds will be released!",
-        lottie: "https://lottie.host/c3d08b1c-47e6-4073-a595-00610001dc82/WKBwB8MRYQ.lottie",
+        lottie: "https://lottie.host/c67e4276-9f3d-4b7d-beeb-eeaa862c9ef0/3dz66CxU8I.lottie",
         styleClass: "completed"
     }
 };
