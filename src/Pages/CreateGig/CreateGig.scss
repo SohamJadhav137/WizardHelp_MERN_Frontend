@@ -1,87 +1,203 @@
-.create-gig-container{
+.create-gig-container {
     width: 100%;
+    display: flex;
+    flex: 1;
 
-    .create-gig{
+    .create-gig {
+        flex: 1;
         max-width: 1300px;
         width: 100%;
         margin: 0 auto;
+        display: flex;
+        flex-direction: column;
 
-        .main-heading{
+        .main-heading {
             font-size: 40px;
-            padding: 30px 0px;
+            padding-top: 30px;
+            // padding: 30px 0px;
             font-weight: 500;
             color: #005461;
         }
 
-        .error-msg{
-            color: red;
-            text-align: center;
-            font-size: 20px;
+
+        .phase-wrapper {
+            display: flex;
+            // justify-content: center;
+            align-items: center;
+            flex: 1;
         }
 
-        .sub-heading{
-            font-size: 30px;
-            padding-left: 60px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid black;
-        }
-        
-        .phase-item{
+        .phase-item {
             width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 2.5rem;
+            /* Spacious padding */
+            border-radius: 12px;
+            /* Smooth corners matching your design */
+
+            /* Subtle shadow for depth */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             display: flex;
             flex-direction: column;
             justify-content: center;
-            
-            .label-item{
+            align-items: stretch;
+
+            .action-buttons {
+                // background-color: yellow;
+                text-align: center;
+
+                .next-btn {
+                    padding: 10px 20px;
+                }
+            }
+
+            .sub-heading {
+                font-size: 30px;
+                padding: 10px 0px;
+            }
+
+            .error-msg {
+                color: red;
+                text-align: center;
+                font-size: 20px;
+                line-height: 24px;
+                height: 44px;
+                padding: 8px 0;
+                transition: opacity 0.2s ease;
+            }
+
+            .error-msg.hidden {
+                visibility: hidden;
+                opacity: 0;
+            }
+
+
+            .form-container {
+
+                input {
+                    width: 100%;
+                    padding: 12px 12px 12px 40px;
+                    font-size: 18px;
+                    border-radius: 30px;
+                    border: 1px solid lightgray;
+                    transition: border-color 0.2s;
+                    outline: none;
+                }
+
+                input:focus {
+                    border-color: #018790;
+                }
+
+                select {
+                    width: 100%;
+                    padding: 12px 40px 12px 40px;
+                    font-size: 18px;
+                    border-radius: 30px;
+                    border: 1px solid lightgray;
+                    transition: border-color 0.2s;
+                    outline: none;
+                    cursor: pointer;
+
+                    appearance: none;
+                    -webkit-appearance: none;
+                    -moz-appearance: none;
+                }
+
+                select:focus {
+                    border-color: #018790;
+                }
+            }
+
+            .label-item {
                 font-size: 20px;
                 margin-right: 20px;
             }
 
-            input{
+            // table {
+            //     width: 60%;
+            //     margin: auto;
+            // }
+
+            // table td {
+            //     width: 50%;
+            //     padding: 10px 0px;
+            // }
+
+            // table tr td:first-child {
+            //     padding-left: 150px;
+            // }
+
+            // textarea:focus {
+            //     outline: none;
+            // }
+
+            .gig-description {
                 width: 100%;
-                padding: 8px;
-                font-size: 15px;
-            }
-            input:focus{
-                outline: none;
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                position: relative;
+
+                .gig-desc-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    // flex-direction: row;
+
+                    .left {
+                        display: flex;
+                        gap: 7px;
+                        color: gray;
+
+                        .info {
+                            font-size: 15px;
+                        }
+                    }
+
+                    .right {
+                        display: flex;
+                        align-items: center;
+                    }
+                }
             }
 
-            select{
-                padding: 8px;
-                font-size: 15px;
-            }
-            select:focus{
-                outline: none;
-            }
-            
-            table{
-                width: 60%;
-                margin: auto;
+            .char-count {
+                position: absolute;
+                right: 0;
             }
 
-            table td{
-                width: 50%;
-                padding: 10px 0px;
-            }
-            
-            table tr td:first-child{
-                padding-left: 150px;
-            }
-
-            textarea:focus{
-                outline: none;
-            }
-
-            .desc{
+            .desc {
                 resize: vertical;
                 font-size: 15px;
                 width: 100%;
                 min-height: 200px;
                 padding: 8px;
                 white-space: pre-line;
+                // position: relative;
             }
 
-            .tag-pill{
+            .bold-text-button {
+                // padding: 5px;
+                // background: none;
+                // border: 1px solid black;
+                // background-color: rgb(226, 226, 226);
+                // border-radius: 4px;
+
+                font-weight: 700;
+                border: 1px solid #ccc;
+                padding: 4px 8px;
+                border-radius: 4px;
+                cursor: pointer;
+                background: #fff;
+
+                &:hover {
+                    background: #f5f5f5;
+                }
+            }
+
+            .tag-pill {
                 background-color: rgb(186, 186, 248);
                 margin-right: 10px;
                 margin-bottom: 5px;
@@ -91,7 +207,7 @@
                 cursor: pointer;
             }
 
-            .gig-draft-btn{
+            .gig-draft-btn {
                 padding: 6px 15px;
                 border: none;
                 border: none;
@@ -101,7 +217,8 @@
                 margin-right: 10px;
                 cursor: pointer;
             }
-            .gig-publish-btn{
+
+            .gig-publish-btn {
                 padding: 6px 15px;
                 border: none;
                 border: none;
@@ -111,39 +228,40 @@
                 cursor: pointer;
             }
 
-            .file-preview-container{
-                
-                .file-preview{
+            .file-preview-container {
+
+                .file-preview {
                     width: 100%;
                     height: 100%;
 
                     display: flex;
                     flex-direction: column;
-                    
+
                     gap: 10px;
                     padding: 8px;
 
-                    .file{
+                    .file {
                         background-color: rgb(196, 196, 196);
                         display: flex;
                         justify-content: space-between;
                         align-items: center;
                         border-radius: 10px;
                     }
-                    img{
+
+                    img {
                         width: 70px;
                         height: 70px;
                         border-radius: 12% 0% 0% 12%;
                     }
 
-                    button{
+                    button {
                         padding: 20px;
                         background: none;
                         border: none;
                         cursor: pointer;
                     }
 
-                    .video_icon{
+                    .video_icon {
                         width: 70px;
                         height: 70px;
                         margin-left: 20px;
@@ -154,7 +272,7 @@
             }
         }
 
-        .last{
+        .last {
             padding-bottom: 80px;
         }
     }

@@ -123,9 +123,7 @@ export default function Signup() {
   }, [formData.email]);
 
   const nextStep = () => setStep(step + 1);
-  const prevStep = () => setStep(step - 1)
-
-
+  const prevStep = () => setStep(step - 1);
 
   const onChangeHandler = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

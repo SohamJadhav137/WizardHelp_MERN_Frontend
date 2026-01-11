@@ -7,6 +7,7 @@ import { getCurrentUser } from '../../utils/getCurrentUser'
 import ReviewBox from '../../Components/Gig/ReviewBox'
 import Swal from 'sweetalert2'
 import { AuthContext } from '../../context/AuthContext'
+import ReactMarkdown from 'react-markdown';
 
 export default function Gig() {
 
@@ -264,10 +265,12 @@ export default function Gig() {
 
                     <div className="about-gig">
 
-                        <span className='title'>About Gig:</span>
+                        <div className='about-gig-title'>About this gig:</div>
 
                         <div className="about-gig-para">
-                            <p>{gig?.description}</p>
+                            <ReactMarkdown>
+                                {gig?.description}
+                            </ReactMarkdown>
                         </div>
                     </div>
 

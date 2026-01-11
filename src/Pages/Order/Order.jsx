@@ -107,7 +107,7 @@ export default function Order() {
         return () => {
             events.forEach(event => socket.off(event, handlerOrderEvent));
         };
-    }, [id]);
+    }, [id, socket]);
 
     // Fetch gig details
     useEffect(() => {
