@@ -6,23 +6,25 @@
   // background: aqua;
 }
 
-.gig-showcase-title-container{
+.gig-showcase-title-container {
   width: 100%;
 
-  .gig-showcase-title{
+  .gig-showcase-title {
     max-width: 1300px;
     width: 100%;
     margin: 0 auto;
-    font-size: 50px;
+    font-size: 45px;
     font-weight: 600;
     padding: 10px 0px;
+    color: #005461;
   }
 }
 
 .gig-card-showcase {
   max-width: 1300px;
   width: 100%;
-  height: 550px;
+  height: clamp(530px, 580px, 700px);
+  height: 570px;
   margin: 0 auto;
   position: relative;
   overflow: hidden;
@@ -37,8 +39,9 @@
   width: 100%;
   height: 100%;
   border-radius: 0px 40px 0px 0px;
-  
-  img{
+  cursor: pointer;
+
+  img {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -47,7 +50,7 @@
   }
 }
 
-.gig-showcase::after{
+.gig-showcase::after {
   content: "";
   position: absolute;
   top: 0;
@@ -55,24 +58,80 @@
   width: 100%;
   height: 100%;
   border-radius: 0px 40px 0px 0px;
-  background: linear-gradient(to right, rgba(0,0,0,0.9), rgba(0,0,0,0.2));
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.2));
 }
 
 
 .gig-card-details-overlay {
   position: absolute;
-  bottom: 120px;
-  left: 20px;
+  // bottom: 120px;
+  // left: 20px;
+  // width: 100%;
+  // text-align: left;
+
+  inset: 0;
   width: 100%;
-  // background: rgba(0,0,0,0.6);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   color: white;
-  text-align: left;
+  // background: rgba(0,0,0,0.6);
   padding: 25px;
+  padding-left: 40px;
   z-index: 10;
+
+  .gig-category {
+    display: flex;
+    justify-content: start;
+    font-size: 40px;
+  }
+
+  .gig-details {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 3px;
+
+    h3 {
+      max-width: 45%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .star-rating {
+      display: flex;
+      gap: 5px;
+    }
+
+    .gig-pricing {
+      font-size: 20px;
+      font-weight: bold;
+      color: gold;
+    }
+  }
+
+  .gig-creator {
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    font-size: 30px;
+    gap: 5px;
+    color: #F4F4F4;
+
+    .creator-name {
+      font-weight: 700;
+
+      &:hover{
+        text-decoration: underline;
+      }
+    }
+  }
 }
 
 .gig-card-overlay h3 {
-  margin: 0;
+  // margin: 0;
   font-size: 18px;
   font-weight: bold;
 }
@@ -81,11 +140,4 @@
   margin: 5px 0;
   font-size: 14px;
   color: #555;
-}
-
-.gig-pricing {
-  margin-top: 8px;
-  font-size: 16px;
-  font-weight: bold;
-  color: gold;
 }

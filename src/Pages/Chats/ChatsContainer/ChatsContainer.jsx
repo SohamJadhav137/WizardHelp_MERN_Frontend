@@ -6,7 +6,7 @@ import Chat from '../../../Components/Messages/Chat'
 import { getCurrentUser } from '../../../utils/getCurrentUser'
 import { DotLottieReact } from '@lottiefiles/dotlottie-react'
 
-export default function ChatsContainer({ convList, onSelectConversation }) {
+export default function ChatsContainer({ convList, searchQuery, setSearchQuery, onSelectConversation }) {
   const currentUser = getCurrentUser();
   const currentRole = currentUser?.role;
 
@@ -16,7 +16,7 @@ export default function ChatsContainer({ convList, onSelectConversation }) {
         Messages
       </div>
       <div className="search-bar">
-        <input type="text" placeholder='Type name...' />
+        <input type="text" placeholder='Type username...' value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
       </div>
       <div className="chat-list">
         {

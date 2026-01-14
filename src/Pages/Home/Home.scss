@@ -73,6 +73,7 @@
             margin: 0 auto;
             font-size: 45px;
             padding: 10px 0px;
+            color: #018790;
         }
     }
 
@@ -104,6 +105,7 @@
             // border: 1px solid gray;
             padding: 1.25rem;
             border-radius: 10px;
+            color: #005461;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -148,6 +150,7 @@
             margin: 0 auto;
             font-size: 45px;
             padding: 10px 0px;
+            color: #018790;
         }
     }
 
@@ -180,7 +183,7 @@
 
             .step {
                 background-color: lightblue;
-                border: 1px solid black;
+                // border: 1px solid black;
                 border-radius: 10px;
                 width: 300px;
                 height: 370px;
@@ -190,6 +193,7 @@
                 flex-direction: column;
                 text-align: center;
                 padding: 0.625rem;
+                color: #005461;
 
 
                 .title {

@@ -12,6 +12,25 @@ export default function MainContainer() {
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const q = searchQuery.toLowerCase().trim();
+
+  const starts = [];
+  const contains = [];
+
+  convList.forEach(conv => {
+    const name = conv.buyerName?.toLowerCase() || conv.sellerName?.toLowerCase();
+
+    if(!q || name.startsWith(q)){
+      starts.push(conv);
+    } else if (name.includes(q)){
+      contains.push(conv);
+    }
+  });
+
+  const filteredConvList = q ? [...starts, ...contains] : convList;
+
   const handleSelectedConv = (conv) => {
     if (conv) {
       navigate(`/messages/${conv}`);
@@ -71,7 +90,7 @@ export default function MainContainer() {
         </div>
       </div> */}
       <div className='chat-app-container'>
-        <ChatsContainer convList={convList} onSelectConversation={handleSelectedConv} />
+        <ChatsContainer convList={filteredConvList} searchQuery={searchQuery} setSearchQuery={setSearchQuery} onSelectConversation={handleSelectedConv} />
         <ChatWindow />
       </div>
     </div>
