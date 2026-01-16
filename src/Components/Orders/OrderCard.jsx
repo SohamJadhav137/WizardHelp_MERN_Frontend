@@ -63,7 +63,13 @@ export default function OrderCard({ order, gigTitle, coverImage, userDetails }) 
     return (
         <div className='order-card'>
             <div className="order-card-img">
-                <img src={coverImage} alt="" />
+                {
+                    coverImage ?
+                        <img src={coverImage} alt="" />
+                        :
+                        <img src={'/no-img.png'} alt="" className='no-img' />
+
+                }
             </div>
             <div className="order-card-info">
 
@@ -72,7 +78,7 @@ export default function OrderCard({ order, gigTitle, coverImage, userDetails }) 
                         <div className="order-id">
                             #{order?._id} <button onClick={() => handleCopyText(order?._id)} className='copy-id-button'><FontAwesomeIcon icon="fa-regular fa-copy" /></button>
                         </div>
-                        <div className='order-card-title-info-gig-name'>Gig Title: {gigTitle}</div>
+                        <div className='order-card-title-info-gig-name'>Gig Title: {gigTitle || '-'}</div>
                         <div className='username'>
                             {
                                 user.role === 'seller' ?

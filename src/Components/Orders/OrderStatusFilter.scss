@@ -2,6 +2,8 @@
   display: flex;
   justify-content: space-between;
   // background-color: yellow;
+  flex-shrink: 0;
+  margin-bottom: 20px;
 
   .order-search-bar {
     flex: 1;
@@ -15,7 +17,7 @@
       position: relative;
       display: flex;
       align-items: center;
-      padding-bottom: 8px;
+      // padding-bottom: 8px;
 
       .input-icon {
         position: absolute;
@@ -46,7 +48,6 @@
   display: flex;
   align-items: center;
   gap: 24px;
-  margin-bottom: 20px;
 }
 
 .filter-tab {

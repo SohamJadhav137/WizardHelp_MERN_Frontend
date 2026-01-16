@@ -6,6 +6,9 @@ import { getSocket } from '../../socket';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import OrderStatusFilter from '../../Components/Orders/OrderStatusFilter';
 import { AuthContext } from '../../context/AuthContext';
+import { getCurrentUser } from '../../utils/getCurrentUser';
+import loading_orders from '../../assets/loading_orders.lottie';
+import data_not_found from '../../assets/data-not-found.lottie';
 
 export default function Orders() {
 
@@ -15,8 +18,11 @@ export default function Orders() {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [orderDetails, setOrderDetails] = useState({}); // Store gig and user details by orderId index
   const [searchQuery, setSearchQuery] = useState('');
-  const [detailsLoading, setDetailsLoading] = useState(false);
   const [ordersLoading, setOrdersLoading] = useState(true);
+  const [initialLoad, setInitialLoad] = useState(true);
+  const [detailsLoad, setDetailsLoad] = useState(true);
+
+  const currentUser = getCurrentUser();
 
   // Fetching orders
   useEffect(() => {
@@ -25,6 +31,8 @@ export default function Orders() {
 
       if (!token) {
         console.log("Token not found, user not logged in");
+        setOrdersLoading(false);
+        setInitialLoad(false);
         return;
       }
 
@@ -44,6 +52,7 @@ export default function Orders() {
         console.error(error);
       } finally {
         setOrdersLoading(false)
+        setInitialLoad(false);
       }
     };
 
@@ -55,15 +64,13 @@ export default function Orders() {
     const token = localStorage.getItem("token");
     if (!token || orders.length === 0) return;
 
+    setDetailsLoad(true);
+
     const fetchDetailsForOrders = async () => {
 
-      setDetailsLoading(true);
-
       const details = {};
-
       for (const order of orders) {
         try {
-          // Fetch gig details
           const gigResponse = await fetch(`http://localhost:5000/api/gigs/${order.gigId}`, {
             headers: { Authorization: `Bearer ${token}` }
           });
@@ -76,22 +83,17 @@ export default function Orders() {
             coverImage = gigData.gig?.coverImageURL;
           }
 
-          // Fetch user details
           let userDetails = null;
           let userId = null;
-          if (user.role === 'seller') {
-            userId = order.buyerId;
-          } else {
-            userId = order.sellerId;
-          }
+          if (user.role === 'seller') { userId = order.buyerId; } else { userId = order.sellerId; }
 
-          if (userId) {
-            const userResponse = await fetch(`http://localhost:5000/api/user/${userId}`, {
-              headers: { Authorization: `Bearer ${token}` }
+          if(userId){
+            const res = await fetch(`http://localhost:5000/api/user/${userId}`, {
+              headers: { Authorization: `Bearer ${token}`}
             });
 
-            if (userResponse.ok) {
-              const userData = await userResponse.json();
+            if(res.ok){
+              const userData = await res.json();
               userDetails = userData.user;
             }
           }
@@ -101,8 +103,10 @@ export default function Orders() {
             coverImage,
             userDetails
           };
-        } catch (error) {
-          console.error(`Error fetching details for order ${order._id}:`, error);
+
+        } catch(error){
+          console.error(`Error fetching details for order ${order._id}:, error`);
+
           details[order._id] = {
             gigTitle: null,
             coverImage: null,
@@ -111,12 +115,14 @@ export default function Orders() {
         }
       }
 
+      setDetailsLoad(false);
+
       setOrderDetails(details);
-      setDetailsLoading(false);
     };
 
     fetchDetailsForOrders();
-  }, [orders]);
+
+  }, [orders])
 
   // Handling orders socket events
   useEffect(() => {
@@ -125,7 +131,7 @@ export default function Orders() {
     const handleSocketEvents = (payload) => {
       const updatedOrder = payload.updatedOrder;
 
-      setOrders(prevOrders => prevOrders.map(order => order?._id === updatedOrder._id ? updatedOrder : order));
+      setOrders(prevOrders => prevOrders.map(order => order?._id === updatedOrder._id ? { ...order, ...updatedOrder } : order));
     };
 
     const events = [
@@ -185,7 +191,7 @@ export default function Orders() {
       ? filteredOrders
       : filteredOrders.filter(order => {
         const gigTitle =
-          orderDetails[order._id]?.gigTitle?.toLowerCase() || "";
+          order.gigId.title?.toLowerCase() || "";
 
         const fullOrderId = order._id.toLowerCase();
         const shortOrderId = order._id.slice(-6).toLowerCase();
@@ -205,12 +211,14 @@ export default function Orders() {
           My Orders
         </div>
 
-        {detailsLoading ? (
+        {orders.length > 0 && (<div className="orders-filter"><OrderStatusFilter orders={orders} selectedStatus={selectedStatus} onChange={setSelectedStatus} searchQuery={searchQuery} onSearchChange={setSearchQuery} /></div>)}
+
+        {detailsLoad ? (
           /* Orders loading */
           <div className="orders-empty-text">
             <div className="gig-container">
               <DotLottieReact
-                src="https://lottie.host/693ee959-eaec-464b-927a-99281f3d2511/95oDLlg8vi.lottie"
+                src={loading_orders}
                 loop
                 autoplay
                 style={{ height: "150px" }}
@@ -236,26 +244,13 @@ export default function Orders() {
           <div className="orders-empty-text">
             <div className="gig-container">
               <DotLottieReact
-                src="https://lottie.host/c53dd459-03d1-4a08-84a6-4a409242d14f/yAUDLZG2Vm.lottie"
+                src={data_not_found}
                 loop
                 autoplay
                 style={{ height: "150px" }}
               />
             </div>
             No orders found.
-          </div>
-        ) : detailsLoading ? (
-          /* Details loading */
-          <div className="orders-empty-text">
-            <div className="gig-container">
-              <DotLottieReact
-                src="https://lottie.host/693ee959-eaec-464b-927a-99281f3d2511/95oDLlg8vi.lottie"
-                loop
-                autoplay
-                style={{ height: "150px" }}
-              />
-            </div>
-            Loading order details...
           </div>
         ) : (
           /* Normal list */

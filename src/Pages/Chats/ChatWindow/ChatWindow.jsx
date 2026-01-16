@@ -6,6 +6,7 @@ import { getSocket } from '../../../socket';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getCurrentUser } from '../../../utils/getCurrentUser';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 
 export default function ChatWindow() {
@@ -30,7 +31,7 @@ export default function ChatWindow() {
 
   // Fetch active conversation
   useEffect(() => {
-    if(!conversationId) return;
+    if (!conversationId) return;
 
     const fetchConversation = async () => {
       try {
@@ -57,31 +58,31 @@ export default function ChatWindow() {
 
   let recpUserId = null;
 
-  if(sender.role === 'seller'){
+  if (sender.role === 'seller') {
     recpUserId = conv?.buyerId;
   }
-  else if(sender.role === 'buyer'){
+  else if (sender.role === 'buyer') {
     recpUserId = conv?.sellerId;
   }
 
   // Fetch recipient user details
   useEffect(() => {
-    if(!recpUserId) return;
+    if (!recpUserId) return;
 
     const fetchRecipientUserDetails = async () => {
-      try{
+      try {
         const res = await fetch(`http://localhost:5000/api/user/${recpUserId}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
 
-        if(!res.ok)
+        if (!res.ok)
           return console.error("Failed to fetch recipient user ID:", res.status);
-        
+
         const data = await res.json();
         setRecpUserDetails(data.user);
-      } catch(error){
+      } catch (error) {
         console.error("Some error occured:", error);
       }
     };
@@ -126,7 +127,7 @@ export default function ChatWindow() {
 
   // Join/Leave conv room
   useEffect(() => {
-    if(!socket || !socket.connected) return;
+    if (!socket || !socket.connected) return;
 
     if (conversationId) {
       socket.emit("join_conversation", conversationId);
@@ -144,8 +145,8 @@ export default function ChatWindow() {
 
   // Receive msg socket
   useEffect(() => {
-    if(!socket) return;
-    
+    if (!socket) return;
+
     const receiveMessageHandler = (data) => {
       console.log("Received Message:\n", data);
       console.log(`From: ${data.senderId.username}\nMessage: ${data.text}`);
@@ -161,8 +162,8 @@ export default function ChatWindow() {
 
   // Send msg socket
   const handleSend = async () => {
-    if(!socket) return;
-    
+    if (!socket) return;
+
     if (!message.trim()) return;
 
     // Some new data to be sent from client
@@ -191,27 +192,33 @@ export default function ChatWindow() {
       {
         conversationId &&
         <div className="conversation-header">
-              <div className="conversation-profile-container">
-                <div className="conv-profile">
-                  <div className="conv-profile-main">
-                    <img src={recpUserDetails?.profilePic || '/profile.png'} alt="" />
-                  </div>
-                  <div className="conv-profile-detials">
-                    <div className="profile-username">
-                      {recpUserDetails?.username}
-                    </div>
-                  </div>
-                </div>
-                <button onClick={() => navigate('/messages')} className='close-chat-btn'>
-                  Close<FontAwesomeIcon icon="fa-solid fa-xmark"/>
-                </button>
+          <div className="conversation-profile-container">
+            <div className="conv-profile">
+              <div className="conv-profile-main">
+                <img src={recpUserDetails?.profilePic || '/profile.png'} alt="" />
               </div>
+              <div className="conv-profile-detials">
+                <div className="profile-username">
+                  {recpUserDetails?.username}
+                </div>
+              </div>
+            </div>
+            <button onClick={() => navigate('/messages')} className='close-chat-btn'>
+              Close<FontAwesomeIcon icon="fa-solid fa-xmark" />
+            </button>
+          </div>
         </div>
       }
       <div className='messages-list'>
         {
           !conversationId ?
             <div className="no-chat-selected-text">
+              <DotLottieReact
+                src="/animations/Chat.lottie"
+                loop
+                autoplay
+                style={{height:"300px", width:"300px"}}
+              />
               Select a chat to view messages
             </div>
             :
@@ -225,7 +232,7 @@ export default function ChatWindow() {
       {
         conversationId &&
         <div className="input-box">
-          <input type="text" value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={submitKeyHandler} placeholder='Type a message...' className='input-text-field'/>
+          <input type="text" value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={submitKeyHandler} placeholder='Type a message...' className='input-text-field' />
           <button onClick={handleSend}>
             <FontAwesomeIcon icon="fa-solid fa-paper-plane" />
           </button>
