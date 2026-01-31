@@ -32,17 +32,49 @@ export default function NavBar() {
   const navigate = useNavigate();
 
   // Navbar active when scrolled
-  const isScroll = () => {
-    window.scrollY > 0 ? setActive(true) : setActive(false)
-  }
+  // const isScroll = () => {
+  //   window.scrollY > 0 ? setActive(true) : setActive(false)
+  // }
+
+  // Navbar scroll effect
+  // useEffect(() => {
+  //   window.addEventListener('scroll', isScroll)
+  //   return () => {
+  //     window.removeEventListener('scroll', isScroll)
+  //   }
+  // }, []);
+
+  // Navbar active only when inside .dark section
+  const checkNavbarPosition = () => {
+    const darkSection = document.querySelector('.dark');
+    const navbar = document.querySelector('.navbar');
+
+    if (!darkSection || !navbar) return;
+
+    const darkRect = darkSection.getBoundingClientRect();
+    const navRect = navbar.getBoundingClientRect();
+
+    const isInsideDark =
+      navRect.bottom > darkRect.top &&
+      navRect.top < darkRect.bottom;
+
+    setActive(isInsideDark);
+  };
 
   // Navbar scroll effect
   useEffect(() => {
-    window.addEventListener('scroll', isScroll)
+    window.addEventListener('scroll', checkNavbarPosition);
+    window.addEventListener('resize', checkNavbarPosition);
+
+    // Run once on mount
+    checkNavbarPosition();
+
     return () => {
-      window.removeEventListener('scroll', isScroll)
-    }
+      window.removeEventListener('scroll', checkNavbarPosition);
+      window.removeEventListener('resize', checkNavbarPosition);
+    };
   }, []);
+
 
   // Scroll/Redirect to homepage and scroll to category slider
   const handleCategoryClick = (event) => {
@@ -64,7 +96,8 @@ export default function NavBar() {
 
   return (
     <>
-      <div className={active && isHomePage ? "navbar active" : 'navbar'}>
+      {/* <div className={active && isHomePage ? "navbar active" : 'navbar'}> */}
+      <div className={active ? "navbar active" : 'navbar'}>
         {/* <div className={navBarForms}> */}
         <div className="container">
           <div className="website-name">
@@ -124,8 +157,8 @@ export default function NavBar() {
                 !isAuthPage &&
                 <>
                   <div className="auth-btns">
-                      <Link to="/auth/login" className='link login-btn'>Login</Link>
-                      <Link to="/auth/signup" className='signup-btn link'>Signup</Link>
+                    <Link to="/auth/login" className='link login-btn'>Login</Link>
+                    <Link to="/auth/signup" className='signup-btn link'>Signup</Link>
                   </div>
                 </>
             }

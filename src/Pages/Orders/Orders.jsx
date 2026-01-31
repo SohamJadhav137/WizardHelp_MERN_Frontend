@@ -64,6 +64,15 @@ export default function Orders() {
     const token = localStorage.getItem("token");
     if (!token || orders.length === 0) return;
 
+    const ordersNeedingDetails = orders.filter(
+      order => !orderDetails[order._id]
+    );
+
+    if (ordersNeedingDetails.length === 0) {
+      setDetailsLoad(false);
+      return;
+    }
+
     setDetailsLoad(true);
 
     const fetchDetailsForOrders = async () => {
@@ -87,12 +96,12 @@ export default function Orders() {
           let userId = null;
           if (user.role === 'seller') { userId = order.buyerId; } else { userId = order.sellerId; }
 
-          if(userId){
+          if (userId) {
             const res = await fetch(`http://localhost:5000/api/user/${userId}`, {
-              headers: { Authorization: `Bearer ${token}`}
+              headers: { Authorization: `Bearer ${token}` }
             });
 
-            if(res.ok){
+            if (res.ok) {
               const userData = await res.json();
               userDetails = userData.user;
             }
@@ -104,7 +113,7 @@ export default function Orders() {
             userDetails
           };
 
-        } catch(error){
+        } catch (error) {
           console.error(`Error fetching details for order ${order._id}:, error`);
 
           details[order._id] = {

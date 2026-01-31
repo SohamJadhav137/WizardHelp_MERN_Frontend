@@ -476,15 +476,16 @@
                             color: white;
                         }
 
-                        .add-file-info-text{
+                        .add-file-info-text {
                             color: red;
                             display: flex;
                             width: 85%;
 
-                            .icon{
+                            .icon {
                                 width: 4%;
                             }
-                            .text{
+
+                            .text {
                                 width: 96%;
                             }
                         }
@@ -716,6 +717,10 @@
                                 }
                             }
 
+                            .no-revisions-left-text{
+                                color: red;
+                            }
+
                             .price-field {
                                 font-size: 24px;
                                 font-weight: 500;
@@ -777,7 +782,17 @@
                             &:hover {
                                 background-color: #EDE9FE;
                             }
+                            &:disabled {
+                                background-color: #F9FAFB; // Lighter, grayish background
+                                color: #9CA3AF; // Muted text color
+                                border-color: #E5E7EB; // Muted border
+                                cursor: not-allowed; // Shows the "blocked" cursor
+                                opacity: 0.7; // Slight transparency
+                                // pointer-events: none; // Prevents hover and click events
+    
+                            }
                         }
+
 
                         .chat-button {
                             background-color: #ffffff;
@@ -845,13 +860,13 @@
                         }
 
                         ///// ORDER CANCELLATION REQUEST //////
-                        .accept-order-cancel{
+                        .accept-order-cancel {
                             background-color: #16a34a;
                             border: none;
                             color: white;
                         }
 
-                        .reject-order-cancel{
+                        .reject-order-cancel {
                             background-color: #dc2626;
                             border: none;
                             color: white;

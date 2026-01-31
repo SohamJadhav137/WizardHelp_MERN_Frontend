@@ -72,13 +72,13 @@ export default function Gigs() {
 
       <div className="breadcrump">
         <div className="breadcrump-container">
-          <span> <Link to='/'>Home</Link><FontAwesomeIcon icon="fa-solid fa-angle-left" /><Link to={`/category/${category}`}>{category}</Link></span>
+          <Link to='/'>Home</Link><FontAwesomeIcon icon="fa-solid fa-angle-left" /><Link to={`/category/${category}`}>{category}</Link>
         </div>
       </div>
 
       <div className="category-heading">
         <div className="category-heading-container">
-          <h2>{category}</h2>
+          {category}
         </div>
       </div>
 

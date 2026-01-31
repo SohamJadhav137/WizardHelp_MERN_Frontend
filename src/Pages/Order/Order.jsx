@@ -12,7 +12,6 @@ import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import ORDER_STATES from '../../Data/OrderStates';
 import { Toast } from '../../utils/copyTextToast';
 
-const socket = getSocket();
 
 const formatBytesToSize = (bytes) => {
     var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
@@ -23,6 +22,7 @@ const formatBytesToSize = (bytes) => {
 };
 
 export default function Order() {
+    const socket = getSocket();
 
     const { user } = useContext(AuthContext);
 
@@ -672,6 +672,14 @@ export default function Order() {
     }, []);
 
     const requestRevisionHandler = async () => {
+        if (order?.revisionCount === order?.totalRevisions) {
+            Toast.fire({
+                icon: 'warning',
+                title: 'All revisions used!'
+            });
+            return;
+        }
+
         const { value: text } = await Swal.fire({
             title: 'Request a Revision',
             html: `
@@ -1734,8 +1742,22 @@ export default function Order() {
                                         {
                                             order?.revisionCount > 0 &&
                                             <tr>
-                                                <td>Revisions Used:</td>
-                                                <td>{order?.revisionCount}</td>
+                                                {
+                                                    order?.revisionCount === order?.totalRevisions ?
+                                                        <>
+                                                            <td className='no-revisions-left-text'>Revisions Used:</td>
+                                                            <td>
+                                                                <span className='no-revisions-left-text'>
+                                                                    {order?.revisionCount} (0 left!)
+                                                                </span>
+                                                            </td>
+                                                        </>
+                                                        :
+                                                        <>
+                                                        <td>Revisions Used:</td>
+                                                        <td>{order?.revisionCount}</td>
+                                                        </>
+                                                }
                                             </tr>
                                         }
                                         {
@@ -1812,287 +1834,7 @@ export default function Order() {
                         </div>
                     </div>
                 </div>
-
-                <div className="order-desc">
-                    <div className="order-desc-attr">
-                        <div className="order-status">
-                            {/* <span className='order-status-title'>Order Status:</span> */}
-                            <div className="order-action">
-                                {/* {
-                                    order?.status === 'completed' && user.role === 'buyer' &&
-                                    <div className="order-complete">
-                                        <table>
-                                            <tbody>
-                                                <tr>
-                                                    <td><span>Delivered On: </span></td>
-                                                    <td><span>{new Date(order?.deliveredAt).toLocaleDateString("en-US", options)}</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <td><span>Completed On:</span></td>
-                                                    <td><span>{new Date(order?.completedAt).toLocaleDateString("en-US", options)}</span></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td>
-                                                        <span>Files: </span>
-                                                    </td>
-                                                    <td>
-                                                        <div className="delivered-files">
-                                                            {
-                                                                order?.deliveryFiles.map((file, index) => (
-                                                                    <div key={index} className='delivered-file'>
-                                                                        <FilePreview2 file={file} />
-                                                                        <div className='delivered-file-info'>
-                                                                            <div className='delivered-file-name'>
-                                                                                <span>{file.fileName}</span>
-                                                                            </div>
-                                                                            <div className='delivered-file-size'>
-                                                                                <span>{formatBytesToSize(file.fileSize)}</span>
-                                                                            </div>
-                                                                        </div>
-                                                                        <button onClick={() => downloadFile(file)} className='deliver-file-button'>
-                                                                            <FontAwesomeIcon icon="fa-regular fa-circle-down" />
-                                                                        </button>
-                                                                    </div>
-                                                                ))
-                                                            }
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                }
-
-                                {
-                                    order?.status === 'completed' && user.role === 'seller' &&
-                                    <table>
-                                        <tbody>
-                                            <tr>
-                                                <td><span>Delivered On: </span></td>
-                                                <td><span>{new Date(order?.deliveredAt).toLocaleDateString("en-US", options)}</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td><span>Completed On: </span></td>
-                                                <td><span>{new Date(order?.completedAt).toLocaleDateString("en-US", options)}</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td><span>Buyer Note:</span></td>
-                                                <td><span>{order?.buyerNote}</span></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                } */}
-
-                                {/* {
-                                    order?.status === 'request-cancellation' &&
-                                    <div className="order-complete">
-                                        <table>
-                                            <tbody>
-                                                <tr>
-                                                    <td><span>Delivered On: </span></td>
-                                                    <td><span>{new Date(order?.deliveredAt).toLocaleDateString("en-US", options)}</span></td>
-                                                </tr>
-
-                                                {
-                                                    user.role === 'buyer' &&
-                                                    <>
-                                                        <tr>
-                                                            <td><span>Seller Note:</span></td>
-                                                            <td><span>{order?.sellerNote !== '' ? order?.sellerNote : 'Note is empty'}</span></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <div>
-                                                                    <p>{orderCancelText}</p>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-
-                                                                <div className='request-cancel-box'>
-                                                                    {
-                                                                        order?.cancellationRequestedBy === 'buyer' &&
-                                                                        <span>Order cancellation request has been sent. Waiting for seller's response...</span>
-                                                                    }
-                                                                    {
-                                                                        order?.cancellationRequestedBy === 'seller' &&
-                                                                        <>
-                                                                            <span>Seller has requested to cancel this order</span>
-                                                                            <button onClick={acceptOrderCancelHandler}>Accept</button>
-                                                                            <button onClick={rejectOrderCancelHandler}>Decline</button>
-                                                                        </>
-                                                                    }
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    </>
-                                                }
-                                                {
-                                                    user.role === 'seller' &&
-                                                    <>
-                                                        <tr>
-                                                            <td><span>Buyer Note:</span></td>
-                                                            <td><span>{order?.sellerNote !== '' ? order?.sellerNote : 'Note is empty'}</span></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-                                                                <div>
-                                                                    <p>{orderCancelText}</p>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>
-
-                                                                <div className='request-cancel-box'>
-                                                                    {
-                                                                        order?.cancellationRequestedBy === 'seller' &&
-                                                                        <span>Order cancellation request has been sent. Waiting for buyer's response...</span>
-                                                                    }
-                                                                    {
-                                                                        order?.cancellationRequestedBy === 'buyer' &&
-                                                                        <>
-                                                                            <span>Buyer has requested to cancel this order</span>
-                                                                            <button onClick={acceptOrderCancelHandler}>Accept</button>
-                                                                            <button onClick={rejectOrderCancelHandler}>Decline</button>
-                                                                        </>
-                                                                    }
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    </>
-                                                }
-
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                } */}
-
-                                {/* CANCEL BUTTON */}
-
-                                {/* <div className='order-cancel'>
-                                    {
-                                        order?.status !== 'cancelled' && order?.status !== 'completed' && order?.status !== 'requested' && order?.status !== 'Declined' && order?.status !== 'request-cancellation' &&
-                                        !showTextBox &&
-                                        <button className='cancel-btn' onClick={() => setShowTextBox(true)}>Cancel Order</button>
-                                    }
-                                    {
-                                        showTextBox &&
-                                        <div className='order-cancel-reason-container'>
-                                            <div className="title">
-                                                Why do you want to cancel this order ?
-                                            </div>
-                                            <textarea name="" id="" onChange={handleCancelNote} value={textAreaCancelNote} placeholder='Explain in detail...'></textarea>
-                                            <div className="order-cancel-action-btns">
-                                                <button className='hide-btn' onClick={() => setShowTextBox(false)}>Hide</button>
-                                                <button className='cancel-btn' onClick={cancelOrderRequestHandler}>Request Cancellation</button>
-                                            </div>
-                                        </div>
-                                    }
-
-                                </div> */}
-
-                                {/* Review Space */}
-                                {/* {
-                                    order?.status === 'completed' && user.role === 'buyer' &&
-                                    <>
-                                        {
-                                            isReviewed || order.isReviewed ?
-                                                <div className="buyer-review-container">
-                                                    <div className="thanks-msg">
-                                                        Thank you for reviewing this gig! Your feedback helps the seller serve better.
-                                                    </div>
-                                                    <div className="review-subtitle">
-                                                        Your review:
-                                                    </div>
-                                                    <div className='review-rating-and-timestamp'>
-                                                        <div className="review-rating">
-                                                            Rating:
-                                                            <Rating name="read-only" value={rating} readOnly />
-                                                        </div>
-                                                        <div className="review-submittedAt">
-                                                            Reviewed At: {reviewDate}
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <textarea name="" id="" disabled placeholder='Share your experience...' value={comment} onChange={(e) => setComment(e.target.value)}>
-                                                        </textarea>
-                                                    </div>
-                                                </div>
-
-                                                :
-                                                <div className="buyer-review-container">
-                                                    <div className="review-title">
-                                                        Leave seller a review...
-                                                    </div>
-
-                                                    <div className='review-rating'>
-                                                        Rating:
-                                                        <Rating
-                                                            name="simple-controlled"
-                                                            value={rating}
-                                                            onChange={(event, newValue) => {
-                                                                setRating(newValue)
-                                                            }}
-                                                            defaultValue={0}
-                                                            precision={0.5}
-                                                        />
-                                                    </div>
-
-                                                    <div>
-                                                        <textarea name="" id="" placeholder='Share your experience...' value={comment} onChange={(e) => setComment(e.target.value)}>
-                                                        </textarea>
-                                                        <button onClick={submitReviewHandler}>Submit</button>
-                                                    </div>
-                                                </div>
-                                        }
-                                    </>
-                                }
-
-                                {
-                                    order?.status === 'completed' && user.role === 'seller' &&
-                                    <>
-                                        {
-                                            isBuyerRated || order?.isBuyerRated ?
-                                                <div className="buyer-review-container">
-                                                    <div className="review-title">
-                                                        Thanks for rating the buyer!
-                                                    </div>
-                                                    <div className='review-rating'>
-                                                        Rating:
-                                                        <Rating name="read-only" value={rating || order?.buyerRating} readOnly />
-                                                    </div>
-                                                </div>
-                                                :
-                                                <div className="buyer-review-container">
-                                                    <div className="review-title">
-                                                        Give buyer a rating:
-                                                    </div>
-                                                    <div className='review-rating'>
-                                                        Rating:
-                                                        <Rating
-                                                            name="simple-controlled"
-                                                            value={rating}
-                                                            onChange={(event, newValue) => {
-                                                                setRating(newValue)
-                                                            }}
-                                                            defaultValue={0}
-                                                            precision={0.5}
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <button onClick={submitBuyerRatingHandler}>Submit</button>
-                                                    </div>
-                                                </div>
-                                        }
-                                    </>
-                                } */}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                
             </div>
         </div>
     )

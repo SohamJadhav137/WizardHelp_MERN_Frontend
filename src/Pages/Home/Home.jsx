@@ -29,6 +29,7 @@ export default function Home() {
   return (
     <>
     {/****************************************** FLYER SECTION ********************************************/}
+    <div className="dark">
       <div className='flyer'>
         <div className="container">
           <div className="text">
@@ -41,6 +42,7 @@ export default function Home() {
     {/****************************************** CATEGORIES SECTION ********************************************/}
     
     <SliderWindow/>
+    </div>
 
     {/****************************************** FEATURES SECTION ********************************************/}
       <div className="container2">
