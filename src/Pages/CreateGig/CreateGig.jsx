@@ -787,7 +787,7 @@ export default function CreateGig() {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <textarea ref={textareaRef} maxLength={MAX_CHARS} name="description" id="gig-desc" className='desc' onChange={handleDescriptionChange} value={formData.description} placeholder='Explain your gig in detail...'></textarea>
+                                            <textarea ref={textareaRef} maxLength={MAX_CHARS} name="description" id="gig-desc" className='desc' onChange={handleDescriptionChange} value={formData.description} placeholder='Explain your gig in detail... (It is recommended to copy paste gig description content from a TEXT EDITOR for formatting purpose)'></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -796,7 +796,6 @@ export default function CreateGig() {
                                     <button className='btn next' type='button' onClick={nextStep}>Next</button>
                                 </div>
                             </>
-
                         }
 
                         {/* GIG VISUALS */}
