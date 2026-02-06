@@ -280,6 +280,7 @@ export default function Signup() {
           title: 'Error',
           text: 'Ritual Failed. Try again!',
           icon: 'error',
+          confirmButtonColor: '#018790',
           customClass: {
             popup: 'swal-custom-popup',
             title: 'swal-custom-title'

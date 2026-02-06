@@ -47,6 +47,7 @@ export default function MyGig() {
             text: "This action cannot be undone!",
             icon: "warning",
             showCancelButton: true,
+            confirmButtonColor: "#018790",
             confirmButtonText: "Delete",
             cancelButtonText: "Cancel",
             customClass: {
@@ -71,6 +72,7 @@ export default function MyGig() {
                     title: "Gig Deleted",
                     text: "Your gig was deleted successfully!",
                     icon: "success",
+                    confirmButtonColor: "#018790",
                     customClass: {
                         popup: 'swal-custom-popup',
                         title: 'swal-custom-title'
@@ -82,6 +84,7 @@ export default function MyGig() {
                     title: "Error",
                     text: "Failed to delete the gig!",
                     icon: "error",
+                    confirmButtonColor: "#018790",
                     customClass: {
                         popup: 'swal-custom-popup',
                         title: 'swal-custom-title'
@@ -145,6 +148,7 @@ export default function MyGig() {
                 title: "Gig Status Updated!",
                 text: `Gig has been ${newState ? "published" : "revoked"} successfully.`,
                 icon: "success",
+                confirmButtonColor: "#018790",
                 customClass: {
                     popup: 'swal-custom-popup',
                     title: 'swal-custom-title'
@@ -161,6 +165,7 @@ export default function MyGig() {
                 title: "Error",
                 text: "Failed to switch gig status!",
                 icon: "error",
+                confirmButtonColor: "#018790",
                 customClass: {
                     popup: 'swal-custom-popup',
                     title: 'swal-custom-title'

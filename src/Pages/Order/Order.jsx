@@ -192,6 +192,7 @@ export default function Order() {
             },
             showCancelButton: true,
             confirmButtonText: 'Decline Order',
+            confirmButtonColor: "#018790",
             cancelButtonText: 'Cancel',
             cancelButtonColor: '#d33',
             inputValidator: (value) => {
@@ -472,7 +473,7 @@ export default function Order() {
                 icon: 'error',
                 title: 'No files uploaded',
                 text: 'Please upload atleast one file to deliver a order.',
-                confirmButtonColor: '#005461',
+                confirmButtonColor: "#018790",
                 customClass: {
                     popup: 'swal-custom-popup',
                     title: 'swal-custom-title'
@@ -532,7 +533,8 @@ export default function Order() {
                         customClass: {
                             popup: 'swal-custom-popup',
                             title: 'swal-custom-title'
-                        }
+                        },
+                        confirmButtonColor: "#018790",
                     });
                     return;
                 }
@@ -556,6 +558,7 @@ export default function Order() {
                         icon: "success",
                         title: "Order Delivered",
                         text: "Now waiting for buyer's approval.",
+                        confirmButtonColor: "#018790",
                         customClass: {
                             popup: 'swal-custom-popup',
                             title: 'swal-custom-title'
@@ -571,7 +574,8 @@ export default function Order() {
                         customClass: {
                             popup: 'swal-custom-popup',
                             title: 'swal-custom-title'
-                        }
+                        },
+                        confirmButtonColor: "#018790",
                     });
                 }
 
@@ -628,6 +632,7 @@ export default function Order() {
                         title: "Order Completed",
                         text: "You can now rate the seller and leave a review.",
                         confirmButtonText: "Ok",
+                        confirmButtonColor: "#018790",
                         customClass: {
                             popup: 'swal-custom-popup',
                             title: 'swal-custom-title'
@@ -766,7 +771,8 @@ export default function Order() {
                     customClass: {
                         popup: 'swal-custom-popup',
                         title: 'swal-custom-title'
-                    }
+                    },
+                    confirmButtonColor: "#018790",
                 });
             }
         }
@@ -833,8 +839,8 @@ export default function Order() {
             showCancelButton: true,
             confirmButtonText: "Cancel order",
             cancelButtonText: "Keep order",
-            confirmButtonColor: "#16a34a", // green
-            cancelButtonColor: "#6b7280",  // gray
+            confirmButtonColor: "#018790",
+            cancelButtonColor: "#6b7280",
             customClass: {
                 popup: 'swal-custom-popup',
                 title: 'swal-custom-title'
@@ -876,11 +882,11 @@ export default function Order() {
                     title: "Order Cancelled",
                     text: "The order has been cancelled successfully.",
                     icon: "success",
+                    confirmButtonColor: "#018790",
                     customClass: {
                         popup: 'swal-custom-popup',
                         title: 'swal-custom-title'
-                    },
-                    confirmButtonColor: "#16a34a"
+                    }
                 });
 
             }
@@ -897,6 +903,7 @@ export default function Order() {
                     popup: 'swal-custom-popup',
                     title: 'swal-custom-title'
                 },
+                confirmButtonColor: "#018790",
                 icon: "error"
             });
         }
@@ -949,11 +956,11 @@ export default function Order() {
                     title: "Request Rejected",
                     text: "The order will continue as before.",
                     icon: "success",
+                    confirmButtonColor: "#018790",
                     customClass: {
                         popup: 'swal-custom-popup',
                         title: 'swal-custom-title'
-                    },
-                    confirmButtonColor: "#dc2626"
+                    }
                 });
             }
             else {
@@ -965,6 +972,7 @@ export default function Order() {
             Swal.fire({
                 title: "Something went wrong",
                 text: error.message,
+                confirmButtonColor: "#018790",
                 customClass: {
                     popup: 'swal-custom-popup',
                     title: 'swal-custom-title'
@@ -984,6 +992,7 @@ export default function Order() {
                 icon: 'info',
                 title: 'Rating is empty!',
                 text: 'Please give rating before submitting the review',
+                confirmButtonColor: "#018790",
                 customClass: {
                     popup: 'swal-custom-popup',
                     title: 'swal-custom-title'
@@ -996,6 +1005,7 @@ export default function Order() {
                 icon: 'info',
                 title: 'Comment is empty!',
                 text: 'Please write comment before submitting the review',
+                confirmButtonColor: "#018790",
                 customClass: {
                     popup: 'swal-custom-popup',
                     title: 'swal-custom-title'

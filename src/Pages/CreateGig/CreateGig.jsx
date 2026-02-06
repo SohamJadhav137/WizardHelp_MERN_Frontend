@@ -237,6 +237,7 @@ export default function CreateGig() {
                 icon: "error",
                 title: "Image too large",
                 text: "Each image must be under 2MB",
+                confirmButtonColor: "#018790",
                 customClass: {
                     popup: 'swal-custom-popup',
                     title: 'swal-custom-title'
@@ -290,6 +291,7 @@ export default function CreateGig() {
                 icon: "error",
                 title: "Video too large",
                 text: "Video must be under 10MB",
+                confirmButtonColor: "#018790",
                 customClass: {
                     popup: 'swal-custom-popup',
                     title: 'swal-custom-title'
@@ -417,6 +419,7 @@ export default function CreateGig() {
                     title: "Upload Error",
                     text: "Failed to upload image!",
                     icon: "error",
+                    confirmButtonColor: "#018790",
                     customClass: {
                         popup: 'swal-custom-popup',
                         title: 'swal-custom-title'
@@ -437,6 +440,7 @@ export default function CreateGig() {
                     title: "Upload Error",
                     text: "Failed to upload video!",
                     icon: "error",
+                    confirmButtonColor: "#018790",
                     customClass: {
                         popup: 'swal-custom-popup',
                         title: 'swal-custom-title'
@@ -475,6 +479,7 @@ export default function CreateGig() {
                 title: "Gig Created!",
                 text: "Your gig was saved to My Gigs",
                 icon: "success",
+                confirmButtonColor: "#018790",
                 customClass: {
                     popup: 'swal-custom-popup',
                     title: 'swal-custom-title'
@@ -490,6 +495,7 @@ export default function CreateGig() {
                 title: "Gig Creation Error!",
                 text: "Failed to create your gig",
                 icon: "error",
+                confirmButtonColor: "#018790",
                 customClass: {
                     popup: 'swal-custom-popup',
                     title: 'swal-custom-title'
@@ -532,6 +538,7 @@ export default function CreateGig() {
                             title: "Upload Error",
                             text: "Failed to upload image!",
                             icon: "error",
+                            confirmButtonColor: "#018790",
                             customClass: {
                                 popup: 'swal-custom-popup',
                                 title: 'swal-custom-title'
@@ -555,6 +562,7 @@ export default function CreateGig() {
                             title: "Upload Error",
                             text: "Failed to upload video!",
                             icon: "error",
+                            confirmButtonColor: "#018790",
                             customClass: {
                                 popup: 'swal-custom-popup',
                                 title: 'swal-custom-title'
@@ -602,6 +610,7 @@ export default function CreateGig() {
                     title: "Gig Edited!",
                     text: "Gig updated with new values",
                     icon: "success",
+                    confirmButtonColor: "#018790",
                     customClass: {
                         popup: 'swal-custom-popup',
                         title: 'swal-custom-title'
@@ -616,6 +625,7 @@ export default function CreateGig() {
                     title: "Gig Edit Failed!",
                     text: "Some error occured while updating gig",
                     icon: "error",
+                    confirmButtonColor: "#018790",
                     customClass: {
                         popup: 'swal-custom-popup',
                         title: 'swal-custom-title'

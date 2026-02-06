@@ -85,6 +85,7 @@ export default function OrderCheckOut() {
                     title: "Order Placed!",
                     text: "Your order has been sent to the seller.",
                     icon: "success",
+                    confirmButtonColor: "#018790",
                     customClass: {
                         popup: 'swal-custom-popup',
                         title: 'swal-custom-title'
@@ -98,6 +99,7 @@ export default function OrderCheckOut() {
                     title: response.status,
                     text: "Failed to create order!",
                     icon: "error",
+                    confirmButtonColor: "#018790",
                     customClass: {
                         popup: 'swal-custom-popup',
                         title: 'swal-custom-title'
