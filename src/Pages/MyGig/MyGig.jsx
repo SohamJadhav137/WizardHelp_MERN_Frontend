@@ -211,7 +211,7 @@ export default function MyGig() {
                                 userGigs.length === 0 ?
                                     <div className="my-gigs-empty-text">
                                         <DotLottieReact
-                                            src="https://lottie.host/208a807b-5d86-4535-8187-233164c645d7/n2yqo67dnS.lottie"
+                                            src="/animations/no-gigs-created.lottie"
                                             loop
                                             autoplay
                                             style={{ height: "350px" }}

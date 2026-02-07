@@ -267,8 +267,9 @@ export default function Signup() {
             title: 'swal-custom-title'
           },
           iconColor: '#018790',
+          confirmButtonColor: '#018790',
           showConfirmButton: true,
-          timer: 3000, // Optional: automatically closes after 3 seconds
+          timer: 4000, // Optional: automatically closes after 3 seconds
           timerProgressBar: true,
           background: '#ffffff'
         });
