@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 
-import './signup.scss';
+import './Signup.scss';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../context/AuthContext';
 import countries from '../../../Data/Countries';

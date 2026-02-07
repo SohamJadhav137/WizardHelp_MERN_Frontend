@@ -1,6 +1,5 @@
 import React, { useContext, useState } from 'react'
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
-import './login.scss';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../context/AuthContext';
 
