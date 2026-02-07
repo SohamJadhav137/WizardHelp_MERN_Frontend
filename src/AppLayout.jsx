@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from 'react'
-import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import NavBar from './shared/NavBar/NavBar';
-import Footer from './shared/Footer/footer';
+import Footer from './shared/Footer/Footer';
 import Home from './Pages/Home/Home';
 import Gigs from './Pages/Gigs/Gigs';
 import Orders from './Pages/Orders/Orders';
