@@ -153,13 +153,15 @@
 
                 .about-gig-title{
                     padding: 10px 0px;
-                    font-size: 27px;
+                    font-size: 30px;
                     font-weight: 700;
                 }
             }
 
             .title{
                 padding: 25px 0px;
+                font-size: 27px;
+                font-weight: 500;
             }
 
 
@@ -167,6 +169,8 @@
                 width: 100%;
                 display: flex;
                 flex-direction: column;
+                gap: 18px;
+                padding-bottom: 30px;
 
                 .reviews-empty-div{
                     width: 100%;
@@ -184,7 +188,6 @@
                     border: 1px solid gray;
                     border-radius: 15px;
                     padding: 10px;
-                    margin-bottom: 50px;
 
                     hr{
                         border: 1px solid gray;
@@ -212,7 +215,7 @@
                     }
 
                     .customer-review{
-                        margin-top: 10px;
+                        padding: 10px 15px;
                     }
 
                     .other-details{
@@ -270,6 +273,7 @@
             flex: 1;
             position: sticky;
             top: 5.788rem;
+            padding-bottom: 30px;
 
             hr{
                 border: 1px solid rgb(189, 188, 188);
