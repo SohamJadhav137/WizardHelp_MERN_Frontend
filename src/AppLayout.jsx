@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from 'react'
-import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import NavBar from './shared/NavBar/NavBar';
 import Footer from './shared/Footer/Footer';
 import Home from './Pages/Home/Home';
@@ -95,6 +95,8 @@ export default function AppLayout() {
                         <Route path="/my-profile/edit" element={<PrivateRoute><EditProfile /></PrivateRoute>} />
                         <Route path="/user/:id" element={<Profile />} />
                         <Route path="/gig/:gigId/order-checkout" element={<PrivateRoute><OrderCheckOut /></PrivateRoute>} />
+
+                        <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
                 </div>
                 <Footer />
