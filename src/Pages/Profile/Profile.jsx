@@ -245,8 +245,8 @@ export default function Profile() {
             if (saveImage.ok) {
 
                 updateUser({ profilePic: finalImageUrl });
+                setUserInfo(prev => ({ ...prev, profilePic: finalImageUrl }));
                 setProfilePhoto(prev => ({ ...(prev || {}), imageUrl: finalImageUrl }));
-                // setIsPicMenuOpen(false);
                 console.log("Profile photo after upload:\n", userInfo?.profilePic);
             }
             else {
