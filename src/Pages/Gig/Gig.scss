@@ -108,7 +108,8 @@
                     overflow-x: auto;
                     background-color: lightgray;
                     display: flex;
-                    flex-direction: row;
+                    gap: 7px;
+                    padding: 5px;
                     
                     .gig-thumbnail{
                         flex-shrink: 0;
