@@ -230,7 +230,7 @@ export default function MyGig() {
                                     <table>
                                         <thead>
                                             <tr>
-                                                <th>Cover-Img</th>
+                                                <th>Thumbnail</th>
                                                 <th>Gig</th>
                                                 <th>Price</th>
                                                 <th>Orders</th>

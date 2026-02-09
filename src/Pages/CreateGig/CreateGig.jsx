@@ -367,25 +367,6 @@ export default function CreateGig() {
 
     const [errors, setErrors] = useState([]);
 
-    // const validateForm = () => {
-    //     const { title, category, description, imageURLs, price, deliveryDays, revisions } = formData
-
-    //     if (!title.trim()) errors.push("Title field is empty!");
-    //     if (!category || category === '') errors.push("Category is required!")
-    //     if (!description.trim()) errors.push("Description is empty!");
-    //     if (selectedImage.length === 0) errors.push("Atleast one image is required!");
-    //     if (!price || isNaN(price) || price < 0) errors.push("Enter valid price!");
-    //     if (!deliveryDays || isNaN(deliveryDays) || deliveryDays < 0) errors.push("Enter valid number for days!");
-    //     if (!revisions || isNaN(revisions) || revisions < 0) errors.push("Enter valid number for revisions!");
-
-    //     console.log("Form errors:", errors)
-
-    //     if (errors.length > 0)
-    //         return false;
-
-    //     return true;
-    // }
-
     const gigStateSubmissionHandler = (shouldPublish) => {
         setGigPublishStatus(shouldPublish);
     };
@@ -821,7 +802,7 @@ export default function CreateGig() {
                                             <div>[Max files: 5 | Size limit: 2MB]</div>
                                             </div>
                                             <div className='right'>
-                                               <Info /> First image is considered as cover-image
+                                               <Info /> First image is considered as thumbnail
                                             </div>
                                         </div>
                                         <input type="file" id='gig-images' onChange={uploadImageHandler} className='img-inp-hide' accept='image/*' disabled={isUploading} />

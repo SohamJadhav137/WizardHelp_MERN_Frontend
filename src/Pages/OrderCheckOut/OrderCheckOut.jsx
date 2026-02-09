@@ -97,7 +97,7 @@ export default function OrderCheckOut() {
             }
             else {
                 Swal.fire({
-                    title: response.status,
+                    title: 'Error',
                     text: "Failed to create order!",
                     icon: "error",
                     confirmButtonColor: "#018790",
