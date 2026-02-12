@@ -257,7 +257,12 @@ export default function Orders() {
                 style={{ height: "350px" }}
               />
             </div>
-            You haven't placed any orders yet...
+            {
+              user.role === 'buyer' ?
+              "You haven't placed any orders yet..."
+              :
+              "You haven't received any orders yet..."
+            }
           </div>
         ) : detailsLoad ? (
           /* Orders loading */
