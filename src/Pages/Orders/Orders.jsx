@@ -211,7 +211,7 @@ export default function Orders() {
       ? filteredOrders
       : filteredOrders.filter(order => {
         const gigTitle =
-          order.gigId.title?.toLowerCase() || "";
+          orderDetails[order._id]?.gigTitle?.toLowerCase() || "";
 
         const fullOrderId = order._id.toLowerCase();
         const shortOrderId = order._id.slice(-6).toLowerCase();
